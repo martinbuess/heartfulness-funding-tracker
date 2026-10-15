@@ -1,76 +1,64 @@
-"""One-off check of candidate sources: reachable? allowed by robots.txt? what comes back?"""
-import json, urllib.request, urllib.robotparser, urllib.parse, urllib.error
+"""Second check: robots.txt rules, permitted feeds, and the EU search filters."""
+import json, urllib.request, urllib.robotparser
 
 UA = "Mozilla/5.0 (compatible; heartfulness-funding-tracker; +https://github.com/martinbuess/heartfulness-funding-tracker)"
-SEDIA = "https://api.tech.ec.europa.eu/search-api/prod/rest/search?apiKey=SEDIA&text=***&pageSize=5&pageNumber=1"
-SEDIA_QUERY = {"bool": {"must": [{"terms": {"type": ["1", "2", "8"]}}, {"terms": {"status": ["31094501", "31094502"]}}]}}
-URLS = [
-    "https://www2.fundsforngos.org/wp-json/wp/v2/posts?per_page=2&_fields=id,title",
-    "https://terravivagrants.org/wp-json/wp/v2/posts?per_page=3&_fields=id,date,link,title",
-    "https://www.terravivagrants.org/feed/",
-    "https://www.hclfoundation.org/hcltech-grant",
-    "https://www.wiprofoundation.org/upcoming-grants-alert/",
-    "https://www.wiprofoundation.org/ecology_programs/community-ecology-program/",
-    "https://www.unep.org/gan/node/14",
-    "https://sgp.undp.org/",
-    "https://www.darwininitiative.org.uk/apply/",
-    "https://www.cepf.net/grants/open-calls-for-proposals",
-    "https://www.indiawaterportal.org/opportunities",
-    "https://www.international-climate-initiative.com/en/find-funding/",
-    "https://www.keidanren.net/kncf/fund/project",
-    "https://www.welthungerhilfe.org/global-food-system-challenge/your-application",
-    "https://www.speciesconservation.org/grants/",
-    "https://whitleyaward.org/apply-for-conservation-funding/apply-for-a-whitley-award/",
-]
-robots = {}
-
-def allowed(url):
-    p = urllib.parse.urlsplit(url)
-    base = f"{p.scheme}://{p.netloc}"
-    if base not in robots:
-        rp = urllib.robotparser.RobotFileParser(base + "/robots.txt")
-        try:
-            req = urllib.request.Request(base + "/robots.txt", headers={"User-Agent": UA})
-            with urllib.request.urlopen(req, timeout=30) as r:
-                rp.parse(r.read().decode("utf-8", "replace").splitlines())
-        except urllib.error.HTTPError as e:
-            rp.allow_all = e.code >= 400 and e.code not in (401, 403)
-            rp.disallow_all = e.code in (401, 403)
-        except Exception as e:
-            rp = f"robots error: {e}"
-        robots[base] = rp
-    rp = robots[base]
-    return rp if isinstance(rp, str) else rp.can_fetch(UA, url)
+out = {}
 
 def get(url, data=None, headers=None):
     req = urllib.request.Request(url, data=data, headers={"User-Agent": UA, **(headers or {})})
     with urllib.request.urlopen(req, timeout=60) as r:
         return r.status, r.headers.get("Content-Type", ""), r.read()
 
-out = []
-for url in URLS:
-    row = {"url": url, "robots_allowed": allowed(url)}
+for host in ["https://www2.fundsforngos.org", "https://www.hclfoundation.org", "https://terravivagrants.org",
+             "https://www.terravivagrants.org", "https://www.indiawaterportal.org"]:
     try:
-        status, ctype, body = get(url)
-        text = body.decode("utf-8", "replace")
-        row.update(status=status, type=ctype, bytes=len(body), start=" ".join(text[:400].split()))
+        out[host + "/robots.txt"] = get(host + "/robots.txt")[2].decode("utf-8", "replace")[:3000]
     except Exception as e:
-        row["error"] = str(e)[:300]
-    out.append(row)
+        out[host + "/robots.txt"] = f"ERROR {e}"
 
-# EU Funding & Tenders public search: multipart form with a "query" part.
-row = {"url": SEDIA, "robots_allowed": allowed(SEDIA)}
-try:
+checks = {}
+for host, paths in {"https://www2.fundsforngos.org": ["/feed/", "/category/latest-funds-for-ngos/feed/",
+                     "/tag/india/feed/", "/category/environment-2/feed/", "/wp-json/wp/v2/posts", "/?s=india&feed=rss2",
+                     "/latest-funds-for-ngos/"],
+                    "https://www.hclfoundation.org": ["/hcltech-grant", "/"],
+                    "https://www.terravivagrants.org": ["/feed/", "/wp-json/wp/v2/posts"]}.items():
+    rp = urllib.robotparser.RobotFileParser(host + "/robots.txt")
+    rp.parse(out[host + "/robots.txt"].splitlines() if not out[host + "/robots.txt"].startswith("ERROR") else [])
+    for p in paths:
+        row = {"robots_allowed": rp.can_fetch(UA, host + p)}
+        try:
+            status, ctype, body = get(host + p)
+            row.update(status=status, type=ctype, bytes=len(body),
+                       items=body.count(b"<item>"), start=" ".join(body[:300].decode("utf-8", "replace").split()))
+        except Exception as e:
+            row["error"] = str(e)[:200]
+        checks[host + p] = row
+out["checks"] = checks
+
+# EU search: open (31094501) and forthcoming (31094502) calls; inspect fields.
+SEDIA = "https://api.tech.ec.europa.eu/search-api/prod/rest/search?apiKey=SEDIA&text={text}&pageSize=20&pageNumber=1"
+def sedia(text, query):
     boundary = "----fbhprobe"
-    body = (f"--{boundary}\r\nContent-Disposition: form-data; name=\"query\"; filename=\"blob\"\r\n"
-            f"Content-Type: application/json\r\n\r\n{json.dumps(SEDIA_QUERY)}\r\n--{boundary}--\r\n").encode()
-    status, ctype, data = get(SEDIA, data=body, headers={"Content-Type": f"multipart/form-data; boundary={boundary}"})
-    j = json.loads(data)
-    row.update(status=status, total=j.get("totalResults"),
-               sample=[{"title": (r.get("metadata", {}).get("title") or [r.get("summary")])[0],
-                        "keys": sorted(r.get("metadata", {}).keys())[:40]} for r in j.get("results", [])[:3]])
-except Exception as e:
-    row["error"] = str(e)[:300]
-out.append(row)
+    parts = ""
+    for name, value in (("query", query), ("languages", ["en"])):
+        parts += (f"--{boundary}\r\nContent-Disposition: form-data; name=\"{name}\"; filename=\"blob\"\r\n"
+                  f"Content-Type: application/json\r\n\r\n{json.dumps(value)}\r\n")
+    body = (parts + f"--{boundary}--\r\n").encode()
+    status, ctype, data = get(SEDIA.format(text=text), data=body,
+                              headers={"Content-Type": f"multipart/form-data; boundary={boundary}"})
+    return json.loads(data)
+
+q = {"bool": {"must": [{"terms": {"type": ["1", "2", "8"]}}, {"terms": {"status": ["31094501", "31094502"]}}]}}
+res = {}
+for text in ["***", "restoration", "biodiversity India", "agroforestry"]:
+    try:
+        j = sedia(text, q)
+        res[text] = {"total": j.get("totalResults"), "sample": [
+            {k: r.get("metadata", {}).get(k) for k in ("identifier", "title", "callTitle", "status", "type", "deadlineDate",
+                                                     "startDate", "frameworkProgramme", "budgetOverview", "links")}
+            | {"url": r.get("url"), "summary": (r.get("summary") or "")[:200]}
+            for r in j.get("results", [])[:4]]}
+    except Exception as e:
+        res[text] = {"error": str(e)[:300]}
+out["sedia"] = res
 json.dump(out, open("probe_results.json", "w"), indent=1, default=str)
-print(json.dumps(out, indent=1, default=str)[:3000])
