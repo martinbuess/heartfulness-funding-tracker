@@ -36,7 +36,8 @@ _CALL = re.compile(r"\b(apply|applications?|call for|proposals?|deadline|last da
 _OPEN = re.compile(r"applications? (are )?(now )?open|now accepting|apply now|apply (here|online|today)|"
                    r"call for (proposals|applications) (is )?(now )?open|open for applications", re.IGNORECASE)
 _CLOSED = re.compile(r"applications? (are |is )?(now )?closed|closed for (applications|this)|no open calls?|"
-                     r"not accepting|call (is |has )?closed|currently closed", re.IGNORECASE)
+                     r"not accepting|currently closed|"
+                     r"(call|round|grants?|programme|program)( \w+)? (is |are |has |have )?(now )?(been )?closed", re.IGNORECASE)
 
 
 def page_text(page):

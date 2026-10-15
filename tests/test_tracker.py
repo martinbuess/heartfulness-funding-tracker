@@ -103,6 +103,7 @@ class EuFundingTest(unittest.TestCase):
         row = matches["HORIZON-MISS-2027-05-SOIL-03"]
         self.assertEqual(row["geography"], "EU call (India usually as partner only)")
         self.assertIn("partner may be needed", row["who_can_apply"])
+        self.assertLessEqual(int(row["fit_score"]), 2)
         self.assertEqual([r["source_id"] for r, _ in dropped], ["HORIZON-MISS-LAKES"])  # "European" in the title
 
 
@@ -119,6 +120,9 @@ class WatchTest(unittest.TestCase):
         self.assertIn("Applications are now closed", snippet)
         self.assertNotIn("planted trees", snippet)  # not about calls
         self.assertNotIn("Home Apply", snippet)  # menus are skipped
+
+    def test_closed_wording(self):
+        self.assertEqual(watch.read("<p>Round 32 is now closed. Apply next year.</p>", TODAY)[1], "Says closed")
 
     def test_flags_changes_and_failures(self):
         pages = [{"name": "Wipro", "url": "https://w"}, {"name": "Down", "url": "https://d"}]

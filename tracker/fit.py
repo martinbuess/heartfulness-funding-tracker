@@ -259,6 +259,9 @@ def assess(row, rules):
     bonus = 1 if pipeline and pipeline[1].lower() not in rules.no_bonus else 0
 
     score = max(1, min(5, program + geo_points + app_points + size_points + bonus))
+    if geo.startswith("EU call"):
+        # European-led research consortia: rarely a realistic route for FBH, so never above 2.
+        score = min(score, 2)
 
     if geo == "India named":
         confirmed.append("India named")
@@ -274,6 +277,8 @@ def assess(row, rules):
     where = "title" if in_title else "description"
     reason = [f"Matches {match} ({where})" if match else "Hand-picked program",
               geo, who, size_note]
+    if geo.startswith("EU call"):
+        reason.append("EU calls are capped at 2: FBH could usually only join a European-led consortium")
     if pipeline:
         reason.append(f"{pipeline[0]} is in our pipeline ({pipeline[1] or 'no status'})")
     row.update({
