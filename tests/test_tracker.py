@@ -105,11 +105,21 @@ class FbhProfileTest(unittest.TestCase):
         scores = [int(r["fit_score"]) for r in profile.apply(PROFILE, _ffn_rows())]
         self.assertEqual(scores, sorted(scores, reverse=True))
 
-    def test_watchlist_funder_adds_a_point(self):
-        prof = dict(PROFILE, watchlist={"funders": ["Example Climate Foundation"]})
+    def test_watchlist_funder_shows_status(self):
+        prof = dict(PROFILE, watchlist={"no_bonus_statuses": ["Discarded"], "funders": [
+            {"name": "Example Climate Foundation", "status": "Contacted", "match": ["Example Climate Foundation"]},
+            {"name": "Nature Fund", "status": "Discarded", "match": ["Nature-based Solutions Fund"]}]})
         rows = {r["source_id"]: r for r in profile.apply(prof, _ffn_rows())}
-        self.assertEqual(rows["1"]["in_pipeline"], "Yes")
-        self.assertIn("pipeline", rows["1"]["fit_reason"])
+        self.assertEqual(rows["1"]["in_pipeline"], "Example Climate Foundation: Contacted")
+        self.assertIn("in our pipeline", rows["1"]["fit_reason"])
+        self.assertEqual(rows["10"]["in_pipeline"], "Nature Fund: Discarded")
+        self.assertEqual(rows["10"]["fit_score"], "2")  # no bonus for a discarded funder
+
+    def test_pipeline_names_match_whole_words_only(self):
+        rules = fit.Rules(PROFILE)
+        hits = lambda text: [name for name, _, p in rules.watchlist if p.search(text)]
+        self.assertIn("Tata Trusts", hits("A call from Tata Trusts for water NGOs"))
+        self.assertEqual(hits("Restoring forests in the Amazon basin near San Francisco"), [])
 
     def test_grants_gov_keeps_only_foreign_eligible_nonprofit_grants(self):
         rows = plain.add(grantsgov.collect(TODAY, xml_source=SAMPLE))
@@ -170,7 +180,15 @@ class CalendarTest(unittest.TestCase):
     def test_repo_calendar_file_parses(self):
         rows = programs.read_mirror(os.path.join(HERE, "..", "data", "calendar.csv"))
         self.assertTrue(rows)
-        self.assertTrue(all(r["program"] and r["link"].startswith("https://") for r in rows))
+        self.assertGreaterEqual(len(rows), 15)
+        self.assertTrue(all(r["program"] and (not r["link"] or r["link"].startswith("https://")) for r in rows))
+
+    def test_sheet_column_names_are_understood(self):
+        rows = programs.parse("Program,Run by,Link,Opens,Closes,Cadence,Amount (USD),Criteria,Comments\n"
+                              "IKI Medium Grants,IKI,https://x,2026-10-13 00:00:00,2027-01-12,Yearly,€300k,Climate,Lead needed\n")
+        row = programs.collect(TODAY, rows=rows)[0]
+        self.assertEqual((row["post_date"], row["close_date"]), ("2026-10-13", "2027-01-12"))
+        self.assertIn("€300k", row["summary"])
 
 
 class RunTest(unittest.TestCase):

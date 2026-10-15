@@ -22,10 +22,16 @@ COLUMNS = ["program", "run_by", "kind", "opens", "closes", "rolling", "amount", 
 STALE_DAYS = 90
 
 
+# Other names the same columns go by (e.g. in the FBH Google Sheet's Calendar tab).
+ALIASES = {"amount_(usd)": "amount", "criteria": "about", "comments": "notes", "cadence": "usual_window",
+           "funder": "run_by", "deadline": "closes", "opening": "opens", "closing": "closes"}
+
+
 def parse(text):
     """Calendar rows from CSV text, with tidy keys; blank rows dropped."""
     reader = csv.DictReader(io.StringIO(text))
-    reader.fieldnames = [(f or "").strip().lower().replace(" ", "_") for f in reader.fieldnames or []]
+    names = [(f or "").strip().lower().replace(" ", "_") for f in reader.fieldnames or []]
+    reader.fieldnames = [ALIASES.get(n, n) for n in names]
     rows = []
     for row in reader:
         row = {k: (v or "").strip() for k, v in row.items() if k}
@@ -68,8 +74,8 @@ def load(url, path=MIRROR_PATH):
 
 
 def _date(text):
-    """Accept 2026-11-13 or 11/13/2026; blank when neither."""
-    for fmt in ("%Y-%m-%d", "%m/%d/%Y"):
+    """Accept 2026-11-13, 2026-11-13 00:00:00, 11/13/2026, 13-Nov-2026 or Nov 13, 2026; blank otherwise."""
+    for fmt in ("%Y-%m-%d", "%Y-%m-%d %H:%M:%S", "%m/%d/%Y", "%Y/%m/%d", "%d-%b-%Y", "%b %d, %Y", "%d %B %Y"):
         try:
             return datetime.datetime.strptime(text, fmt).date().isoformat()
         except ValueError:

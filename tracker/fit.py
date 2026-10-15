@@ -129,7 +129,15 @@ class Rules:
         self.priority_min = s.get("priority_min_usd", 50000)
         self.minimum = s.get("minimum_usd", 10000)
         self.usd_per = s.get("usd_per", {"USD": 1.0})
-        self.watchlist = [w.lower() for w in profile.get("watchlist", {}).get("funders", []) if w.strip()]
+        watch = profile.get("watchlist", {})
+        self.no_bonus = {s.lower() for s in watch.get("no_bonus_statuses", [])}
+        self.watchlist = []
+        for entry in watch.get("funders", []):
+            if isinstance(entry, str):  # a plain name is also accepted
+                entry = {"name": entry, "match": [entry]}
+            pattern = whole_words(entry.get("match") or [entry["name"]])
+            if pattern:
+                self.watchlist.append((entry["name"], entry.get("status", ""), pattern))
 
 
 def areas(row, rules):
@@ -226,10 +234,11 @@ def assess(row, rules):
         size_points, size_note = -1, f"smaller grant, about {_money(usd)}"
     if usd_text:
         size_note += f" (from \"{usd_text}\"; may be the total budget)"
-    funder_text = f"{row['funder']} {row['title']} {row['summary']}".lower()
-    pipeline = any(name in funder_text for name in rules.watchlist)
+    funder_text = f"{row['funder']} {row['title']} {row['summary']}"
+    pipeline = next(((name, status) for name, status, pattern in rules.watchlist if pattern.search(funder_text)), None)
+    bonus = 1 if pipeline and pipeline[1].lower() not in rules.no_bonus else 0
 
-    score = max(1, min(5, program + geo_points + app_points + size_points + (1 if pipeline else 0)))
+    score = max(1, min(5, program + geo_points + app_points + size_points + bonus))
 
     if geo == "India named":
         confirmed.append("India named")
@@ -246,7 +255,7 @@ def assess(row, rules):
     reason = [f"Matches {match} ({where})" if match else "Hand-picked program",
               geo, who, size_note]
     if pipeline:
-        reason.append("funder already in our pipeline")
+        reason.append(f"{pipeline[0]} is in our pipeline ({pipeline[1] or 'no status'})")
     row.update({
         "fbh_area": area_label,
         "geography": geo,
@@ -255,7 +264,7 @@ def assess(row, rules):
             "Confirmed: " + ", ".join(confirmed) if confirmed else "",
             "Verify: " + ", ".join(verify) if verify else ""])),
         "amount_usd": f"{usd:.0f}" if usd is not None else "",
-        "in_pipeline": "Yes" if pipeline else "",
+        "in_pipeline": f"{pipeline[0]}: {pipeline[1] or 'no status'}" if pipeline else "",
         "fit_score": str(score),
         "fit_reason": ". ".join(reason) + ".",
     })
