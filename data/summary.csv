@@ -1,26 +1,26 @@
 section,name,level,open,matches,set_aside,detail
 run,Last refresh,,,,,2026-10-15
-total,All sources,,1952,124,173,3 sources
-source,fundsforNGOs,Aggregator,529,94,103,"Grant calls for NGOs worldwide, read from the site's public post feed"
-source,Grants.gov,US federal,1416,23,70,US federal grants; only those open to foreign or international applicants are kept
+total,All sources,,1952,80,217,3 sources
+source,fundsforNGOs,Aggregator,529,71,126,"Grant calls for NGOs worldwide, read from the site's public post feed"
+source,Grants.gov,US federal,1416,2,91,US federal grants; only those open to foreign or international applicants are kept
 source,Calendar (hand-kept),Programs,7,7,0,"Yearly programs with no feed, kept by hand in data/calendar.csv or the sheet's Calendar tab"
-score,Fit 5,,,9,,
-score,Fit 4,,,13,,
-score,Fit 3,,,33,,
-score,Fit 2,,,34,,
-score,Fit 1,,,35,,
-area,Ecological restoration & biodiversity,,,51,,
-area,General environment / climate,,,45,,
-area,Water & watershed,,,28,,
-area,Agroforestry & regenerative agriculture,,,16,,
+score,Fit 5,,,5,,
+score,Fit 4,,,4,,
+score,Fit 3,,,17,,
+score,Fit 2,,,27,,
+score,Fit 1,,,27,,
+area,Ecological restoration & biodiversity,,,37,,
+area,General environment / climate,,,25,,
+area,Water & watershed,,,17,,
+area,Agroforestry & regenerative agriculture,,,10,,
 area,Biochar & carbon removal,,,2,,
-set_aside,geography,,,,129,
-set_aside,for individuals or events,,,,19,
-set_aside,too small,,,,13,
+set_aside,geography,,,,174,
+set_aside,for individuals or events,,,,21,
+set_aside,too small,,,,10,
 set_aside,not open to nonprofits (Grants.gov applicant types),,,,8,
 set_aside,for companies or start-ups,,,,3,
 set_aside,procurement,,,,1,
-new,New in the last 7 days,,,124,,
+new,New in the last 7 days,,,80,,
 archived,Closed or expired today,,,0,,moved to data/archive/
 calendar_check,Climate Transformation Fund — Nature & Decarbonization,,,,,Round closed; add next round's dates
 calendar_check,Women Entrepreneurs Award,,,,,Round closed; add next round's dates
