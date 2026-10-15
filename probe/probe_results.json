@@ -1,270 +1,407 @@
-[
- {
-  "url": "https://www2.fundsforngos.org/wp-json/wp/v2/posts?per_page=2&_fields=id,title",
-  "robots_allowed": false,
-  "status": 200,
-  "type": "application/json; charset=UTF-8",
-  "bytes": 222,
-  "start": "[{\"id\":499517,\"title\":{\"rendered\":\"Apply Now: Developing a Data Lab for Science with EOSC and RAISE\"}},{\"id\":499569,\"title\":{\"rendered\":\"CFAs: Transformative Change towards a Nature-positive Economy and Society Program\"}}]"
+{
+ "https://www2.fundsforngos.org/robots.txt": "ERROR HTTP Error 403: Forbidden",
+ "https://www.hclfoundation.org/robots.txt": "User-agent: *\nDisallow: /",
+ "https://terravivagrants.org/robots.txt": "User-agent: *\nDisallow: /wp-content/uploads/wc-logs/\nDisallow: /wp-content/uploads/woocommerce_transient_files/\nDisallow: /wp-content/uploads/woocommerce_uploads/\nDisallow: /*?add-to-cart=\nDisallow: /*?*add-to-cart=\nDisallow: /wp-admin/\nAllow: /wp-admin/admin-ajax.php\n\nSitemap: https://www.terravivagrants.org/sitemap_index.xml\n",
+ "https://www.terravivagrants.org/robots.txt": "User-agent: *\nDisallow: /wp-content/uploads/wc-logs/\nDisallow: /wp-content/uploads/woocommerce_transient_files/\nDisallow: /wp-content/uploads/woocommerce_uploads/\nDisallow: /*?add-to-cart=\nDisallow: /*?*add-to-cart=\nDisallow: /wp-admin/\nAllow: /wp-admin/admin-ajax.php\n\nSitemap: https://www.terravivagrants.org/sitemap_index.xml\n",
+ "https://www.indiawaterportal.org/robots.txt": "User-agent: *\nSitemap: https://www.indiawaterportal.org/sitemap.xml\nSitemap: https://www.indiawaterportal.org/news_sitemap.xml\nAllow: /",
+ "checks": {
+  "https://www2.fundsforngos.org/feed/": {
+   "robots_allowed": true,
+   "status": 200,
+   "type": "application/rss+xml; charset=UTF-8",
+   "bytes": 113078,
+   "items": 25,
+   "start": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><rss version=\"2.0\" xmlns:content=\"http://purl.org/rss/1.0/modules/content/\" xmlns:wfw=\"http://wellformedweb.org/CommentAPI/\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:atom=\"http://www.w3.org/2005/Atom\" xmlns:sy=\"http://purl.org/rss/1.0/modules/syndi"
+  },
+  "https://www2.fundsforngos.org/category/latest-funds-for-ngos/feed/": {
+   "robots_allowed": true,
+   "error": "HTTP Error 403: Forbidden"
+  },
+  "https://www2.fundsforngos.org/tag/india/feed/": {
+   "robots_allowed": true,
+   "error": "HTTP Error 403: Forbidden"
+  },
+  "https://www2.fundsforngos.org/category/environment-2/feed/": {
+   "robots_allowed": true,
+   "error": "HTTP Error 403: Forbidden"
+  },
+  "https://www2.fundsforngos.org/wp-json/wp/v2/posts": {
+   "robots_allowed": true,
+   "status": 200,
+   "type": "application/json; charset=UTF-8",
+   "bytes": 411234,
+   "items": 0,
+   "start": "[{\"id\":499517,\"date\":\"2026-10-15T11:06:15\",\"date_gmt\":\"2026-10-15T11:06:15\",\"guid\":{\"rendered\":\"https:\\/\\/www2.fundsforngos.org\\/?p=499517\"},\"modified\":\"2026-10-15T11:06:15\",\"modified_gmt\":\"2026-10-15T11:06:15\",\"slug\":\"horizon-europe-call-raise-2027-01-04-for-research-and-innovation-projects\",\"statu"
+  },
+  "https://www2.fundsforngos.org/?s=india&feed=rss2": {
+   "robots_allowed": true,
+   "error": "HTTP Error 403: Forbidden"
+  },
+  "https://www2.fundsforngos.org/latest-funds-for-ngos/": {
+   "robots_allowed": true,
+   "error": "HTTP Error 403: Forbidden"
+  },
+  "https://www.hclfoundation.org/hcltech-grant": {
+   "robots_allowed": false,
+   "status": 200,
+   "type": "text/html; charset=UTF-8",
+   "bytes": 162425,
+   "items": 0,
+   "start": "<!DOCTYPE html> <html lang=\"en\" dir=\"ltr\" prefix=\"content: http://purl.org/rss/1.0/modules/content/ dc: http://purl.org/dc/terms/ foaf: http://xmlns.com/foaf/0.1/ og: http://ogp.me/ns# rdfs: http://www.w3.org/2000/01/rdf-schema# schema: http://schema.org/ sioc: http://rdfs.org/sioc/ns# sioct"
+  },
+  "https://www.hclfoundation.org/": {
+   "robots_allowed": false,
+   "status": 200,
+   "type": "text/html; charset=UTF-8",
+   "bytes": 153171,
+   "items": 0,
+   "start": "<!DOCTYPE html> <html lang=\"en\" dir=\"ltr\" prefix=\"content: http://purl.org/rss/1.0/modules/content/ dc: http://purl.org/dc/terms/ foaf: http://xmlns.com/foaf/0.1/ og: http://ogp.me/ns# rdfs: http://www.w3.org/2000/01/rdf-schema# schema: http://schema.org/ sioc: http://rdfs.org/sioc/ns# sioct"
+  },
+  "https://www.terravivagrants.org/feed/": {
+   "robots_allowed": true,
+   "status": 200,
+   "type": "application/rss+xml; charset=UTF-8",
+   "bytes": 31675,
+   "items": 10,
+   "start": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><rss version=\"2.0\" xmlns:content=\"http://purl.org/rss/1.0/modules/content/\" xmlns:wfw=\"http://wellformedweb.org/CommentAPI/\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:atom=\"http://www.w3.org/2005/Atom\" xmlns:sy=\"http://purl.org/rss/1.0/modules/syndi"
+  },
+  "https://www.terravivagrants.org/wp-json/wp/v2/posts": {
+   "robots_allowed": true,
+   "status": 200,
+   "type": "application/json; charset=UTF-8",
+   "bytes": 38981,
+   "items": 0,
+   "start": "[{\"id\":112253,\"date\":\"2026-10-15T03:00:09\",\"date_gmt\":\"2026-10-15T03:00:09\",\"guid\":{\"rendered\":\"https:\\/\\/www.terravivagrants.org\\/?p=112253\"},\"modified\":\"2026-10-13T16:25:41\",\"modified_gmt\":\"2026-10-13T16:25:41\",\"slug\":\"monthly-update-october-2026\",\"status\":\"publish\",\"type\":\"post\",\"link\":\"https:\\/\\"
+  }
  },
- {
-  "url": "https://terravivagrants.org/wp-json/wp/v2/posts?per_page=3&_fields=id,date,link,title",
-  "robots_allowed": true,
-  "status": 200,
-  "type": "application/json; charset=UTF-8",
-  "bytes": 583,
-  "start": "[{\"id\":112253,\"date\":\"2026-10-15T03:00:09\",\"link\":\"https:\\/\\/www.terravivagrants.org\\/monthly-update-october-2026\\/\",\"title\":{\"rendered\":\"Monthly Update: October 2026\"}},{\"id\":25771,\"date\":\"2026-10-11T12:26:40\",\"link\":\"https:\\/\\/www.terravivagrants.org\\/yale-university-young-global-scholars-program\\/\",\"title\":{\"rendered\":\"Yale University \\u2014 Young Global Scholars Program\"}},{\"id\":107036,\"date\":"
- },
- {
-  "url": "https://www.terravivagrants.org/feed/",
-  "robots_allowed": true,
-  "status": 200,
-  "type": "application/rss+xml; charset=UTF-8",
-  "bytes": 31675,
-  "start": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><rss version=\"2.0\" xmlns:content=\"http://purl.org/rss/1.0/modules/content/\" xmlns:wfw=\"http://wellformedweb.org/CommentAPI/\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:atom=\"http://www.w3.org/2005/Atom\" xmlns:sy=\"http://purl.org/rss/1.0/modules/syndication/\" xmlns:slash=\"http://purl.org/rss/1.0/modules/slash/\" > <channel> <title>Terra Viva Gran"
- },
- {
-  "url": "https://www.hclfoundation.org/hcltech-grant",
-  "robots_allowed": false,
-  "status": 200,
-  "type": "text/html; charset=UTF-8",
-  "bytes": 162425,
-  "start": "<!DOCTYPE html> <html lang=\"en\" dir=\"ltr\" prefix=\"content: http://purl.org/rss/1.0/modules/content/ dc: http://purl.org/dc/terms/ foaf: http://xmlns.com/foaf/0.1/ og: http://ogp.me/ns# rdfs: http://www.w3.org/2000/01/rdf-schema# schema: http://schema.org/ sioc: http://rdfs.org/sioc/ns# sioct: http://rdfs.org/sioc/types# skos: http://www.w3.org/2004/02/skos/core# xsd: http://www.w3.org/20"
- },
- {
-  "url": "https://www.wiprofoundation.org/upcoming-grants-alert/",
-  "robots_allowed": true,
-  "status": 200,
-  "type": "text/html; charset=UTF-8",
-  "bytes": 256594,
-  "start": "<!DOCTYPE html> <html lang=\"en-US\"> <head> <meta charset=\"UTF-8\"> <script> var gform;gform||(document.addEventListener(\"gform_main_scripts_loaded\",function(){gform.scriptsLoaded=!0}),document.addEventListener(\"gform/theme/scripts_loaded\",function(){gform.themeScriptsLoaded=!0}),window.addEventListener(\"DOMContentLoaded\",function(){gform.domLoaded=!0}),gform={domLoaded:!1,scriptsLoaded:!1,themeS"
- },
- {
-  "url": "https://www.wiprofoundation.org/ecology_programs/community-ecology-program/",
-  "robots_allowed": true,
-  "status": 200,
-  "type": "text/html; charset=UTF-8",
-  "bytes": 255646,
-  "start": "<!DOCTYPE html> <html lang=\"en-US\"> <head> <meta charset=\"UTF-8\"> <script> var gform;gform||(document.addEventListener(\"gform_main_scripts_loaded\",function(){gform.scriptsLoaded=!0}),document.addEventListener(\"gform/theme/scripts_loaded\",function(){gform.themeScriptsLoaded=!0}),window.addEventListener(\"DOMContentLoaded\",function(){gform.domLoaded=!0}),gform={domLoaded:!1,scriptsLoaded:!1,themeS"
- },
- {
-  "url": "https://www.unep.org/gan/node/14",
-  "robots_allowed": true,
-  "status": 200,
-  "type": "text/html; charset=UTF-8",
-  "bytes": 21702,
-  "start": "<!DOCTYPE html> <html lang=\"en\" dir=\"ltr\" prefix=\"content: http://purl.org/rss/1.0/modules/content/ dc: http://purl.org/dc/terms/ foaf: http://xmlns.com/foaf/0.1/ og: http://ogp.me/ns# rdfs: http://www.w3.org/2000/01/rdf-schema# schema: http://schema.org/ sioc: http://rdfs.org/sioc/ns# sioct: http://rdfs.org/sioc/types# skos: http://www.w3.org/2004/02/skos/core# xsd: http://www.w3.org/200"
- },
- {
-  "url": "https://sgp.undp.org/",
-  "robots_allowed": true,
-  "status": 200,
-  "type": "text/html; charset=utf-8",
-  "bytes": 104734,
-  "start": "<!DOCTYPE html> <html prefix=\"og: http://ogp.me/ns#\" lang=\"en-gb\" dir=\"ltr\"> <head> <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1\" /> <meta charset=\"utf-8\" /> <base href=\"https://sgp.undp.org/\" /> <meta name=\"keywords\" content=\"The GEF Small Grants Programme\" /> <meta name=\"description\" content=\"The GEF Small Grants Programme\" /> <meta"
- },
- {
-  "url": "https://www.darwininitiative.org.uk/apply/",
-  "robots_allowed": true,
-  "status": 200,
-  "type": "text/html; charset=utf-8",
-  "bytes": 40578,
-  "start": "<html lang=\"en\"> <head> <!-- Google Tag Manager --> <script> (function (w, d, s, l, i) { w[l] = w[l] || []; w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' }); var f = d.getElementsByTagName(s)[0], j = d.crea"
- },
- {
-  "url": "https://www.cepf.net/grants/open-calls-for-proposals",
-  "robots_allowed": true,
-  "status": 200,
-  "type": "text/html; charset=UTF-8",
-  "bytes": 100558,
-  "start": "<!DOCTYPE html> <html lang=\"en\"> <head> <meta charset=\"utf-8\" /> <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, viewport-fit=cover\" /><link rel=\"icon\" href=\"https://www.cepf.net/favicon.ico\" sizes=\"any\" /> <link rel=\"mask-icon\" href=\"https://www.cepf.net/safari-pinned-tab.svg\" color=\"#E13E3E\" /> <link rel=\"apple-touch-icon\" href=\"https://www"
- },
- {
-  "url": "https://www.indiawaterportal.org/opportunities",
-  "robots_allowed": true,
-  "status": 200,
-  "type": "text/html; charset=utf-8",
-  "bytes": 399842,
-  "start": "<!DOCTYPE html> <html lang=\"en\" dir=\"ltr\"> <head> <meta charset=\"utf-8\"/> <title>Opportunities</title><link rel=\"canonical\" href=\"https://www.indiawaterportal.org/opportunities\"/><meta name=\"description\" content=\"Explore water conservation, management, and sustainability on India Water Portal. Join us in safeguarding India&#x27;s precious water resources.\"/><meta name=\"title\" content=\"Oppo"
- },
- {
-  "url": "https://www.international-climate-initiative.com/en/find-funding/",
-  "robots_allowed": true,
-  "status": 200,
-  "type": "text/html; charset=utf-8",
-  "bytes": 148904,
-  "start": "<!DOCTYPE html> <html lang=\"en-US\" class=\"no-js\"> <head> <meta charset=\"utf-8\"> <!-- coding.powerful.systems. CPS GmbH - www.cps-it.de This website is powered by TYPO3 - inspiring people to share! TYPO3 is a free open source Content Management Framework initially created by Kasper Skaarhoj and licensed under GNU/GPL. TYPO3 is copyright 1998-2026 of Kasper Skaarhoj. Extensions are copyri"
- },
- {
-  "url": "https://www.keidanren.net/kncf/fund/project",
-  "robots_allowed": true,
-  "status": 200,
-  "type": "text/html; charset=UTF-8",
-  "bytes": 48285,
-  "start": "<!DOCTYPE HTML> <html> <head> <meta charset=\"utf-8\"> <meta http-equiv=\"content-language\" content=\"ja\"> <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\"> <link rel=\"shortcut icon\" href=\"https://keidanren-kncf.sakura.ne.jp/kncf/wp/wp-content/themes/kncf/images/favicon.ico\" type=\"image/vnd.microsoft.icon\"> <link rel=\"apple-touch-icon\" href=\"https://keidanren-kncf.sakura.ne.jp/kncf/wp/wp-con"
- },
- {
-  "url": "https://www.welthungerhilfe.org/global-food-system-challenge/your-application",
-  "robots_allowed": true,
-  "status": 200,
-  "type": "text/html;charset=utf-8",
-  "bytes": 105808,
-  "start": "<!DOCTYPE html> <html lang=\"en\" class=\"no-js\"> <head> <meta charset=\"utf-8\"> <!-- This website is powered by TYPO3 - inspiring people to share! TYPO3 is a free open source Content Management Framework initially created by Kasper Skaarhoj and licensed under GNU/GPL. TYPO3 is copyright 1998-2026 of Kasper Skaarhoj. Extensions are copyright of their respective owners. Information and contri"
- },
- {
-  "url": "https://www.speciesconservation.org/grants/",
-  "robots_allowed": true,
-  "status": 200,
-  "type": "text/html; charset=UTF-8",
-  "bytes": 75711,
-  "start": "<!doctype html> <html lang=\"en-US\"> <head> <!-- Google tag (gtag.js) --> <script async src=\"https://www.googletagmanager.com/gtag/js?id=G-W3P7M4VY2F\"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-W3P7M4VY2F'); </script> <meta charset=\"UTF-8\"> <meta name=\"viewport\" content=\"widt"
- },
- {
-  "url": "https://whitleyaward.org/apply-for-conservation-funding/apply-for-a-whitley-award/",
-  "robots_allowed": false,
-  "error": "HTTP Error 403: Forbidden"
- },
- {
-  "url": "https://api.tech.ec.europa.eu/search-api/prod/rest/search?apiKey=SEDIA&text=***&pageSize=5&pageNumber=1",
-  "robots_allowed": true,
-  "status": 200,
-  "total": 16378,
-  "sample": [
-   {
-    "title": "Competence Centers-Coordination and Support Action",
-    "keys": [
-     "DATASOURCE",
-     "REFERENCE",
-     "actions",
-     "allowPartnerSearch",
-     "budgetOverview",
-     "callIdentifier",
-     "callTitle",
-     "callccm2Id",
-     "ccm2Id",
-     "crossCuttingPriorities",
-     "deadlineDate",
-     "deadlineModel",
-     "descriptionByte",
-     "destination",
-     "destinationDescription",
-     "destinationDetails",
-     "destinationGroup",
-     "esDA_IngestDate",
-     "esDA_QueueDate",
-     "esST_FileName",
-     "esST_URL",
-     "esST_checksum",
-     "es_Combine",
-     "es_ContentType",
-     "es_SortDate",
-     "focusArea",
-     "frameworkProgramme",
-     "identifier",
-     "keywords",
-     "language",
-     "latestInfos",
-     "links",
-     "mission",
-     "missionDescription",
-     "missionDetails",
-     "missionGroup",
-     "programmeDivision",
-     "programmePeriod",
-     "sepTemplate",
-     "sortStatus"
-    ]
-   },
-   {
-    "title": "Call for proposals on the development of social services for psychosocial support and rehabilitation for children and their families in paediatric oncology clinics in Member States and countries associated to the EU4Health Programme - CR-g-24-43",
-    "keys": [
-     "DATASOURCE",
-     "REFERENCE",
-     "actions",
-     "allowPartnerSearch",
-     "budgetOverview",
-     "callIdentifier",
-     "callTitle",
-     "callccm2Id",
-     "ccm2Id",
-     "crossCuttingPriorities",
-     "deadlineDate",
-     "deadlineModel",
-     "descriptionByte",
-     "destination",
-     "destinationDescription",
-     "destinationDetails",
-     "destinationGroup",
-     "esDA_IngestDate",
-     "esDA_QueueDate",
-     "esST_FileName",
-     "esST_URL",
-     "esST_checksum",
-     "es_Combine",
-     "es_ContentType",
-     "es_SortDate",
-     "focusArea",
-     "frameworkProgramme",
-     "identifier",
-     "keywords",
-     "language",
-     "latestInfos",
-     "links",
-     "mission",
-     "missionDescription",
-     "missionDetails",
-     "missionGroup",
-     "programmeDivision",
-     "programmePeriod",
-     "sepTemplate",
-     "sortStatus"
-    ]
-   },
-   {
-    "title": "Call for Proposal to support integration of cancer images into the federated pan-European infrastructure to foster screening programmes - CR-g-24-37",
-    "keys": [
-     "DATASOURCE",
-     "REFERENCE",
-     "actions",
-     "allowPartnerSearch",
-     "budgetOverview",
-     "callIdentifier",
-     "callTitle",
-     "callccm2Id",
-     "ccm2Id",
-     "crossCuttingPriorities",
-     "deadlineDate",
-     "deadlineModel",
-     "descriptionByte",
-     "destination",
-     "destinationDescription",
-     "destinationDetails",
-     "destinationGroup",
-     "esDA_IngestDate",
-     "esDA_QueueDate",
-     "esST_FileName",
-     "esST_URL",
-     "esST_checksum",
-     "es_Combine",
-     "es_ContentType",
-     "es_SortDate",
-     "focusArea",
-     "frameworkProgramme",
-     "identifier",
-     "keywords",
-     "language",
-     "latestInfos",
-     "links",
-     "mission",
-     "missionDescription",
-     "missionDetails",
-     "missionGroup",
-     "programmeDivision",
-     "programmePeriod",
-     "sepTemplate",
-     "sortStatus"
-    ]
-   }
-  ]
+ "sedia": {
+  "***": {
+   "total": 1199,
+   "sample": [
+    {
+     "identifier": [
+      "DIGITAL-ECCC-2024-DEPLOY-NCC-06-MS-COORDINATION"
+     ],
+     "title": [
+      "Deploying The Network of National Coordination Centres with Member States"
+     ],
+     "callTitle": [
+      "Enhancing the Cybersecurity Capabilities of the Domestic SME Sector (SSNS-NCC-HU-FSTP-2026)"
+     ],
+     "status": [
+      "31094502"
+     ],
+     "type": [
+      "8"
+     ],
+     "deadlineDate": [
+      "2026-06-28T22:59:00.000+0000"
+     ],
+     "startDate": [
+      "2026-03-24T00:00:00.000+0000"
+     ],
+     "frameworkProgramme": [
+      "43152860"
+     ],
+     "budgetOverview": null,
+     "links": null,
+     "url": "https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/competitive-calls-cs/46786367",
+     "summary": "Enhancing the Cybersecurity Capabilities of the Domestic SME Sector (SSNS-NCC-HU-FSTP-2026)"
+    },
+    {
+     "identifier": [
+      "DIGITAL-2024-ADVANCED-DIGITAL-07-KEYCAPACITY"
+     ],
+     "title": [
+      "Specialised Education Programmes in Key Capacity Areas"
+     ],
+     "callTitle": [
+      "Phortify Internship (Traineeship) Grants - Pilot Call"
+     ],
+     "status": [
+      "31094502"
+     ],
+     "type": [
+      "8"
+     ],
+     "deadlineDate": [
+      "2027-02-03T23:59:00.000+0000"
+     ],
+     "startDate": [
+      "2026-02-04T00:00:00.000+0000"
+     ],
+     "frameworkProgramme": [
+      "43152860"
+     ],
+     "budgetOverview": null,
+     "links": null,
+     "url": "https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/competitive-calls-cs/46813062",
+     "summary": "Phortify Internship (Traineeship) Grants - Pilot Call"
+    },
+    {
+     "identifier": [
+      "CERV-2024-CITIZENS-VALUES"
+     ],
+     "title": [
+      "Call for proposals for civil society organisations active on protecting and promoting Union values: call to intermediaries (giving financial support to third parties)"
+     ],
+     "callTitle": [
+      "Experience sharing grants"
+     ],
+     "status": [
+      "31094502"
+     ],
+     "type": [
+      "8"
+     ],
+     "deadlineDate": [
+      "2025-10-31T12:00:00.000+0000",
+      "2026-03-02T12:00:00.000+0000",
+      "2026-06-30T12:00:00.000+0000",
+      "2026-10-30T12:00:00.000+0000"
+     ],
+     "startDate": [
+      "2025-09-18T00:00:00.000+0000"
+     ],
+     "frameworkProgramme": [
+      "43251589"
+     ],
+     "budgetOverview": null,
+     "links": null,
+     "url": "https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/competitive-calls-cs/46357639",
+     "summary": "Experience sharing grants"
+    },
+    {
+     "identifier": [
+      "EURATOM-2021-ADHOC-IBA"
+     ],
+     "title": [
+      "Euratom-Adhoc-2021-2027"
+     ],
+     "callTitle": [
+      "FuseNet Call for the Organisation of Mini-Workshops in Fusion"
+     ],
+     "status": [
+      "31094502"
+     ],
+     "type": [
+      "8"
+     ],
+     "deadlineDate": [
+      "2026-12-31T23:59:00.000+0000"
+     ],
+     "startDate": [
+      "2026-02-18T00:00:00.000+0000"
+     ],
+     "frameworkProgramme": [
+      "43298916"
+     ],
+     "budgetOverview": null,
+     "links": null,
+     "url": "https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/competitive-calls-cs/43549596",
+     "summary": "FuseNet Call for the Organisation of Mini-Workshops in Fusion"
+    }
+   ]
+  },
+  "restoration": {
+   "total": 100,
+   "sample": [
+    {
+     "identifier": [
+      "HORIZON-MISS-2023-OCEAN-01-01"
+     ],
+     "title": [
+      "European Blue Parks \u2013 Protection and restoration of marine habitats"
+     ],
+     "callTitle": null,
+     "status": [
+      "31094502"
+     ],
+     "type": [
+      "1"
+     ],
+     "deadlineDate": [
+      "2023-09-20T17:00:00.000+0000"
+     ],
+     "startDate": [
+      "2023-01-17T00:00:00.000+0000"
+     ],
+     "frameworkProgramme": [
+      "43108390"
+     ],
+     "budgetOverview": null,
+     "links": null,
+     "url": "https://ec.europa.eu/info/funding-tenders/opportunities/data/topicDetails/HORIZON-MISS-2023-OCEAN-01-01.json",
+     "summary": "European Blue Parks \u2013 Protection and restoration of marine habitats"
+    },
+    {
+     "identifier": [
+      "HORIZON-MISS-2023-OCEAN-01-04"
+     ],
+     "title": [
+      "European natural lakes: demonstration of integrated approaches for protection and restoration of natural lake ecosystems and their biodiversity"
+     ],
+     "callTitle": null,
+     "status": [
+      "31094502"
+     ],
+     "type": [
+      "1"
+     ],
+     "deadlineDate": [
+      "2023-09-20T17:00:00.000+0000"
+     ],
+     "startDate": [
+      "2023-01-17T00:00:00.000+0000"
+     ],
+     "frameworkProgramme": [
+      "43108390"
+     ],
+     "budgetOverview": null,
+     "links": null,
+     "url": "https://ec.europa.eu/info/funding-tenders/opportunities/data/topicDetails/HORIZON-MISS-2023-OCEAN-01-04.json",
+     "summary": "European natural lakes: demonstration of integrated approaches for protection and restoration of natural lake ecosystems and their biodiversity"
+    },
+    {
+     "identifier": [
+      "HORIZON-CL6-2027-01-BIODIV-03"
+     ],
+     "title": [
+      "Technical innovation to protect ecosystems and to scale up their restoration"
+     ],
+     "callTitle": [
+      "Call 01 - single stage (2027)"
+     ],
+     "status": [
+      "31094501"
+     ],
+     "type": [
+      "1"
+     ],
+     "deadlineDate": [
+      "2027-09-22T00:00:00.000+0000"
+     ],
+     "startDate": [
+      "2027-04-20T00:00:00.000+0000"
+     ],
+     "frameworkProgramme": [
+      "43108390"
+     ],
+     "budgetOverview": [
+      "{\"budgetYearsColumns\":[\"2027\"],\"budgetTopicActionMap\":{\"113153\":[{\"action\":\"HORIZON-CL6-2027-01-CIRCBIO-05 - HORIZON-RIA HORIZON  Research and Innovation Actions\",\"expectedGrants\":2,\"minContribution\":4000000,\"maxContribution\":5000000,\"budgetYearMap\":{\"2027\":\"9000000\"},\"plannedOpeningDate\":\"2027-04-20\",\"deadlineModel\":\"single-stage\",\"deadlineDates\":[\"2027-09-22\"]}],\"113152\":[{\"action\":\"HORIZON-CL6-2027-01-BIODIV-08 - HORIZON-RIA HORIZON  Research and Innovation Actions\",\"expectedGrants\":2,\"minContribution\":6000000,\"maxContribution\":6000000,\"budgetYearMap\":{\"2027\":\"12000000\"},\"plannedOpeningDate\":\"2027-04-20\",\"deadlineModel\":\"single-stage\",\"deadlineDates\":[\"2027-09-22\"]}],\"113155\":[{\"action\":\"HORIZON-CL6-2027-01-CIRCBIO-02 - HORIZON-IA HORIZON Innovation Actions\",\"expectedGrants\":2,\"minContribution\":5000000,\"maxContribution\":5000000,\"budgetYearMap\":{\"2027\":\"10000000\"},\"plannedOpeningDate\":\"2027-04-20\",\"deadlineModel\":\"single-stage\",\"deadlineDates\":[\"2027-09-22\"]}],\"113154\":[{\"action\":\"HORIZON-CL6-2027-01-BIODIV-02 - HORIZON-CSA HORIZON Coordination and Support Actions\",\"expectedGrants\":1,\"minContribution\":7000000,\"maxContribution\":7000000,\"budgetYearMap\":{\"2027\":\"7000000\"},\"plannedOpeningDate\":\"2027-04-20\",\"deadlineModel\":\"single-stage\",\"deadlineDates\":[\"2027-09-22\"]}],\"113157\":[{\"action\":\"HORIZON-CL6-2027-01-BIODIV-09 - HORIZON-RIA HORIZON  Research and Innovation Actions\",\"expectedGrants\":2,\"minContribution\":6000000,\"maxContribution\":6000000,\"budgetYearMap\":{\"2027\":\"12000000\"},\"plannedOpeningDate\":\"2027-04-20\",\"deadlineModel\":\"single-stage\",\"deadlineDates\":[\"2027-09-22\"]}],\"113156\":[{\"action\":\"HORIZON-CL6-2027-01-BIODIV-06 - HORIZON-RIA HORIZON  Research and Innovation Actions\",\"expectedGrants\":2,\"minContribution\":7000000,\"maxContribution\":7000000,\"budgetYearMap\":{\"2027\":\"14000000\"},\"plannedOpeningDate\":\"2027-04-20\",\"deadlineModel\":\"single-stage\",\"deadlineDates\":[\"2027-09-22\"]}],\"113159\":[{\"action\":\"HORIZON-CL6-2027-01-BIODIV-07 - HORIZON-RIA HORIZON  Research and Innovation Actions\",\"expectedGrants\":2,\"minContribution\":7000000,\"maxContribution\":7000000,\"budgetYearMap\":{\"2027\":\"14000000\"},\"plannedOpeningDate\":\"2027-04-20\",\"deadlineModel\":\"single-stage\",\"deadlineDates\":[\"2027-09-22\"]}],\"113158\":[{\"action\":\"HORIZON-CL6-2027-01-CIRCBIO-01 - HORIZON-IA HORIZON Innovation Actions\",\"expectedGrants\":2,\"minContribution\":5000000,\"maxContribution\":5000000,\"budgetYearMap\":{\"2027\":\"10000000\"},\"plannedOpeningDate\":\"2027-04-20\",\"deadlineModel\":\"single-stage\",\"deadlineDates\":[\"2027-09-22\"]}],\"113161\":[{\"action\":\"HORIZON-CL6-2027-01-ZEROPOLLUTION-02 - HORIZON-RIA HORIZON  Research and Innovation Actions\",\"expectedGrants\":2,\"minContribution\":4900000,\"maxContribution\":4900000,\"budgetYearMap\":{\"2027\":\"9800000\"},\"plannedOpeningDate\":\"2027-04-20\",\"deadlineModel\":\"single-stage\",\"deadlineDates\":[\"2027-09-22\"]}],\"113160\":[{\"action\":\"HORIZON-CL6-2027-01-CIRCBIO-04 - HORIZON-RIA HORIZON  Research and Innovation Actions\",\"expectedGrants\":2,\"minContribution\":4000000,\"maxContribution\":5000000,\"budgetYearMap\":{\"2027\":\"9000000\"},\"plannedOpeningDate\":\"2027-04-20\",\"deadlineModel\":\"single-stage\",\"deadlineDates\":[\"2027-09-22\"]}],\"113163\":[{\"action\":\"HORIZON-CL6-2027-01-ZEROPOLLUTION-04 - HORIZON-CSA HORIZON Coordination and Support Actions\",\"expectedGrants\":1,\"minContribution\":3000000,\"maxContribution\":3000000,\"budgetYearMap\":{\"2027\":\"3000000\"},\"plannedOpeningDate\":\"2027-04-20\",\"deadlineModel\":\"single-stage\",\"deadlineDates\":[\"2027-09-22\"]}],\"113162\":[{\"action\":\"HORIZON-CL6-2027-01-CIRCBIO-03 - HORIZON-RIA HORIZON  Research and Innovation Actions\",\"expectedGrants\":2,\"minContribution\":5000000,\"maxContribution\":5000000,\"budgetYearMap\":{\"2027\":\"10000000\"},\"plannedOpeningDate\":\"2027-04-20\",\"deadlineModel\":\"single-stage\",\"deadlineDates\":[\"2027-09-22\"]}],\"113165\":[{\"action\":\"HORIZON-CL6-2027-01-BIODIV-01 - HORIZON-RIA HORIZON  Research and Innovation Actions\",\"expectedGrants\":2,\"minContribution\":5000000,\"maxContribution\":5000000,\"budgetYearMap\":{\"2027\":\"10000000\"},\"plannedOpeningDate\":\"2027-04-20\",\"deadlineModel\":\"single-stage\",\"deadlineDates\":[\"2027-09-22\"]}],\"113164\":[{\"action\":\"HORIZON-CL6-2027-01-CIRCBIO-06 - HORIZON-RIA HORIZON  Research and Innovation Actions\",\"expectedGrants\":2,\"minContribution\":6000000,\"maxContribution\":6000000,\"budgetYearMap\":{\"2027\":\"12000000\"},\"plannedOpeningDate\":\"2027-04-20\",\"deadlineModel\":\"single-stage\",\"deadlineDates\":[\"2027-09-22\"]}],\"113167\":[{\"action\":\"HORIZON-CL6-2027-01-BIODIV-03 - HORIZON-IA HORIZON Innovation Actions\",\"expectedGrants\":2,\"minContribution\":7000000,\"maxContribution\":7000000,\"budgetYearMap\":{\"2027\":\"14000000\"},\"plannedOpeningDate\":\"2027-04-20\",\"deadlineModel\":\"single-stage\",\"deadlineDates\":[\"2027-09-22\"]}],\"113166\":[{\"action\":\"HORIZON-CL6-2027-01-CIRCBIO-07 - HORIZON-IA HORIZON Innovation Actions\",\"expectedGrants\":2,\"minContribution\":7000000,\"maxContribution\":7000000,\"budgetYearMap\":{\"2027\":\"14000000\"},\"plannedOpeningDate\":\"2027-04-20\",\"deadlineModel\":\"single-stage\",\"deadlineDates\":[\"2027-09-22\"]}],\"113145\":[{\"action\":\"HORIZON-CL6-2027-01-CIRCBIO-08 - HORIZON-IA HORIZON Innovation Actions\",\"expectedGrants\":2,\"minContribution\":6000000,\"maxContribution\":6000000,\"budgetYearMap\":{\"2027\":\"12000000\"},\"plannedOpeningDate\":\"2027-04-20\",\"deadlineModel\":\"single-stage\",\"deadlineDates\":[\"2027-09-22\"]}],\"113147\":[{\"action\":\"HORIZON-CL6-2027-01-CIRCBIO-09 - HORIZON-IA HORIZON Innovation Actions\",\"expectedGrants\":2,\"minContribution\":6000000,\"maxContribution\":6000000,\"budgetYearMap\":{\"2027\":\"12000000\"},\"plannedOpeningDate\":\"2027-04-20\",\"deadlineModel\":\"single-stage\",\"deadlineDates\":[\"2027-09-22\"]}],\"113146\":[{\"action\":\"HORIZON-CL6-2027-01-CIRCBIO-10 - HORIZON-RIA HORIZON  Research and Innovation Actions\",\"expectedGrants\":1,\"minContribution\":6000000,\"maxContribution\":6000000,\"budgetYearMap\":{\"2027\":\"6000000\"},\"plannedOpeningDate\":\"2027-04-20\",\"deadlineModel\":\"single-stage\",\"deadlineDates\":[\"2027-09-22\"]}],\"113149\":[{\"action\":\"HORIZON-CL6-2027-01-ZEROPOLLUTION-03 - HORIZON-RIA HORIZON  Research and Innovation Actions\",\"expectedGrants\":2,\"minContribution\":6000000,\"maxContribution\":6000000,\"budgetYearMap\":{\"2027\":\"12000000\"},\"plannedOpeningDate\":\"2027-04-20\",\"deadlineModel\":\"single-stage\",\"deadlineDates\":[\"2027-09-22\"]}],\"113148\":[{\"action\":\"HORIZON-CL6-2027-01-BIODIV-05 - HORIZON-RIA HORIZON  Research and Innovation Actions\",\"expectedGrants\":2,\"minContribution\":7000000,\"maxContribution\":7000000,\"budgetYearMap\":{\"2027\":\"14000000\"},\"plannedOpeningDate\":\"2027-04-20\",\"deadlineModel\":\"single-stage\",\"deadlineDates\":[\"2027-09-22\"]}],\"113151\":[{\"action\":\"HORIZON-CL6-2027-01-ZEROPOLLUTION-01 - HORIZON-RIA HORIZON  Research and Innovation Actions\",\"expectedGrants\":3,\"minContribution\":4000000,\"maxContribution\":4000000,\"budgetYearMap\":{\"2027\":\"12000000\"},\"plannedOpeningDate\":\"2027-04-20\",\"deadlineModel\":\"single-stage\",\"deadlineDates\":[\"2027-09-22\"]}],\"113150\":[{\"action\":\"HORIZON-CL6-2027-01-BIODIV-04 - HORIZON-RIA HORIZON  Research and Innovation Actions\",\"expectedGrants\":3,\"minContribution\":8000000,\"maxContribution\":8000000,\"budgetYearMap\":{\"2027\":\"24000000\"},\"plannedOpeningDate\":\"2027-04-20\",\"deadlineModel\":\"single-stage\",\"deadlineDates\":[\"2027-09-22\"]}]}}"
+     ],
+     "links": [
+      "[]"
+     ],
+     "url": "https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-details/HORIZON-CL6-2027-01-BIODIV-03",
+     "summary": "Technical innovation to protect ecosystems and to scale up their restoration"
+    },
+    {
+     "identifier": [
+      "HORIZON-MISS-2027-03-OCEAN-05"
+     ],
+     "title": [
+      "Large-scale demonstration of protection, restoration and management of blue forest ecosystems in European sea basins"
+     ],
+     "callTitle": [
+      "Supporting the implementation of the Restore our Ocean and Waters Mission"
+     ],
+     "status": [
+      "31094501"
+     ],
+     "type": [
+      "1"
+     ],
+     "deadlineDate": [
+      "2027-09-21T00:00:00.000+0000"
+     ],
+     "startDate": [
+      "2027-02-09T00:00:00.000+0000"
+     ],
+     "frameworkProgramme": [
+      "43108390"
+     ],
+     "budgetOverview": [
+      "{\"budgetYearsColumns\":[\"2027\"],\"budgetTopicActionMap\":{\"113093\":[{\"action\":\"HORIZON-MISS-2027-03-OCEAN-01 - HORIZON-IA HORIZON Innovation Actions\",\"expectedGrants\":4,\"minContribution\":8000000,\"maxContribution\":8925000,\"budgetYearMap\":{\"2027\":\"35700000\"},\"plannedOpeningDate\":\"2027-02-09\",\"deadlineModel\":\"single-stage\",\"deadlineDates\":[\"2027-09-21\"]}],\"113095\":[{\"action\":\"HORIZON-MISS-2027-03-OCEAN-02 - HORIZON-IA HORIZON Innovation Actions\",\"expectedGrants\":4,\"minContribution\":7200000,\"maxContribution\":7725000,\"budgetYearMap\":{\"2027\":\"30900000\"},\"plannedOpeningDate\":\"2027-02-09\",\"deadlineModel\":\"single-stage\",\"deadlineDates\":[\"2027-09-21\"]}],\"113094\":[{\"action\":\"HORIZON-MISS-2027-03-OCEAN-05 - HORIZON-IA HORIZON Innovation Actions\",\"expectedGrants\":4,\"minContribution\":3500000,\"maxContribution\":3975000,\"budgetYearMap\":{\"2027\":\"15900000\"},\"plannedOpeningDate\":\"2027-02-09\",\"deadlineModel\":\"single-stage\",\"deadlineDates\":[\"2027-09-21\"]}],\"113097\":[{\"action\":\"HORIZON-MISS-2027-03-OCEAN-04 - HORIZON-IA HORIZON Innovation Actions\",\"expectedGrants\":4,\"minContribution\":1000000,\"maxContribution\":1500000,\"budgetYearMap\":{\"2027\":\"6000000\"},\"plannedOpeningDate\":\"2027-02-09\",\"deadlineModel\":\"single-stage\",\"deadlineDates\":[\"2027-09-21\"]}],\"113096\":[{\"action\":\"HORIZON-MISS-2027-03-OCEAN-03 - HORIZON-IA HORIZON Innovation Actions\",\"expectedGrants\":2,\"minContribution\":5500000,\"maxContribution\":5950000,\"budgetYearMap\":{\"2027\":\"11900000\"},\"plannedOpeningDate\":\"2027-02-09\",\"deadlineModel\":\"single-stage\",\"deadlineDates\":[\"2027-09-21\"]}]}}"
+     ],
+     "links": [
+      "[]"
+     ],
+     "url": "https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-details/HORIZON-MISS-2027-03-OCEAN-05",
+     "summary": "Large-scale demonstration of protection, restoration and management of blue forest ecosystems in European sea basins"
+    }
+   ]
+  },
+  "biodiversity India": {
+   "error": "URL can't contain control characters. '/search-api/prod/rest/search?apiKey=SEDIA&text=biodiversity India&pageSize=20&pageNumber=1' (found at least ' ')"
+  },
+  "agroforestry": {
+   "total": 2,
+   "sample": [
+    {
+     "identifier": [
+      "HORIZON-MISS-2027-05-SOIL-03-two-stage"
+     ],
+     "title": [
+      "Agroforestry for soil health at landscape level"
+     ],
+     "callTitle": [
+      "Supporting the implementation of the Soil Deal for Europe Mission"
+     ],
+     "status": [
+      "31094501"
+     ],
+     "type": [
+      "1"
+     ],
+     "deadlineDate": [
+      "2027-04-08T00:00:00.000+0000",
+      "2027-09-14T00:00:00.000+0000"
+     ],
+     "startDate": [
+      "2027-02-04T00:00:00.000+0000"
+     ],
+     "frameworkProgramme": [
+      "43108390"
+     ],
+     "budgetOverview": [
+      "{\"budgetYearsColumns\":[\"2027\"],\"budgetTopicActionMap\":{\"113089\":[{\"action\":\"HORIZON-MISS-2027-05-SOIL-02-two-stage - HORIZON-RIA HORIZON  Research and Innovation Actions\",\"expectedGrants\":2,\"minContribution\":12000000,\"maxContribution\":12000000,\"budgetYearMap\":{\"2027\":\"24000000\"},\"plannedOpeningDate\":\"2027-02-04\",\"deadlineModel\":\"two-stage\",\"deadlineDates\":[\"2027-04-08\",\"2027-09-14\"]}],\"113088\":[{\"action\":\"HORIZON-MISS-2027-05-SOIL-06-two-stage - HORIZON-RIA HORIZON  Research and Innovation Actions\",\"expectedGrants\":1,\"minContribution\":7000000,\"maxContribution\":7000000,\"budgetYearMap\":{\"2027\":\"7000000\"},\"plannedOpeningDate\":\"2027-02-04\",\"deadlineModel\":\"two-stage\",\"deadlineDates\":[\"2027-04-08\",\"2027-09-14\"]}],\"113085\":[{\"action\":\"HORIZON-MISS-2027-05-SOIL-05-two-stage - HORIZON-IA HORIZON Innovation Actions\",\"expectedGrants\":2,\"minContribution\":6400000,\"maxContribution\":6400000,\"budgetYearMap\":{\"2027\":\"12800000\"},\"plannedOpeningDate\":\"2027-02-04\",\"deadlineModel\":\"two-stage\",\"deadlineDates\":[\"2027-04-08\",\"2027-09-14\"]}],\"113084\":[{\"action\":\"HORIZON-MISS-2027-05-SOIL-01-two-stage - HORIZON-RIA HORIZON  Research and Innovation Actions\",\"expectedGrants\":2,\"minContribution\":12000000,\"maxContribution\":12000000,\"budgetYearMap\":{\"2027\":\"24000000\"},\"plannedOpeningDate\":\"2027-02-04\",\"deadlineModel\":\"two-stage\",\"deadlineDates\":[\"2027-04-08\",\"2027-09-14\"]}],\"113087\":[{\"action\":\"HORIZON-MISS-2027-05-SOIL-04-two-stage - HORIZON-RIA HORIZON  Research and Innovation Actions\",\"expectedGrants\":2,\"minContribution\":5500000,\"maxContribution\":5500000,\"budgetYearMap\":{\"2027\":\"11000000\"},\"plannedOpeningDate\":\"2027-02-04\",\"deadlineModel\":\"two-stage\",\"deadlineDates\":[\"2027-04-08\",\"2027-09-14\"]}],\"113086\":[{\"action\":\"HORIZON-MISS-2027-05-SOIL-03-two-stage - HORIZON-IA HORIZON Innovation Actions\",\"expectedGrants\":2,\"minContribution\":8000000,\"maxContribution\":8000000,\"budgetYearMap\":{\"2027\":\"16000000\"},\"plannedOpeningDate\":\"2027-02-04\",\"deadlineModel\":\"two-stage\",\"deadlineDates\":[\"2027-04-08\",\"2027-09-14\"]}]}}"
+     ],
+     "links": [
+      "[]"
+     ],
+     "url": "https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-details/HORIZON-MISS-2027-05-SOIL-03-two-stage",
+     "summary": "Agroforestry for soil health at landscape level"
+    },
+    {
+     "identifier": [
+      "HORIZON-CL6-2024-FARM2FORK-01-10"
+     ],
+     "title": [
+      "EU-African Union cooperation on agroforestry management for climate change adaptation and mitigation"
+     ],
+     "callTitle": null,
+     "status": [
+      "31094501"
+     ],
+     "type": [
+      "1"
+     ],
+     "deadlineDate": [
+      "2024-02-22T17:00:00.000+0000"
+     ],
+     "startDate": [
+      "2023-10-17T00:00:00.000+0000"
+     ],
+     "frameworkProgramme": [
+      "43108390"
+     ],
+     "budgetOverview": null,
+     "links": null,
+     "url": "https://ec.europa.eu/info/funding-tenders/opportunities/data/topicDetails/HORIZON-CL6-2024-FARM2FORK-01-10.json",
+     "summary": "EU-African Union cooperation on agroforestry management for climate change adaptation and mitigation"
+    }
+   ]
+  }
  }
-]
+}
