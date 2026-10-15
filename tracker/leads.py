@@ -1,4 +1,4 @@
-"""Leads: calls for startups posted by incubators, water clusters and funders.
+"""Leads: calls posted on the news feeds of funders and networks.
 
 Awards like the Nicor Gas Illinois Innovator Award are announced on incubator
 and water-cluster websites, not on government portals. Many of those sites
@@ -142,8 +142,10 @@ def collect(today, profile):
     call_words = _words(settings.get("call_words", []))
     title_words = _words(settings.get("call_title_words", []))
     skip = _words(settings.get("skip_title_words", []))
-    water = profile.get("filter", {}).get("keywords", [])
-    topics = {"water": _words(water), "climate": _words(water + settings.get("climate_words", []))}
+    area_words = [w for words in profile.get("areas", {}).values() for w in words]
+    general = profile.get("filter", {}).get("general_keywords", [])
+    topics = {"topic": _words(area_words), "climate": _words(area_words + general + settings.get("climate_words", [])),
+              "water": _words(area_words)}
     leads, failed = [], []
     for feed in settings.get("feeds", []):
         try:
@@ -189,6 +191,7 @@ def merge(old, fresh, today):
 
 
 def save(rows, path=PATH):
+    os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
     with open(path, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=COLUMNS, extrasaction="ignore")
         writer.writeheader()

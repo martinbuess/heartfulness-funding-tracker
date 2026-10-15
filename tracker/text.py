@@ -7,7 +7,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-USER_AGENT = "Mozilla/5.0 (compatible; glia-funding-tracker; +https://github.com/gauravshikhargandhi-web/glia-funding-tracker)"
+USER_AGENT = "Mozilla/5.0 (compatible; heartfulness-funding-tracker; +https://github.com/martinbuess/heartfulness-funding-tracker)"
 
 
 def drop_default_port(url):
@@ -68,3 +68,45 @@ def dollars(text):
         return ""
     value = match.group(1).replace(",", "")
     return value if value.strip("0") else ""
+
+
+_MONTHS = ("January|February|March|April|May|June|July|August|September|October|November|December|"
+           "Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sept|Sep|Oct|Nov|Dec")
+# 15-Sep-2026, 15 September 2026, 15th Sep. 2026
+_DMY = re.compile(r"\b(\d{1,2})(?:st|nd|rd|th)?[\s-]+(" + _MONTHS + r")\.?,?[\s-]+(\d{4})\b", re.IGNORECASE)
+# September 15, 2026
+_MDY = re.compile(r"\b(" + _MONTHS + r")\.?\s+(\d{1,2})(?:st|nd|rd|th)?,?\s+(\d{4})\b", re.IGNORECASE)
+_ISO = re.compile(r"\b(20\d\d)-(\d\d)-(\d\d)\b")
+
+
+def dates(text):
+    """Every date written in the text, in order, as datetime.date."""
+    import datetime
+    found = []
+    for pattern, order in ((_DMY, "dmy"), (_MDY, "mdy"), (_ISO, "ymd")):
+        for m in pattern.finditer(text or ""):
+            if order == "dmy":
+                day, month, year = m.groups()
+            elif order == "mdy":
+                month, day, year = m.groups()
+            else:
+                year, month, day = m.groups()
+            try:
+                if order == "ymd":
+                    date = datetime.date(int(year), int(month), int(day))
+                else:
+                    date = datetime.datetime.strptime(f"{day} {month[:3]} {year}", "%d %b %Y").date()
+            except ValueError:
+                continue
+            found.append((m.start(), date))
+    return [d for _, d in sorted(found)]
+
+
+def deadline_in(text):
+    """The date written right after "deadline" (or "due", "closes", "apply by"); None if there isn't one."""
+    for m in re.finditer(r"\b(deadline|due|closing date|closes|close on|apply (?:by|before)|submit (?:by|before)|last date)\b",
+                         text or "", re.IGNORECASE):
+        found = dates(text[m.end():m.end() + 60])
+        if found:
+            return found[0]
+    return None

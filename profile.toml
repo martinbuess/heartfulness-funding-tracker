@@ -1,212 +1,206 @@
-# Your funding profile. Edit this file to change what lands in data/matches.csv.
-# The full pool of open listings is always in data/listings.csv.
+# Forests by Heartfulness (FBH) funding profile.
+#
+# This is the one settings file you edit to change what the tracker looks for.
+# Everything is plain lists of words. Words are matched at the start of a word and
+# ignore capitals, so "afforest" catches afforestation and afforested.
+#
+# Every listing the tracker reads is kept in data/listings.csv. The ones that fit
+# this profile go to data/matches.csv and the Google Sheet. Anything a rule below
+# removes goes to data/filtered_out.csv with the reason, so you can check that
+# nothing useful was cut.
 
-name = "GLIA water and water-adjacent cohort"
+name = "Forests by Heartfulness"
+
+# --- 1. What FBH works on -----------------------------------------------------
+# A listing is relevant if it mentions any word from these four areas. The area
+# names appear in the "FBH area" column of the sheet. A word in the title counts
+# more than a word only in the description.
+
+[areas]
+"Ecological restoration & biodiversity" = [
+  "afforest", "reforest", "forest", "tree planting", "tree-planting", "trees", "native tree", "native species",
+  "miyawaki", "ecological restoration", "ecosystem restoration", "land restoration", "landscape restoration",
+  "forest landscape restoration", "degraded land", "degraded forest", "land degradation", "desertification",
+  "biodiversity", "wildlife", "habitat", "ecosystem", "rewild", "mangrove", "grassland", "nature-based solution",
+  "nature based solution", "nature-positive", "nature positive", "green cover", "urban forest", "seed bank",
+  "endangered species", "threatened species", "species conservation", "protected area", "pollinat",
+  "deforestation", "elephant", "tiger", "nature conservation", "conservation of nature", "restoration",
+]
+"Water & watershed" = [
+  "lake", "pond", "wetland", "watershed", "check dam", "check-dam", "groundwater", "aquifer", "recharge",
+  "rainwater harvest", "water harvesting", "water conservation", "water security", "water scarcity",
+  "water resource", "water management", "freshwater", "river", "rejuvenat", "desilt", "catchment", "springshed",
+  "spring revival", "riparian", "drought", "flood", "climate resilien", "climate adaptation",
+  "ecosystem-based adaptation", "ecosystem based adaptation", "adaptation",
+]
+"Agroforestry & regenerative agriculture" = [
+  "agroforest", "agro-forest", "regenerative agricultur", "regenerative farm", "agroecolog", "agro-ecolog",
+  "sustainable agricultur", "climate-smart agricultur", "climate smart agricultur", "natural farming",
+  "organic farming", "soil health", "soil fertility", "soil regenerat", "soil restoration", "smallholder",
+  "farmer", "farming communit", "rural livelihood", "livelihood", "food security", "food system", "permaculture",
+  "silvopast", "farm forestry", "horticultur", "farmer producer", "land use",
+]
+"Biochar & carbon removal" = [
+  "biochar", "bio-char", "carbon removal", "carbon dioxide removal", "CDR", "carbon sequestration", "sequester",
+  "carbon sink", "soil carbon", "carbon farming", "carbon credit", "carbon market", "negative emission",
+  "pyrolysis", "crop residue", "stubble burning", "agricultural residue", "biomass", "enhanced weathering",
+  "blue carbon",
+]
 
 [filter]
-# A listing matches if its title or summary contains any of these (case-insensitive,
-# matched at the start of a word, so "aquacultur" catches aquaculture and aquacultural).
-keywords = [
-  "water", "wastewater", "stormwater", "storm water", "sewer", "watershed",
-  "coastal", "great lakes", "ocean", "marine", "aquacultur", "fisheries", "seafood",
-  "harbor", "port infrastructure", "seawall", "shoreline", "flood", "pfas", "wetland",
-  "estuar", "drought", "irrigation", "harmful algal", "invasive species", "bycatch",
-  "unmanned", "drone", "digital twin", "climate resilien", "coast resilien",
-  # Added 2026-10-06 after reading the first California and NYC pulls.
-  "sea level", "storm surge", "tidal", "groundwater", "aquifer", "aquatic", "hydrolog",
-  "hydrosphere", "desalinat", "river", "lake", "riparian", "erosion", "dredg", "levee",
-  "culvert", "lead service line", "lead pipe", "shellfish", "oyster", "salmon", "coral",
-  "kelp", "seaweed", "blue carbon", "vessel", "boat", "underwater", "subsea", "bathymetr",
-  "sonar", "buoy", "algae", "nutrient pollution",
-  # Added 2026-10-06 after reading the first MWRD, Chicago and Great Lakes Water Authority bids.
-  "clarifier", "biosolid", "sludge", "water reclamation", "treatment plant", "pump station",
-  "pumping station", "lift station", "hydrant",
-  # Added 2026-10-08 from the incubator feeds (Leads tab).
-  "blue economy",
+# Broad environmental words. A listing with only these (and no area word above)
+# is still kept, labelled "General environment / climate", with a lower score.
+general_keywords = [
+  "climate", "environment", "ecolog", "natural resource", "sustainable development", "green growth",
+  "nature", "conservation", "net zero", "net-zero", "SDG 13", "SDG 15", "SDG 6",
 ]
 
-# Every listing from these funders counts as a keyword match, even when its title
-# has no water words (e.g. a water utility buying maintenance software). The other
-# filters below still apply. Matched against the funder column, ignoring case.
-water_agencies = [
-  "Metropolitan Water Reclamation District",  # MWRD, Chicago area
-  "Great Lakes Water Authority",              # GLWA, Detroit area
-  "Department Of Water Management",           # City of Chicago
-  "Northeast Ohio Regional Sewer District",    # NEORSD, Cleveland area
-  "Milwaukee Metropolitan Sewerage District",  # MMSD, Milwaukee area
-  "Buffalo Sewer Authority",                   # Buffalo, NY
-  "City of Cleveland Division of Water",       # also matches Division of Water Pollution Control
-  "Metropolitan Council Environmental Services",  # Minneapolis-St. Paul wastewater
-]
-
-# Sources that count as matches without water words: "calendar" is the
-# Calendar tab of the Google Sheet (picked by hand), "nsf-sbir" is NSF's
-# small-business research program, which fits every cohort company.
-hand_picked_sources = ["calendar", "nsf-sbir"]
-
-# Drop listings that mention any of these.
-# "Watervliet" is an Army arsenal; "Marine Corps" notices match "marine" but are rarely about water.
-# "Bottled drinking water" and "water cooler" are office supply orders; the rest are
-# building plumbing and pool services that mention water (seen in Massachusetts bids).
+# Drop listings that mention any of these: other meanings of our words.
 exclude_keywords = [
-  "Watervliet", "Marine Corps", "Marine Forces", "bottled drinking water", "water cooler",
-  "water damage", "water heater", "chilled water", "condensing water", "lifeguard", "swim lesson",
+  "dental", "historic preservation", "historic restoration", "building restoration", "art restoration",
+  "film restoration", "data recovery", "HIV", "cancer", "clinical trial", "vaccine", "opioid", "Watervliet",
+  "Marine Corps", "Lake County", "Lake Charles", "Salt Lake", "Fort Lake", "Indiana",
 ]
 
-# Keep only listings open to at least one of these applicant types.
-# "Others (see listing)" catches listings that describe eligibility in text;
-# some of those won't allow startups, so check the eligibility column.
-eligibility_any = [
-  "Small businesses",
-  "For-profit organizations",
-  "Unrestricted",
-  "Others (see listing)",
-  "Business",        # California's term for companies
-  "Any vendor",      # city solicitations open to any registered vendor
-  "Any company",     # calendar programs open to any startup
-]
-
-# --- Who can bid -------------------------------------------------------------
-# These rules drop listings a startup could not bid on. Everything they drop is
-# written to data/filtered_out.csv with the reason, so you can check nothing
-# useful was cut. Delete a line (or empty a list) to turn a rule off.
-
-# Set-asides that need a certification most startups don't hold. Matched
-# against the eligibility column. "Small business" set-asides are kept.
-exclude_set_asides = [
-  "8(a)", "HUBZone", "Service-Disabled Veteran", "SDVOSB", "Veteran-Owned",
-  "Women-Owned", "WOSB", "Buy Indian", "Indian Economic", "Target Market",
-]
-
-# Construction and public-works bids go to licensed, bonded contractors.
-# These words are checked in the titles of contracts only, never grants.
-contractor_only_title_words = [
-  "construction", "reconstruction", "paving", "repaving", "sidewalk", "roofing",
-  "roof replacement", "HVAC", "demolition", "general bids", "force main",
-  "water line replacement", "waterline replacement", "water main replacement",
-  "water line extension", "waterline extension", "pump station replacement",
-  "pump station improvements", "bridge replacement", "bridge preservation",
-  "bridge superstructure", "culvert replacement", "tank replacement", "recoating",
-  "pipe lining", "sewer rehab", "rehabilitation of water mains", "rehabilitation of local sewers",
-  "culvert rehabilitation", "dam replacement", "expansion joint", "exterior building", "roof rep",
-]
-# Bids for things a technology startup doesn't sell: supplies, chemicals, grounds,
-# building services and property deals. Many come from water agencies, whose bids
-# all count as matches. Checked in the titles of contracts only, never grants;
-# the technical words below still keep a bid.
-off_topic_title_words = [
-  "rubbish", "refuse collection", "trash collection", "trash removal", "recycling services", "janitorial", "custodial",
-  "elevator", "landscap", "turf", "mowing", "snow removal", "pest control", "flagger",
-  "hypochlorite", "activated carbon", "chemical supply", "florosilicic", "bottled water", "bags of ice",
-  "uniform", "furniture",
-  "snack bar", "statue", "basketball", "morgue", "doors and frames", "real estate",
-  "emergency sewer work", "emergency water main", "water main break",
-]
-# Contract categories that mean construction (Virginia eVA labels every bid).
-contractor_only_topics = ["Category: Construction"]
-# A bid whose title has any of these is kept even when it looks like
-# construction, because a technology or services company could win it.
-not_construction_words = [
-  "monitoring", "instrumentation", "sensor", "SCADA", "inspection", "assessment",
-  "study", "testing", "locating", "optimization", "data", "water quality",
-  "mitigation credit", "mitigation cred",
-]
-
-# Grant text that rules businesses out. Checked in the eligibility notes and
-# summary. Grants that just say "see listing" are kept.
-not_eligible_patterns = [
-  'for[- ]profit (organizations|entities|businesses|companies|applicants)?[^.]{0,40}(are|is) not eligible',
-  'not eligible[^.]{0,40}for[- ]profit',
-  'not open to for[- ]profit',
-  'eligib\w* (applicants|entities) (are|is) limited to (states?|state agencies|local|units of local government|tribes|tribal|federally[- ]recognized|non-?profit|public|institutions of higher education|universities)',
-  'only (states|state agencies|tribes|federally[- ]recognized tribes|units of local government|local governments|non-?profit organizations|public agencies|institutions of higher education) (are eligible|may apply|can apply)',
-]
-
-# Skip funders whose code starts with any of these (HHS is mostly health research).
+# Funders to skip entirely by their Grants.gov code (HHS is health research).
 exclude_funder_codes = ["HHS"]
 
-# Skip listings whose topics contain any of these. SAM.gov topics carry the
-# federal product/service code (PSC) and industry code (NAICS). These cut
-# construction, building repair and facility operations contracts:
-# PSC Y/Z = construction and repair of buildings and sites, J = equipment repair,
-# M = operating facilities, S = utilities and housekeeping, X = leases,
-# NAICS 23 = construction.
-exclude_topics = ["PSC Y", "PSC Z", "PSC J", "PSC M", "PSC S", "PSC X", "NAICS 23"]
+# --- 2. Things FBH can't apply for (moved to data/filtered_out.csv) -----------
 
-# Federal contracts (SAM.gov) carry a product/service code (PSC) saying what is
-# being bought. Keep only those whose code starts with one of these; listings
-# without a code are not affected. Look codes up at https://www.acquisition.gov/psc-manual
-allowed_codes = [
-  "PSC A",     # research and development
-  "PSC B",     # special studies and analysis (environmental studies, water testing)
-  "PSC C2",    # architect and engineering services
-  "PSC D",     # IT and data services
-  "PSC F",     # natural resources and environmental services
-  "PSC H",     # inspection, testing and quality control
-  "PSC R4",    # professional and engineering services
-  "PSC 1550",  # unmanned aircraft
-  "PSC 46",    # water purification and sewage treatment equipment
-  "PSC 5845",  # underwater sound equipment
-  "PSC 66",    # instruments and laboratory equipment
-  "PSC 7",     # IT equipment and software
+# Calls for individuals rather than organisations. Checked in the title only.
+individual_title_words = [
+  "scholarship", "fellowship", "phd", "ph.d", "doctoral", "postdoc", "master's", "masters", "internship",
+  "student", "journalis", "photograph", "film", "essay", "poetry", "summer school", "online course",
+  "training course", "webinar", "conference", "youth summit", "residency", "artist", "writers",
 ]
+
+# Procurement and consultancy: buying services, not giving grants. Checked in the title.
+procurement_title_words = [
+  "tender", "RFQ", "request for quotation", "invitation to bid", "supply of", "procurement of",
+  "consultant", "consultancy", "terms of reference", "TOR for", "hiring", "vacancy", "job",
+]
+
+# Funding only for companies or start-ups. Checked in the title. A listing that
+# also says NGOs or nonprofits may apply is kept, marked "verify".
+business_title_words = [
+  "startup", "start-up", "SME", "small business", "SBIR", "STTR", "for-profit", "entrepreneur",
+  "accelerator", "incubat", "venture", "investment readiness", "equity",
+]
+
+# Text that rules nonprofits out. Checked in the eligibility notes and description.
+not_eligible_patterns = [
+  'non-?profits? (organizations? )?(are|is) not eligible',
+  'not open to (ngos|non-?profits|civil society)',
+  'only (for-profit|private sector|companies|businesses|startups|smes) (are eligible|may apply|can apply)',
+  'eligib\w* (applicants|entities) (are|is) limited to (states?|state agencies|local|units of local government|tribes|tribal|federally[- ]recognized|public|institutions of higher education|universities)',
+  'only (states|state agencies|tribes|federally[- ]recognized tribes|units of local government|local governments|public agencies|institutions of higher education) (are eligible|may apply|can apply)',
+]
+
+# --- 3. Where the work can happen --------------------------------------------
+[geography]
+# India named: the best fit.
+india = [
+  "India", "Indian", "South Asia", "South Asian", "Telangana", "Andhra Pradesh", "Karnataka", "Tamil Nadu",
+  "Kerala", "Maharashtra", "Gujarat", "Rajasthan", "Madhya Pradesh", "Uttar Pradesh", "Uttarakhand", "Bihar",
+  "Odisha", "Orissa", "Jharkhand", "Chhattisgarh", "West Bengal", "Assam", "Meghalaya", "Himachal",
+  "Punjab", "Haryana", "Delhi", "Goa", "Sikkim", "Hyderabad", "Bengaluru", "Bangalore", "Mumbai", "Chennai",
+  "Western Ghats", "Himalaya",
+]
+# Open worldwide or to regions that include India: India is likely eligible, but check.
+international = [
+  "global", "globally", "worldwide", "international", "all countries", "any country", "developing countries",
+  "developing nations", "low- and middle-income", "low and middle income", "LMIC", "LMICs", "Global South",
+  "emerging economies", "emerging markets", "ODA-eligible", "ODA eligible", "DAC list", "Asia", "Asia-Pacific",
+  "Asia Pacific", "Commonwealth", "foreign", "non-U.S.", "non-US", "outside the United States",
+]
+# Places that, when named in the title without India, mean the call is for somewhere else.
+other_places = [
+  "United States", "U.S.", "USA", "America", "Americas", "Canada", "Mexico", "Latin America", "Caribbean",
+  "Brazil", "Colombia", "Peru", "Ecuador", "Bolivia", "Chile", "Argentina", "Guatemala", "Honduras",
+  "Africa", "African", "Sub-Saharan", "Kenya", "Uganda", "Tanzania", "Rwanda", "Ethiopia", "Nigeria", "Ghana",
+  "Malawi", "Zambia", "Zimbabwe", "Mozambique", "Madagascar", "South Africa", "Cameroon", "Senegal", "Mali",
+  "Burkina Faso", "Niger", "Sierra Leone", "Liberia", "Somalia", "Sudan", "Egypt", "Morocco", "Tunisia",
+  "Europe", "European", "EU Member States", "UK", "United Kingdom", "England", "Scotland", "Wales", "Ireland",
+  "Germany", "France", "Italy", "Spain", "Portugal", "Netherlands", "Belgium", "Poland", "Ukraine", "Balkans",
+  "Middle East", "MENA", "Jordan", "Lebanon", "Syria", "Iraq", "Yemen", "Turkey", "Afghanistan",
+  "Pakistan", "Bangladesh", "Nepal", "Sri Lanka", "Bhutan", "Maldives", "Myanmar", "Thailand", "Vietnam",
+  "Cambodia", "Laos", "Indonesia", "Philippines", "Malaysia", "Southeast Asia", "South-East Asia",
+  "Central Asia", "East Asia", "China", "Mongolia", "Japan", "Korea", "Australia", "New Zealand",
+  "Pacific Islands", "Fiji", "Papua New Guinea",
+]
+# Text that limits a call to the United States (or US-registered charities).
+us_only_patterns = [
+  'U\.?S\.?[- ]based (organizations|nonprofits|charities|applicants)',
+  '(located|based|registered|operating) (in|within) the United States',
+  'United States only',
+  'U\.?S\.? (citizens|residents) only',
+  'projects? (must be )?(located|conducted|implemented) (in|within) the (United States|U\.S\.)',
+]
+
+# --- 4. Who can apply ---------------------------------------------------------
+[applicants]
+# Words that say NGOs / nonprofits can apply.
+nonprofit = [
+  "NGO", "NGOs", "non-governmental", "nongovernmental", "nonprofit", "non-profit", "not-for-profit",
+  "civil society", "CSO", "CSOs", "charit", "community-based organi", "community based organi", "CBO",
+  "voluntary organi", "section 8 compan", "trusts and societies", "grassroots organi",
+]
+# Words that mean a partner or consortium may be needed. Shown as "check".
+partnership = [
+  "consortium", "consortia", "in partnership with", "partner with", "lead applicant", "co-applicant",
+  "lead partner", "jointly with", "university partner", "joint application",
+]
+# Mentions of US charity status. Not a reason to drop: many US funders accept an
+# equivalency determination or a US fiscal sponsor. Shown as "check".
+us_charity_words = ["501(c)(3)", "501c3", "equivalency determination"]
+
+# --- 5. Funding size (US dollars; other currencies are converted roughly) -------
+[size]
+priority_min_usd = 50000   # at or above this: a plus in the score
+minimum_usd = 10000        # below this: moved to filtered_out.csv
+# Rough exchange rates used only to compare sizes. Update now and then.
+usd_per = { USD = 1.0, EUR = 1.10, GBP = 1.30, INR = 0.0114, CHF = 1.15, AUD = 0.65, CAD = 0.72, SEK = 0.095, NOK = 0.093, DKK = 0.148, JPY = 0.0067 }
+
+# --- 6. Funders already in our pipeline ----------------------------------------
+# Listings from these funders get +1 on the score and "Yes" in the "In pipeline"
+# column. Matched against the funder, title and description, ignoring capitals.
+[watchlist]
+funders = []
+
+# --- 7. Sources -----------------------------------------------------------------
+# fundsforNGOs: an aggregator of grant calls for NGOs worldwide. Read through its
+# public WordPress feed (the same way Gaurav's tracker read its sister site).
+[fundsforngos]
+api = "https://www2.fundsforngos.org/wp-json/wp/v2/posts"
+latest_pages = 2          # newest posts, 100 per page
+# One extra page of posts for each of these searches, so older relevant calls are found.
+searches = ["India", "biodiversity", "forest", "restoration", "water", "climate", "agriculture", "carbon"]
+# A post with no deadline we can read stays listed this many days after first seen.
+keep_days_without_deadline = 120
 
 [calendar]
-# The Calendar tab of the Google Sheet, read as CSV each run. The sheet must be
-# shared as "anyone with the link can view". Leave blank to use data/calendar.csv only.
-sheet_csv = "https://docs.google.com/spreadsheets/d/1Hdk8iebShtatUGKV1sUEGooQkF8m5A1FL6WhUsMt3ig/gviz/tq?tqx=out:csv&headers=1&sheet=Calendar"
+# The Calendar tab of the Google Sheet, read as CSV each run. Leave blank to use
+# data/calendar.csv in the repository only. See the README before setting this:
+# the tab must be viewable by anyone with the link.
+sheet_csv = ""
 
 [leads]
-# News feeds of incubators, water clusters and funders. Every run reads them and
-# writes posts that look like a call for startups (apply, prize, deadline, ...)
-# to data/leads.csv and the sheet's Leads tab. Add a feed by copying a block.
-#   needs = "water"    keep only posts that also have a water keyword (feeds covering every industry)
-#   needs = "climate"  water keyword or one of climate_words (general startup hubs)
-#   standing = true    the feed lists open programs, so every post counts however old
-#   format = "wordpress" for a /wp-json/ address; leave it out for an RSS feed
-# Imagine H2O's feed is left out: its host now answers automated requests with a
-# captcha page. Its yearly call is in the Calendar tab instead.
+# News feeds (RSS or WordPress) of funders and networks. Every run keeps posts that
+# look like a call (apply, call for proposals, ...) and mention an FBH area word,
+# and lists them in the sheet's Leads tab. Add a feed by copying the example block
+# at the end and removing the # signs.
 call_words = [
   "apply", "applications open", "applications are open", "application deadline", "now accepting",
-  "accepting applications", "call for", "open call", "request for proposals", "request for applications",
-  "nominations open", "entries open", "submissions open",
+  "accepting applications", "call for proposals", "call for applications", "call for concept notes",
+  "request for proposals", "request for applications", "expression of interest", "nominations open",
+  "open call",
 ]
-# These count only when they are in a post's title ("challenge" alone is in lots of news stories).
-call_title_words = ["prize", "challenge", "competition", "award", "grant", "funding", "deadline", "pitch", "rfp"]
-# Posts whose title has one of these are news about past winners or programs
-# outside the US, not calls our startups can answer. Matched at the start of a word,
-# so "India)" catches "(India)" without catching Indiana.
-skip_title_words = [
-  "winner", "spotlight", "welcomes", "meet cohort", "meet the cohort", "participants", "recap",
-  "India)", "Africa", "Uganda", "Pakistan", "Maldives", "Australia", "Ghana", "Zimbabwe", "UK)",
-]
-climate_words = ["climate", "cleantech", "clean tech", "clean energy", "decarboni", "sustainab", "environment"]
+call_title_words = ["grant", "grants", "fund", "funding", "award", "prize", "challenge", "call", "deadline", "rfp"]
+skip_title_words = ["winner", "winners", "awarded", "recipients", "announces grantees", "recap"]
+climate_words = []
 
-[[leads.feeds]]
-name = "Evergreen Climate Innovations (awards)"
-url = "https://evergreeninno.org/wp-json/wp/v2/awards?per_page=50"
-format = "wordpress"
-standing = true
-
-[[leads.feeds]]
-name = "The Water Council"
-url = "https://thewatercouncil.com/feed/"
-
-[[leads.feeds]]
-name = "Current (Chicago)"
-url = "https://currentwater.org/feed/"
-
-[[leads.feeds]]
-name = "LACI (Los Angeles)"
-url = "https://laincubator.org/feed/"
-
-[[leads.feeds]]
-name = "JumpStart (Ohio)"
-url = "https://www.jumpstartinc.org/feed/"
-needs = "climate"
-
-[[leads.feeds]]
-name = "fundsforcompanies (awards and prizes)"
-url = "https://fundsforcompanies.fundsforngos.org/wp-json/wp/v2/posts?categories=218&per_page=50"
-format = "wordpress"
-needs = "water"
+feeds = []
+# [[leads.feeds]]
+# name = "Example funder news"
+# url = "https://example.org/feed/"
+# needs = "topic"     # keep only posts that mention an FBH area word near the top

@@ -2,7 +2,7 @@
 
 Every source names things its own way ("Contract (Combined Synopsis/Solicitation)",
 "Cooperative agreement; Grant", "Others (see listing)"). These columns put each
-listing into a few simple buckets so founders can sort and filter in one go.
+listing into a few simple buckets so people can sort and filter in one go.
 The source's own wording stays in the original columns.
 """
 
@@ -29,8 +29,8 @@ def describe(row):
 
 def kind(row):
     t = row["listing_type"].lower()
-    if "prize" in t:
-        return "Prize"
+    if "prize" in t or "award" in t:
+        return "Prize or award"
     if t.startswith("contract"):
         return "Contract"
     if "grant" in t or "cooperative agreement" in t:
@@ -84,16 +84,14 @@ def _money(value):
 
 
 def who_can_apply(row):
+    """A first reading from the source's own applicant types. For matches,
+    tracker/fit.py refines it using the listing text."""
     e = row["eligibility"].lower()
-    if "small business set aside" in e or "small business set-aside" in e:
-        return "Small businesses only"
-    if "any vendor" in e or "any company" in e or "unrestricted" in e:
-        return "Any company"
-    if "business" in e or "for-profit" in e:
-        return "Companies eligible"
-    if "see listing" in e:
-        return "Check listing"
-    return "Not companies"
+    if "nonprofit" in e or "ngo" in e:
+        return "NGOs eligible"
+    if "unrestricted" in e or "any" in e:
+        return "Anyone"
+    return "Check listing"
 
 
 def short_summary(text, limit=280):

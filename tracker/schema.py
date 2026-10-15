@@ -11,7 +11,7 @@ FIELDS = [
     "stage",           # Open, Coming soon, Info request
     "deadline",        # close date, or "Not set"
     "amount",          # e.g. "Up to $500K"
-    "who_can_apply",   # Any company, Companies eligible, Small businesses only, Check listing, Not companies
+    "who_can_apply",   # NGOs eligible, Anyone, Check listing (and "partner may be needed")
     "short_summary",   # first sentences of the summary
     # The source's own fields
     "listing_type",    # grant, cooperative agreement, contract, prize, ...
@@ -27,6 +27,14 @@ FIELDS = [
     "location",        # where the applicant or work must be; "National" for federal
     "link",            # the original listing page
     "summary",         # first part of the description
+    # How well the listing fits FBH (filled in by tracker/fit.py for matches)
+    "fbh_area",        # which FBH program area(s) it matches
+    "geography",       # India named, International (check India), Unclear, ...
+    "eligibility_check",  # "Confirmed: ..." facts from the listing; "Verify: ..." assumptions to check
+    "amount_usd",      # rough size in US dollars, for the size rule
+    "in_pipeline",     # "Yes" when the funder is on our watch list
+    "fit_score",       # 1 (weak) to 5 (strong)
+    "fit_reason",      # why it scored what it did
     "first_seen",      # date this pool first saw the listing
     "last_seen",       # most recent date it was still open
 ]

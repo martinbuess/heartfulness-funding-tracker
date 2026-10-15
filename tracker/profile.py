@@ -1,10 +1,17 @@
-"""A simple profile filter that narrows the pool to what one founder cares about.
+"""Which listings fit FBH, using the settings in profile.toml.
 
-This is deliberately basic (keywords plus eligibility); proper matching comes later.
+A listing is kept when it mentions an FBH program area (or a broad
+environment/climate word) and no rule rules it out. Listings removed by a rule
+are returned with the reason so they can be checked in data/filtered_out.csv;
+nothing is dropped silently except plainly off-topic listings.
 """
 
-import re
 import tomllib
+
+from tracker import fit
+
+# Sources picked by a person: every listing counts, and no rule sets it aside.
+HAND_PICKED = ("calendar",)
 
 
 def load(path):
@@ -12,107 +19,81 @@ def load(path):
         return tomllib.load(f)
 
 
-_CODE = re.compile(r"PSC \w")
+class _Filter:
+    def __init__(self, profile):
+        rules = profile.get("filter", {})
+        self.fit = fit.Rules(profile)
+        topic_words = [w for words in profile.get("areas", {}).values() for w in words]
+        self.topic = fit.prefix_words(topic_words + rules.get("general_keywords", []))
+        self.exclude = fit.whole_words(rules.get("exclude_keywords", []))
+        self.skip_funders = tuple(rules.get("exclude_funder_codes", []))
+        self.individual = fit.prefix_words(rules.get("individual_title_words", []))
+        self.procurement = fit.whole_words(rules.get("procurement_title_words", []))
+        self.business = fit.prefix_words(rules.get("business_title_words", []))
+        self.not_eligible = fit.regex(rules.get("not_eligible_patterns", []))
 
+    def on_topic(self, row):
+        if row["source"] in HAND_PICKED:
+            return True
+        if self.skip_funders and row.get("funder_code", "").startswith(self.skip_funders):
+            return False
+        text = f"{row['title']} {row['summary']}"
+        if not (self.topic and self.topic.search(text)):
+            return False
+        return not (self.exclude and self.exclude.search(text))
 
-def _pattern(words):
-    if not words:
-        return None
-    return re.compile(r"\b(" + "|".join(re.escape(w) for w in words) + r")", re.IGNORECASE)
-
-
-def _regex(patterns):
-    if not patterns:
-        return None
-    return re.compile("|".join(f"(?:{p})" for p in patterns), re.IGNORECASE)
+    def set_aside(self, row):
+        """Why FBH could not apply, or "" if nothing says so."""
+        title = row["title"]
+        listing_type = row.get("listing_type", "").lower()
+        if "procurement" in listing_type or listing_type.startswith("contract"):
+            return "procurement: a contract to supply services, not a grant"
+        found = self.procurement.search(title) if self.procurement else None
+        if found:
+            return f"procurement: \"{found.group(0)}\" in the title"
+        found = self.individual.search(title) if self.individual else None
+        if found:
+            return f"for individuals or events: \"{found.group(0)}\" in the title"
+        elig = row.get("eligibility", "").lower()
+        if row["source"] == "grants.gov" and not any(w in elig for w in ("nonprofit", "unrestricted", "see listing")):
+            return "not open to nonprofits (Grants.gov applicant types)"
+        notes = f"{row.get('eligibility_notes', '')} {row['summary']}"
+        found = self.not_eligible.search(notes) if self.not_eligible else None
+        if found:
+            return f"not open to nonprofits: \"{found.group(0)}\""
+        found = self.business.search(title) if self.business else None
+        if found and not (self.fit.nonprofit and self.fit.nonprofit.search(f"{title} {notes}")):
+            return f"for companies or start-ups: \"{found.group(0)}\" in the title"
+        return ""
 
 
 def apply(profile, rows, dropped=None):
-    """Return the rows that fit the profile.
+    """Return the rows that fit FBH, with the fit columns filled in.
 
-    Pass a list as dropped to collect (row, reason) for listings that matched
-    the keywords but were removed by the "who can bid" rules, for review.
+    Pass a list as dropped to collect (row, reason) for listings that were on
+    topic but set aside by a rule.
     """
-    rules = profile.get("filter", {})
-    include = _pattern(rules.get("keywords", []))
-    exclude = _pattern(rules.get("exclude_keywords", []))
-    eligible = [e.lower() for e in rules.get("eligibility_any", [])]
-    skip_funders = tuple(rules.get("exclude_funder_codes", []))
-    skip_topics = rules.get("exclude_topics", [])
-    allowed_codes = rules.get("allowed_codes", [])
-    water_agencies = [a.lower() for a in rules.get("water_agencies", [])]
-    picked = rules.get("hand_picked_sources", [])
-    set_asides = [a.lower() for a in rules.get("exclude_set_asides", [])]
-    contractor_words = _pattern(rules.get("contractor_only_title_words", []))
-    contractor_topics = rules.get("contractor_only_topics", [])
-    off_topic_words = _pattern(rules.get("off_topic_title_words", []))
-    tech_words = _pattern(rules.get("not_construction_words", []))
-    not_eligible = _regex(rules.get("not_eligible_patterns", []))
-
+    f = _Filter(profile)
     matches = []
     for row in rows:
-        if not _on_topic(row, include, exclude, water_agencies, picked):
+        if not f.on_topic(row):
             continue
-        reason = _who_can_bid(row, set_asides, contractor_words, contractor_topics, tech_words, not_eligible,
-                              off_topic_words)
+        hand_picked = row["source"] in HAND_PICKED
+        reason = "" if hand_picked else f.set_aside(row)
+        if not reason:
+            reason = fit.assess(row, f.fit)
+            if hand_picked:
+                reason = ""
         if reason:
             if dropped is not None:
                 dropped.append((row, reason))
             continue
-        if eligible and not any(e in row["eligibility"].lower() for e in eligible):
-            continue
-        if skip_funders and row["funder_code"].startswith(skip_funders):
-            continue
-        if any(t in row["topics"] for t in skip_topics):
-            continue
-        # Listings that carry a product/service code (SAM.gov) must use an allowed one.
-        if allowed_codes and _CODE.search(row["topics"]) and not any(c in row["topics"] for c in allowed_codes):
-            continue
         matches.append(row)
+    matches.sort(key=lambda r: (-int(r["fit_score"] or 0), r["close_date"] or "9999"))
     return matches
 
 
 def on_topic(profile, rows):
-    """The rows that match the keywords (or come from a water agency), before any
-    eligibility or "who can bid" rule. Used to decide what goes in the archive."""
-    rules = profile.get("filter", {})
-    include = _pattern(rules.get("keywords", []))
-    exclude = _pattern(rules.get("exclude_keywords", []))
-    water_agencies = [a.lower() for a in rules.get("water_agencies", [])]
-    picked = rules.get("hand_picked_sources", [])
-    return [r for r in rows if _on_topic(r, include, exclude, water_agencies, picked)]
-
-
-def _on_topic(row, include, exclude, water_agencies, picked=()):
-    text = f"{row['title']} {row['summary']}"
-    from_water_agency = any(a in row["funder"].lower() for a in water_agencies)
-    if row["source"] in picked:
-        return True
-    if include and not from_water_agency and not include.search(text):
-        return False
-    return not (exclude and exclude.search(text))
-
-
-def _who_can_bid(row, set_asides, contractor_words, contractor_topics, tech_words, not_eligible,
-                 off_topic_words=None):
-    """Why a startup could not bid on this listing, or "" if nothing says so."""
-    eligibility = row["eligibility"].lower()
-    for name in set_asides:
-        if name in eligibility:
-            return f"set-aside: {name}"
-    looks_technical = tech_words and tech_words.search(row["title"])
-    if row["listing_type"].startswith("Contract") and not looks_technical:
-        found = contractor_words.search(row["title"]) if contractor_words else None
-        if found:
-            return f"construction bid: {found.group(0).lower()}"
-        for topic in contractor_topics:
-            if topic in row["topics"]:
-                return f"construction bid: {topic}"
-        found = off_topic_words.search(row["title"]) if off_topic_words else None
-        if found:
-            return f"off-topic bid: {found.group(0).lower()}"
-    if not_eligible:
-        found = not_eligible.search(f"{row.get('eligibility_notes', '')} {row['summary']}")
-        if found:
-            return f"not open to businesses: {found.group(0)}"
-    return ""
+    """Rows that mention an FBH area, before any eligibility rule. Used for the archive."""
+    f = _Filter(profile)
+    return [r for r in rows if f.on_topic(r)]

@@ -28,12 +28,14 @@ def closed(previous, source, fresh):
     return [r for r in previous if r["source"] == source and r["source_id"] not in still_open]
 
 
-def archive(path, rows):
-    """Add closed listings to the archive, keeping one row per listing."""
+def archive(path, rows, today=None):
+    """Add closed listings to the archive, keeping one row per listing and the date it closed."""
     kept = {(r["source"], r["source_id"]): r for r in load(path)}
     for row in rows:
-        kept[(row["source"], row["source_id"])] = row
-    save(path, kept.values())
+        old = kept.get((row["source"], row["source_id"]), {})
+        closed_on = old.get("closed_on") or (today.isoformat() if today else "")
+        kept[(row["source"], row["source_id"])] = dict(row, closed_on=closed_on)
+    save(path, kept.values(), extra=["closed_on"])
     return len(kept)
 
 

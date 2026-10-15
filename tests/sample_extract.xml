@@ -40,4 +40,32 @@
         <AgencyName>EPA</AgencyName>
         <Description>Forecast with no dates yet.</Description>
     </OpportunityForecastDetail_1_0>
+    <OpportunitySynopsisDetail_1_0>
+        <OpportunityID>200</OpportunityID>
+        <OpportunityTitle>Asian Elephant Conservation Fund</OpportunityTitle>
+        <FundingInstrumentType>G</FundingInstrumentType>
+        <CategoryOfFundingActivity>NR</CategoryOfFundingActivity>
+        <EligibleApplicants>12</EligibleApplicants>
+        <EligibleApplicants>25</EligibleApplicants>
+        <AgencyCode>DOI-FWS</AgencyCode>
+        <AgencyName>Fish and Wildlife Service</AgencyName>
+        <PostDate>09152026</PostDate>
+        <CloseDate>01152027</CloseDate>
+        <AwardCeiling>200000</AwardCeiling>
+        <AdditionalInformationOnEligibility>Foreign governments, international organizations and non-governmental organizations in range countries may apply.</AdditionalInformationOnEligibility>
+        <Description>Supports habitat conservation and human-elephant conflict reduction in Asian elephant range countries.</Description>
+    </OpportunitySynopsisDetail_1_0>
+    <OpportunitySynopsisDetail_1_0>
+        <OpportunityID>201</OpportunityID>
+        <OpportunityTitle>Urban Forest Restoration Grants</OpportunityTitle>
+        <FundingInstrumentType>G</FundingInstrumentType>
+        <CategoryOfFundingActivity>NR</CategoryOfFundingActivity>
+        <EligibleApplicants>12</EligibleApplicants>
+        <AgencyCode>USDA-FS</AgencyCode>
+        <AgencyName>Forest Service</AgencyName>
+        <PostDate>09152026</PostDate>
+        <CloseDate>12152026</CloseDate>
+        <AwardCeiling>500000</AwardCeiling>
+        <Description>Tree planting and urban forest restoration in American cities.</Description>
+    </OpportunitySynopsisDetail_1_0>
 </Grants>

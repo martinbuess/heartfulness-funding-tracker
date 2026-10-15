@@ -57,6 +57,7 @@ def load(url, path=MIRROR_PATH):
         else:
             if _valid(text):
                 rows = parse(text)
+                os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
                 with open(path, "w", newline="", encoding="utf-8") as f:
                     writer = csv.DictWriter(f, fieldnames=COLUMNS, extrasaction="ignore")
                     writer.writeheader()
