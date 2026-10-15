@@ -85,7 +85,7 @@ def amounts(text, usd_per):
             except ValueError:
                 continue
             rate = usd_per.get(code)
-            if rate and value >= 100:
+            if rate and value * rate >= 1000:  # smaller figures are usually fees or costs, not grant sizes
                 found.append((value * rate, m.group(0).strip()))
     return found
 
@@ -121,6 +121,7 @@ class Rules:
         # "Asia" counts as international, but not inside "Southeast Asia" or "Central Asia".
         self.other = whole_words(geo.get("other_places", []))
         self.us_only = regex(geo.get("us_only_patterns", []))
+        self.gg_foreign = regex(geo.get("grants_gov_foreign_patterns", []))
         app = profile.get("applicants", {})
         self.nonprofit = prefix_words(app.get("nonprofit", []))
         self.partnership = prefix_words(app.get("partnership", []))
@@ -154,6 +155,16 @@ def areas(row, rules):
     return in_title, anywhere, words
 
 
+def _embassy(funder):
+    """The country in "U.S. Mission to Cambodia" or "U.S. Embassy in Ghana"; blank for other funders."""
+    m = re.search(r"(?:mission to|embassy (?:in|to)|bureau of) (.+)", funder or "", re.IGNORECASE)
+    return m.group(1) if m else ""
+
+
+def _place(text):
+    return text if text.isupper() else text.title()
+
+
 def _strip_subregions(text):
     return re.sub(r"\b(south[- ]?east|central|east|west|north) asia", "subregion", text, flags=re.IGNORECASE)
 
@@ -165,17 +176,22 @@ def geography(row, rules):
         return "India named", 2, ""
     if rules.us_only and rules.us_only.search(text):
         return "US only", 0, "US-based work or applicants only"
+    # A place named in the title or the funder (e.g. "U.S. Mission to Cambodia") without India.
+    # A title that also says "global" or "Asia" (e.g. "Africa and Asia") is not restricted.
+    title_places = _found(rules.other, f"{row['title']} {_embassy(row['funder'])}")
+    title_intl = rules.international and rules.international.search(_strip_subregions(row["title"]))
+    # "US" in capitals (e.g. "Pilot Program (US)"); lower-case "us" is just a word.
+    if re.search(r"\bUS\b", row["title"]):
+        title_places.append("US")
+    if title_places and not title_intl:
+        return "Elsewhere", 0, f"for {', '.join(_place(p) for p in title_places[:3])}, not India"
     if row["source"] == "grants.gov":
-        # Federal grants are for US applicants unless the listing says otherwise.
+        # Federal grants are for US applicants unless the listing says foreign organisations may apply.
         notes = f"{row['summary']} {row.get('eligibility_notes', '')}"
-        if rules.international and rules.international.search(_strip_subregions(notes)):
+        if rules.gg_foreign and rules.gg_foreign.search(notes):
             return "International (check India)", 1, ""
         return "US only", 0, "US federal grant with no mention of foreign applicants"
-    title_places = _found(rules.other, row["title"])
-    intl = rules.international and rules.international.search(_strip_subregions(text))
-    if title_places and not intl:
-        return "Elsewhere", 0, f"for {', '.join(title_places[:3]).title()}, not India"
-    if intl:
+    if rules.international and rules.international.search(_strip_subregions(text)):
         return "International (check India)", 1, ""
     places = _found(rules.other, text[:400])
     if places:

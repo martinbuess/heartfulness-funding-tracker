@@ -72,6 +72,7 @@ individual_title_words = [
   "scholarship", "fellowship", "phd", "ph.d", "doctoral", "postdoc", "master's", "masters", "internship",
   "student", "journalis", "photograph", "film", "essay", "poetry", "summer school", "online course",
   "training course", "webinar", "conference", "youth summit", "residency", "artist", "writers",
+  "art competition", "art contest", "children's", "drawing competition", "photo contest",
 ]
 
 # Procurement and consultancy: buying services, not giving grants. Checked in the title.
@@ -100,7 +101,9 @@ not_eligible_patterns = [
 [geography]
 # India named: the best fit.
 india = [
-  "India", "Indian", "South Asia", "South Asian", "Telangana", "Andhra Pradesh", "Karnataka", "Tamil Nadu",
+  # Not plain "Indian": US grants use it for American Indian tribes.
+  "India", "Indian NGOs", "Indian NGO", "Indian nonprofits", "Indian organisations", "Indian organizations",
+  "Indian civil society", "Indian states", "South Asia", "South Asian", "Telangana", "Andhra Pradesh", "Karnataka", "Tamil Nadu",
   "Kerala", "Maharashtra", "Gujarat", "Rajasthan", "Madhya Pradesh", "Uttar Pradesh", "Uttarakhand", "Bihar",
   "Odisha", "Orissa", "Jharkhand", "Chhattisgarh", "West Bengal", "Assam", "Meghalaya", "Himachal",
   "Punjab", "Haryana", "Delhi", "Goa", "Sikkim", "Hyderabad", "Bengaluru", "Bangalore", "Mumbai", "Chennai",
@@ -113,20 +116,47 @@ international = [
   "emerging economies", "emerging markets", "ODA-eligible", "ODA eligible", "DAC list", "Asia", "Asia-Pacific",
   "Asia Pacific", "Commonwealth", "foreign", "non-U.S.", "non-US", "outside the United States",
 ]
-# Places that, when named in the title without India, mean the call is for somewhere else.
+# Places that, when named in the title (or in the funder, e.g. "U.S. Mission to Cambodia")
+# without India, mean the call is for somewhere else.
 other_places = [
-  "United States", "U.S.", "USA", "America", "Americas", "Canada", "Mexico", "Latin America", "Caribbean",
-  "Brazil", "Colombia", "Peru", "Ecuador", "Bolivia", "Chile", "Argentina", "Guatemala", "Honduras",
-  "Africa", "African", "Sub-Saharan", "Kenya", "Uganda", "Tanzania", "Rwanda", "Ethiopia", "Nigeria", "Ghana",
-  "Malawi", "Zambia", "Zimbabwe", "Mozambique", "Madagascar", "South Africa", "Cameroon", "Senegal", "Mali",
-  "Burkina Faso", "Niger", "Sierra Leone", "Liberia", "Somalia", "Sudan", "Egypt", "Morocco", "Tunisia",
-  "Europe", "European", "EU Member States", "UK", "United Kingdom", "England", "Scotland", "Wales", "Ireland",
-  "Germany", "France", "Italy", "Spain", "Portugal", "Netherlands", "Belgium", "Poland", "Ukraine", "Balkans",
-  "Middle East", "MENA", "Jordan", "Lebanon", "Syria", "Iraq", "Yemen", "Turkey", "Afghanistan",
-  "Pakistan", "Bangladesh", "Nepal", "Sri Lanka", "Bhutan", "Maldives", "Myanmar", "Thailand", "Vietnam",
-  "Cambodia", "Laos", "Indonesia", "Philippines", "Malaysia", "Southeast Asia", "South-East Asia",
-  "Central Asia", "East Asia", "China", "Mongolia", "Japan", "Korea", "Australia", "New Zealand",
-  "Pacific Islands", "Fiji", "Papua New Guinea",
+  "United States", "U.S.", "USA", "America", "Americas", "North America", "Canada", "Mexico", "Latin America",
+  "Central America", "South America", "Caribbean", "Antigua", "Argentina", "Bahamas", "Barbados", "Belize",
+  "Bolivia", "Brazil", "Chile", "Colombia", "Costa Rica", "Cuba", "Dominica", "Dominican Republic", "Ecuador",
+  "El Salvador", "Grenada", "Guatemala", "Guyana", "Haiti", "Honduras", "Jamaica", "Nicaragua", "Panama",
+  "Paraguay", "Peru", "Saint Lucia", "Suriname", "Trinidad", "Uruguay", "Venezuela", "Africa", "African",
+  "Sub-Saharan", "West Africa", "East Africa", "Southern Africa", "North Africa", "Algeria", "Angola", "Benin",
+  "Botswana", "Burkina Faso", "Burundi", "Cabo Verde", "Cape Verde", "Cameroon", "Central African Republic",
+  "Chad", "Comoros", "Congo", "DRC", "Côte d'Ivoire", "Ivory Coast", "Djibouti", "Egypt", "Equatorial Guinea",
+  "Eritrea", "Eswatini", "Ethiopia", "Gabon", "Gambia", "Ghana", "Guinea", "Guinea-Bissau", "Kenya", "Lesotho",
+  "Liberia", "Libya", "Madagascar", "Malawi", "Mali", "Mauritania", "Mauritius", "Morocco", "Mozambique",
+  "Namibia", "Niger", "Nigeria", "Rwanda", "Sao Tome", "Senegal", "Seychelles", "Sierra Leone", "Somalia",
+  "South Africa", "South Sudan", "Sudan", "Tanzania", "Togo", "Tunisia", "Uganda", "Zambia", "Zimbabwe", "Europe",
+  "European", "EU Member States", "Western Balkans", "Balkans", "UK", "United Kingdom", "England", "Scotland",
+  "Wales", "Northern Ireland", "Ireland", "Albania", "Andorra", "Austria", "Belarus", "Belgium", "Bosnia",
+  "Bulgaria", "Croatia", "Cyprus", "Czech Republic", "Czechia", "Denmark", "Estonia", "Finland", "France",
+  "Germany", "Greece", "Hungary", "Iceland", "Italy", "Kosovo", "Latvia", "Lithuania", "Luxembourg", "Malta",
+  "Moldova", "Monaco", "Montenegro", "Netherlands", "North Macedonia", "Norway", "Poland", "Portugal", "Romania",
+  "Serbia", "Slovakia", "Slovenia", "Spain", "Sweden", "Switzerland", "Ukraine", "Middle East", "MENA", "Bahrain",
+  "Iran", "Iraq", "Israel", "Jordan", "Kuwait", "Lebanon", "Oman", "Palestine", "Qatar", "Saudi Arabia", "Syria",
+  "Turkey", "Türkiye", "United Arab Emirates", "UAE", "Yemen", "Caucasus", "Armenia", "Azerbaijan", "Georgia",
+  "Central Asia", "Kazakhstan", "Kyrgyzstan", "Tajikistan", "Turkmenistan", "Uzbekistan", "Afghanistan",
+  "Pakistan", "Bangladesh", "Nepal", "Sri Lanka", "Bhutan", "Maldives", "Southeast Asia", "South-East Asia",
+  "ASEAN", "Brunei", "Cambodia", "Indonesia", "Laos", "Lao PDR", "Malaysia", "Myanmar", "Philippines", "Singapore",
+  "Thailand", "Timor-Leste", "Vietnam", "Viet Nam", "East Asia", "China", "Hong Kong", "Taiwan", "Mongolia",
+  "Japan", "Korea", "Australia", "New Zealand", "Pacific Islands", "Pacific Island", "Fiji", "Kiribati",
+  "Marshall Islands", "Micronesia", "Nauru", "Palau", "Papua New Guinea", "Samoa", "Solomon Islands", "Tonga",
+  "Tuvalu", "Vanuatu",
+]
+# Grants.gov only: a US federal grant counts as open to Indian organisations only when its
+# eligibility notes or description say foreign or international organisations may apply.
+grants_gov_foreign_patterns = [
+  'foreign (organi[sz]ations|entities|institutions|applicants|non-?profits|public entities|ngos|governments)',
+  'non-?u\.?s\.? (organi[sz]ations|entities|institutions|applicants|non-?profits|ngos)',
+  'public international organi[sz]ations',
+  'international (organi[sz]ations|non-?governmental organi[sz]ations|ngos) (are|may|can) (eligible|apply)',
+  'organi[sz]ations (based|located|registered) (outside|abroad)',
+  'range (countries|states)',
+  '\bIndia\b',
 ]
 # Text that limits a call to the United States (or US-registered charities).
 us_only_patterns = [

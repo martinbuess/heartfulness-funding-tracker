@@ -132,6 +132,34 @@ class FbhProfileTest(unittest.TestCase):
         self.assertTrue(reasons["201"].startswith("geography: US federal grant"))
 
 
+class GeographyTest(unittest.TestCase):
+    """Cases found in the first live run."""
+
+    def geo(self, title, summary="", funder="", source="fundsforngos", notes=""):
+        row = {"title": title, "summary": summary, "funder": funder, "source": source,
+               "eligibility_notes": notes, "location": ""}
+        return fit.geography(row, fit.Rules(PROFILE))
+
+    def test_country_in_title_or_embassy_funder_is_elsewhere(self):
+        self.assertEqual(self.geo("GEF Small Grants Program (Palau)", "Global Environment Facility")[2],
+                         "for Palau, not India")
+        self.assertEqual(self.geo("Small Grant Program", funder="U.S. Mission to China", source="grants.gov")[0],
+                         "Elsewhere")
+        self.assertEqual(self.geo("Wildlife Crossings Pilot Program (US)")[0], "Elsewhere")
+        self.assertEqual(self.geo("Grants for NGOs in Africa and Asia")[0], "International (check India)")
+
+    def test_american_indian_tribes_are_not_india(self):
+        self.assertEqual(self.geo("Tribal Drought Resilience", "Indian tribes may apply", source="grants.gov")[0],
+                         "US only")
+
+    def test_grants_gov_needs_foreign_applicants_stated(self):
+        self.assertEqual(self.geo("Economics", "international collaboration encouraged", source="grants.gov")[0],
+                         "US only")
+        self.assertEqual(self.geo("Elephant Fund", notes="Foreign governments and NGOs may apply",
+                                  source="grants.gov")[0], "International (check India)")
+        self.assertEqual(self.geo("Lake grants", "Projects in India are eligible.")[0], "India named")
+
+
 class MoneyAndDatesTest(unittest.TestCase):
     RATES = {"USD": 1.0, "EUR": 1.1, "INR": 0.0114, "GBP": 1.3}
 
