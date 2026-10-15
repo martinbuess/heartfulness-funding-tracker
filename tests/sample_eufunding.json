@@ -1,0 +1,74 @@
+{
+ "results": [
+  {
+   "url": "https://ec.europa.eu/info/funding-tenders/opportunities/data/topicDetails/HORIZON-MISS-2027-05-SOIL-03.json",
+   "metadata": {
+    "identifier": [
+     "HORIZON-MISS-2027-05-SOIL-03"
+    ],
+    "title": [
+     "Agroforestry for soil health at landscape level"
+    ],
+    "callTitle": [
+     "Supporting the implementation of the Soil Deal for Europe Mission"
+    ],
+    "status": [
+     "31094501"
+    ],
+    "type": [
+     "1"
+    ],
+    "deadlineDate": [
+     "2027-04-08T00:00:00.000+0000",
+     "2027-09-14T00:00:00.000+0000"
+    ],
+    "startDate": [
+     "2027-02-04T00:00:00.000+0000"
+    ],
+    "budgetOverview": [
+     "{\"budgetTopicActionMap\": {\"1\": [{\"action\": \"x\", \"minContribution\": 4000000, \"maxContribution\": 5000000, \"budgetYearMap\": {\"2027\": 10000000}}]}}"
+    ],
+    "descriptionByte": [
+     "<p>Proposals should demonstrate agroforestry systems that restore soil health and biodiversity.</p>"
+    ]
+   }
+  },
+  {
+   "url": "https://ec.europa.eu/x",
+   "metadata": {
+    "identifier": [
+     "OLD-CALL"
+    ],
+    "title": [
+     "Old call"
+    ],
+    "status": [
+     "31094502"
+    ],
+    "deadlineDate": [
+     "2023-09-20T17:00:00.000+0000"
+    ]
+   }
+  },
+  {
+   "url": "https://ec.europa.eu/y",
+   "metadata": {
+    "identifier": [
+     "HORIZON-MISS-LAKES"
+    ],
+    "title": [
+     "European natural lakes: restoration of lake ecosystems"
+    ],
+    "status": [
+     "31094502"
+    ],
+    "deadlineDate": [
+     "2027-01-20T17:00:00.000+0000"
+    ],
+    "descriptionByte": [
+     "Lake restoration."
+    ]
+   }
+  }
+ ]
+}

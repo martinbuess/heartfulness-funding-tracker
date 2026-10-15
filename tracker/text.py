@@ -6,6 +6,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+import urllib.robotparser
 
 USER_AGENT = "Mozilla/5.0 (compatible; heartfulness-funding-tracker; +https://github.com/martinbuess/heartfulness-funding-tracker)"
 
@@ -36,12 +37,44 @@ _opener = urllib.request.build_opener(_RedirectHandler, urllib.request.HTTPCooki
 RETRY_WAIT = 60  # seconds before trying a site again after a server error
 
 
-def fetch(url, timeout=300, data=None, headers=None):
+class Blocked(Exception):
+    """The site's robots.txt asks automated readers not to fetch this address."""
+
+
+_robots = {}
+
+
+def allowed(url):
+    """Whether the site's robots.txt lets this tracker read the URL (rules as in RFC 9309:
+    a missing robots.txt or a 4xx answer means no rules; a server error means stay away)."""
+    parts = urllib.parse.urlsplit(url)
+    base = f"{parts.scheme}://{parts.netloc}"
+    if base not in _robots:
+        parser = urllib.robotparser.RobotFileParser(base + "/robots.txt")
+        try:
+            request = urllib.request.Request(base + "/robots.txt", headers={"User-Agent": USER_AGENT})
+            with _opener.open(request, timeout=30) as resp:
+                parser.parse(resp.read().decode("utf-8", "replace").splitlines())
+        except urllib.error.HTTPError as error:
+            if error.code >= 500:
+                parser.disallow_all = True
+            else:
+                parser.allow_all = True
+        except OSError:
+            parser.allow_all = True  # robots.txt unreachable: the page fetch will report the real problem
+        _robots[base] = parser
+    return _robots[base].can_fetch(USER_AGENT, url)
+
+
+def fetch(url, timeout=300, data=None, headers=None, check_robots=True):
     """Download a URL and return its bytes. Pass data (bytes) to POST.
 
+    Refuses (raises Blocked) when the site's robots.txt disallows the address.
     A server error (HTTP 5xx) is often a passing hiccup, so it is tried once
     more after a short wait before the source counts as failed.
     """
+    if check_robots and not allowed(url):
+        raise Blocked(f"robots.txt of {urllib.parse.urlsplit(url).netloc} asks automated readers not to fetch {url}")
     request = urllib.request.Request(url, data=data, headers={"User-Agent": USER_AGENT, **(headers or {})})
     try:
         with _opener.open(request, timeout=timeout) as resp:

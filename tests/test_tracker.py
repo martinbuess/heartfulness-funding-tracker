@@ -7,7 +7,7 @@ import unittest
 import urllib.error
 from unittest import mock
 
-from tracker import fit, fundsforngos, grantsgov, leads, plain, pool, profile, programs, run, text
+from tracker import eufunding, feeds, fit, grantsgov, leads, plain, pool, profile, programs, run, text, watch
 
 HERE = os.path.dirname(__file__)
 SAMPLE = os.path.join(HERE, "sample_extract.xml")
@@ -15,10 +15,12 @@ TODAY = datetime.date(2026, 10, 5)
 PROFILE = profile.load(os.path.join(HERE, "..", "profile.toml"))
 
 
+FEED = {"source": "fundsforngos", "name": "Sample", "url": "https://example.org/feed/"}
+
+
 def _ffn_rows(today=datetime.date(2026, 10, 15)):
-    with open(os.path.join(HERE, "sample_fundsforngos.json"), encoding="utf-8") as f:
-        items = json.load(f)
-    return plain.add(fundsforngos.collect(today, {}, items=items))
+    with open(os.path.join(HERE, "sample_feed.xml"), encoding="utf-8") as f:
+        return plain.add(feeds.collect(today, FEED, text=f.read()))
 
 
 class GrantsGovTest(unittest.TestCase):
@@ -43,7 +45,7 @@ class GrantsGovTest(unittest.TestCase):
         self.assertEqual(self.rows["103"]["close_date"], "")
 
 
-class FundsForNgosTest(unittest.TestCase):
+class FeedsTest(unittest.TestCase):
     def setUp(self):
         self.rows = {r["source_id"]: r for r in _ffn_rows()}
 
@@ -56,6 +58,7 @@ class FundsForNgosTest(unittest.TestCase):
         self.assertEqual(row["close_date"], "2026-11-30")
         self.assertEqual(row["funder"], "Example Climate Foundation")
         self.assertEqual(row["link"], "https://www2.fundsforngos.org/?p=1")
+        self.assertEqual(row["post_date"], "2026-10-11")
         self.assertIn("registered non-profit organisations in India", row["eligibility_notes"])
         self.assertFalse(row["summary"].startswith("Deadline"))
         self.assertEqual(self.rows["8"]["listing_type"], "Prize or award")
@@ -63,10 +66,86 @@ class FundsForNgosTest(unittest.TestCase):
 
     def test_left_feed_but_still_open(self):
         today = datetime.date(2026, 10, 15)
-        self.assertTrue(fundsforngos.still_open({"close_date": "2026-11-01"}, today, 120))
-        self.assertFalse(fundsforngos.still_open({"close_date": "2026-10-14"}, today, 120))
-        self.assertTrue(fundsforngos.still_open({"close_date": "", "first_seen": "2026-08-01"}, today, 120))
-        self.assertFalse(fundsforngos.still_open({"close_date": "", "first_seen": "2026-05-01"}, today, 120))
+        self.assertTrue(feeds.still_open({"close_date": "2026-11-01"}, today, 120))
+        self.assertFalse(feeds.still_open({"close_date": "2026-10-14"}, today, 120))
+        self.assertTrue(feeds.still_open({"close_date": "", "first_seen": "2026-08-01"}, today, 120))
+        self.assertFalse(feeds.still_open({"close_date": "", "first_seen": "2026-05-01"}, today, 120))
+
+    def test_skip_words_and_empty_feed(self):
+        with open(os.path.join(HERE, "sample_feed.xml"), encoding="utf-8") as f:
+            text = f.read()
+        rows = feeds.collect(datetime.date(2026, 10, 15), dict(FEED, skip_title_words=["Biochar"]), text=text)
+        self.assertNotIn("1", {r["source_id"] for r in rows})
+        with self.assertRaises(RuntimeError):
+            feeds.collect(TODAY, FEED, text="<html>Access denied</html>")
+
+
+class EuFundingTest(unittest.TestCase):
+    def setUp(self):
+        with open(os.path.join(HERE, "sample_eufunding.json"), encoding="utf-8") as f:
+            results = json.load(f)["results"]
+        self.rows = {r["source_id"]: r for r in eufunding.collect(datetime.date(2026, 10, 15), {}, results=results)}
+
+    def test_keeps_calls_with_deadlines_ahead(self):
+        self.assertEqual(set(self.rows), {"HORIZON-MISS-2027-05-SOIL-03", "HORIZON-MISS-LAKES"})
+
+    def test_normalizes_fields(self):
+        row = self.rows["HORIZON-MISS-2027-05-SOIL-03"]
+        self.assertEqual(row["close_date"], "2027-04-08")
+        self.assertEqual(row["status"], "forecast")
+        self.assertEqual(row["award_ceiling"], "5500000")  # EUR 5M at 1.10
+        self.assertTrue(row["link"].endswith("/topic-details/HORIZON-MISS-2027-05-SOIL-03"))
+        self.assertIn("agroforestry systems", row["summary"])
+
+    def test_scored_as_partner_only_or_set_aside_when_european(self):
+        dropped = []
+        matches = {r["source_id"]: r for r in profile.apply(PROFILE, plain.add(list(self.rows.values())), dropped)}
+        row = matches["HORIZON-MISS-2027-05-SOIL-03"]
+        self.assertEqual(row["geography"], "EU call (India usually as partner only)")
+        self.assertIn("partner may be needed", row["who_can_apply"])
+        self.assertEqual([r["source_id"] for r, _ in dropped], ["HORIZON-MISS-LAKES"])  # "European" in the title
+
+
+class WatchTest(unittest.TestCase):
+    PAGE = """<html><head><script>var x = 1;</script></head><body><nav>Home Apply About</nav>
+      <h1>Community Ecology Grants</h1><p>Applications are now closed for this grant.</p>
+      <p>The next call will open on 15 January 2027. Last date to apply: 28 February 2027.</p>
+      <p>Our team planted trees with volunteers.</p><footer>Contact us</footer></body></html>"""
+
+    def test_reads_call_sentences_signal_and_next_date(self):
+        fingerprint, signal, next_date, snippet = watch.read(self.PAGE, TODAY)
+        self.assertEqual(signal, "Says closed")
+        self.assertEqual(next_date, "2027-01-15")
+        self.assertIn("Applications are now closed", snippet)
+        self.assertNotIn("planted trees", snippet)  # not about calls
+        self.assertNotIn("Home Apply", snippet)  # menus are skipped
+
+    def test_flags_changes_and_failures(self):
+        pages = [{"name": "Wipro", "url": "https://w"}, {"name": "Down", "url": "https://d"}]
+        def get(url):
+            if url == "https://d":
+                raise OSError("timed out")
+            return self.PAGE
+        rows, failed = watch.check(pages, TODAY, {}, get=get)
+        self.assertEqual(rows[0]["status"], "First check (baseline saved)")
+        self.assertEqual(failed, ["Down"])
+        previous = {r["link"]: r for r in rows}
+        rows, _ = watch.check(pages[:1], TODAY + datetime.timedelta(days=1), previous, get=get)
+        self.assertEqual(rows[0]["status"], "No change")
+        changed = self.PAGE.replace("now closed", "now open")
+        rows, _ = watch.check(pages[:1], TODAY + datetime.timedelta(days=2), {r["link"]: r for r in rows},
+                              get=lambda url: changed)
+        self.assertTrue(rows[0]["status"].startswith("CHANGED"))
+        self.assertEqual(rows[0]["signal"], "Says open")
+        self.assertEqual(rows[0]["last_changed"], "2026-10-07")
+
+    def test_robots_txt_is_respected(self):
+        parser = text.urllib.robotparser.RobotFileParser()
+        parser.parse(["User-agent: *", "Disallow: /"])
+        with mock.patch.dict(text._robots, {"https://blocked.example": parser}):
+            self.assertFalse(text.allowed("https://blocked.example/page"))
+            with self.assertRaises(text.Blocked):
+                text.fetch("https://blocked.example/page")
 
 
 class FbhProfileTest(unittest.TestCase):
@@ -234,7 +313,7 @@ class RunTest(unittest.TestCase):
                     {"source": "fundsforngos", "source_id": "2", "close_date": "2026-10-01", "first_seen": "2026-09-01"},
                     {"source": "grants.gov", "source_id": "9", "close_date": "", "first_seen": "2026-09-01"}]
         fresh = [{"source": "fundsforngos", "source_id": "3", "close_date": ""}]
-        kept = run._keep_until_deadline(previous, "fundsforngos", fresh, today, 120)
+        kept = run._keep_until_deadline(previous, "fundsforngos", fresh, today, 120)  # any aggregator
         self.assertEqual([r["source_id"] for r in kept], ["3", "1"])
 
     def test_opportunities_file(self):
@@ -377,7 +456,8 @@ class TextTest(unittest.TestCase):
                 raise result
             return Response(result)
 
-        with mock.patch.object(text._opener, "open", fake_open), mock.patch.object(text.time, "sleep"):
+        with mock.patch.object(text._opener, "open", fake_open), mock.patch.object(text.time, "sleep"), \
+                mock.patch.object(text, "allowed", lambda url: True):
             return text.fetch("https://example.com/x"), calls
 
     def _error(self, code):

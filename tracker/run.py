@@ -10,7 +10,7 @@ import csv
 import datetime
 import os
 
-from tracker import fundsforngos, grantsgov, leads, plain, pool, profile, programs
+from tracker import eufunding, feeds, grantsgov, leads, plain, pool, profile, programs, watch
 
 POOL_PATH = "data/listings.csv"
 MATCHES_PATH = "data/matches.csv"
@@ -29,13 +29,12 @@ NEW_DAYS = 7
 SOON_DAYS = 21
 
 # How each source is described in data/summary.csv (and the sheet's About tab).
+# Aggregator feeds from profile.toml are added to this at the start of each run.
 ABOUT = {
-    "fundsforngos": ("fundsforNGOs", "Aggregator", "Grant calls for NGOs worldwide, read from the site's public post feed"),
+    "eu-funding": ("EU Funding & Tenders", "Multilateral", "Open and upcoming EU calls on FBH topics (India usually only as a consortium partner)"),
     "grants.gov": ("Grants.gov", "US federal", "US federal grants; only those open to foreign or international applicants are kept"),
-    "calendar": ("Calendar (hand-kept)", "Programs", "Yearly programs with no feed, kept by hand in data/calendar.csv or the sheet's Calendar tab"),
+    "calendar": ("Calendar (hand-kept)", "Programs", "Yearly programs with no feed, kept by hand in data/calendar.csv"),
 }
-# Sources whose feed only shows recent posts: their listings stay until the deadline passes.
-FEED_SOURCES = {"fundsforngos"}
 
 # The columns of data/opportunities.csv, the file the Google Sheet shows, in order.
 OPPORTUNITY_COLUMNS = [
@@ -59,10 +58,13 @@ def main():
     rows = pool.load(POOL_PATH)
     prof = profile.load(args.profile)
     calendar_url = prof.get("calendar", {}).get("sheet_csv", "")
-    ffn = prof.get("fundsforngos", {})
+    aggregators = {feed["source"]: feed for feed in prof.get("aggregators", [])}
+    for source, feed in aggregators.items():
+        ABOUT.setdefault(source, (feed["name"], "Aggregator", feed.get("about", "")))
 
-    sources = [
-        ("fundsforngos", lambda: fundsforngos.collect(today, ffn)),
+    sources = [(source, lambda feed=feed: feeds.collect(today, feed)) for source, feed in aggregators.items()]
+    sources += [
+        ("eu-funding", lambda: eufunding.collect(today, prof.get("eu_funding", {}))),
         ("grants.gov", lambda: grantsgov.collect(today, xml_source=args.xml)),
         ("calendar", lambda: programs.collect(today, url=calendar_url)),
     ]
@@ -76,8 +78,8 @@ def main():
             print(f"{name}: FAILED ({exc}); keeping previous listings")
             failed.append(name)
             continue
-        if name in FEED_SOURCES:
-            fresh = _keep_until_deadline(rows, name, fresh, today, ffn.get("keep_days_without_deadline", 120))
+        if name in aggregators:
+            fresh = _keep_until_deadline(rows, name, fresh, today, aggregators[name].get("keep_days", 120))
         gone = pool.closed(rows, name, fresh)
         if not fresh and len(gone) >= 10:
             # A big source that suddenly returns nothing has more likely broken than closed everything.
@@ -100,6 +102,13 @@ def main():
     lead_rows = leads.merge(leads.load(), fresh_leads, today)
     leads.save(lead_rows)
 
+    # Watched pages: funders' apply pages with no feed. A page that can't be read
+    # is reported on the sheet; it doesn't fail the run.
+    watch_rows, watch_failed = watch.check(prof.get("watch", {}).get("pages", []), today, watch.load())
+    watch.save(watch_rows)
+    print(f"watched pages: {len(watch_rows)} checked, "
+          f"{sum(r['status'].startswith('CHANGED') for r in watch_rows)} changed, {len(watch_failed)} not read")
+
     plain.add(rows)
     pool.save(POOL_PATH, rows)
     dropped = []
@@ -114,7 +123,8 @@ def main():
               extra=["filtered_reason"])
     streaks = update_streaks(STREAK_PATH, failed)
     save_summary(SUMMARY_PATH, today, rows, matches, dropped, failed,
-                 programs.checks(today, programs.read_mirror()), lead_rows, leads_failed, streaks, len(to_archive))
+                 programs.checks(today, programs.read_mirror()), lead_rows, leads_failed, streaks, len(to_archive),
+                 watch_rows)
     print(f"pool: {len(rows)} listings, {len(matches)} fit FBH, "
           f"{len(dropped)} more set aside by a rule (see {FILTERED_PATH})")
     broken = [name for name in failed if streaks[name] >= FAIL_AFTER_DAYS]
@@ -128,7 +138,7 @@ def _keep_until_deadline(previous, source, fresh, today, keep_days):
     """Add back this source's earlier listings that left the feed but are still open."""
     seen = {r["source_id"] for r in fresh}
     kept = [r for r in previous if r["source"] == source and r["source_id"] not in seen
-            and fundsforngos.still_open(r, today, keep_days)]
+            and feeds.still_open(r, today, keep_days)]
     return fresh + [dict(r) for r in kept]
 
 
@@ -173,7 +183,7 @@ def update_streaks(path, failed):
 
 
 def save_summary(path, today, rows, matches, dropped, failed, calendar_checks=(), lead_rows=(), leads_failed=(),
-                 streaks=None, archived_today=0):
+                 streaks=None, archived_today=0, watch_rows=()):
     """A small table of today's counts, for the sheet's About tab."""
     pool_by = collections.Counter(r["source"] for r in rows)
     match_by = collections.Counter(r["source"] for r in matches)
@@ -205,6 +215,10 @@ def save_summary(path, today, rows, matches, dropped, failed, calendar_checks=()
                 "", f"{len(lead_rows)} leads in the last year"])
     for name in leads_failed:
         out.append(["leads_failed", name, "", "", "", "", "Feed could not be read today"])
+    out.append(["watch", "Watched pages changed", "", len(watch_rows),
+                sum(r["status"].startswith("CHANGED") for r in watch_rows),
+                sum(not r["status"].startswith(("CHANGED", "No change", "First")) for r in watch_rows),
+                "Tracker – Watched pages tab"])
     with open(path, "w", newline="", encoding="utf-8") as f:
         csv.writer(f).writerows(out)
 

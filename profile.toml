@@ -359,15 +359,89 @@ funders = [
 ]
 
 # --- 7. Sources -----------------------------------------------------------------
-# fundsforNGOs: an aggregator of grant calls for NGOs worldwide. Read through its
-# public WordPress feed (the same way Gaurav's tracker read its sister site).
-[fundsforngos]
-api = "https://www2.fundsforngos.org/wp-json/wp/v2/posts"
-latest_pages = 2          # newest posts, 100 per page
-# One extra page of posts for each of these searches, so older relevant calls are found.
-searches = ["India", "biodiversity", "forest", "restoration", "water", "climate", "agriculture", "carbon"]
-# A post with no deadline we can read stays listed this many days after first seen.
-keep_days_without_deadline = 120
+# Aggregators: RSS feeds of sites that publish grant calls. Each run reads each feed
+# once (nothing else on the site) and keeps each call until its deadline passes, or
+# keep_days when no deadline is given. Add one by copying a block.
+[[aggregators]]
+source = "fundsforngos"
+name = "fundsforNGOs"
+url = "https://www2.fundsforngos.org/feed/"
+about = "Grant calls for NGOs worldwide (its newest 25 posts each day)"
+keep_days = 120
+
+[[aggregators]]
+source = "terraviva"
+name = "Terra Viva Grants"
+url = "https://www.terravivagrants.org/feed/"
+about = "Funding News: open calls for agriculture, environment and natural resources in developing countries"
+keep_days = 120
+skip_title_words = ["Monthly Update"]   # summaries of past posts, not calls
+
+# EU Funding & Tenders portal: open and upcoming EU calls, one search per word.
+[eu_funding]
+searches = ["restoration", "biodiversity", "agroforestry", "forest", "watershed", "soil", "biochar",
+            "carbon removal", "nature-based", "climate adaptation", "regenerative"]
+eur_to_usd = 1.10
+
+# Watched pages: funders' apply pages with no feed. Each run compares the page's
+# call-related sentences with the day before and flags any change, so you know
+# when to look. Only pages whose site allows automated reading are listed:
+# HCL Foundation and the Whitley Award ask robots to stay away, so they are in
+# the calendar for manual checking instead.
+[[watch.pages]]
+name = "Wipro Foundation: upcoming grants alert"
+funder = "Wipro Foundation"
+url = "https://www.wiprofoundation.org/upcoming-grants-alert/"
+
+[[watch.pages]]
+name = "Wipro Foundation: Community Ecology grants"
+funder = "Wipro Foundation"
+url = "https://www.wiprofoundation.org/ecology_programs/community-ecology-program/"
+
+[[watch.pages]]
+name = "Global EbA Fund (UNEP)"
+funder = "Global EbA Fund"
+url = "https://www.unep.org/gan/node/14"
+
+[[watch.pages]]
+name = "GEF Small Grants Programme"
+funder = "GEF SGP / UNDP"
+url = "https://sgp.undp.org/"
+
+[[watch.pages]]
+name = "Darwin Initiative: how to apply"
+funder = "UK Defra"
+url = "https://www.darwininitiative.org.uk/apply/"
+
+[[watch.pages]]
+name = "CEPF open calls for proposals"
+funder = "Critical Ecosystem Partnership Fund"
+url = "https://www.cepf.net/grants/open-calls-for-proposals"
+
+[[watch.pages]]
+name = "India Water Portal: opportunities"
+funder = "India Water Portal (listings)"
+url = "https://www.indiawaterportal.org/opportunities"
+
+[[watch.pages]]
+name = "IKI (German International Climate Initiative): find funding"
+funder = "International Climate Initiative"
+url = "https://www.international-climate-initiative.com/en/find-funding/"
+
+[[watch.pages]]
+name = "Keidanren Nature Conservation Fund"
+funder = "Keidanren Nature Conservation Fund"
+url = "https://www.keidanren.net/kncf/fund/project"
+
+[[watch.pages]]
+name = "Global Food System Challenge (Welthungerhilfe)"
+funder = "Seeding the Future / Welthungerhilfe"
+url = "https://www.welthungerhilfe.org/global-food-system-challenge/your-application"
+
+[[watch.pages]]
+name = "Mohamed bin Zayed Species Conservation Fund"
+funder = "Mohamed bin Zayed Species Conservation Fund"
+url = "https://www.speciesconservation.org/grants/"
 
 [calendar]
 # The Calendar tab of the Google Sheet, read as CSV each run. Leave blank to use

@@ -171,7 +171,9 @@ def _strip_subregions(text):
 
 def geography(row, rules):
     """(label, points, reason to set aside or "")."""
-    text = f"{row['title']} {row['summary']} {row.get('eligibility_notes', '')} {row.get('location', '')}"
+    # The EU note is our own words (it mentions India), so it isn't read as the call's geography.
+    notes = "" if row["source"] == "eu-funding" else row.get("eligibility_notes", "")
+    text = f"{row['title']} {row['summary']} {notes} {row.get('location', '')}"
     if rules.india and rules.india.search(text):
         return "India named", 2, ""
     if rules.us_only and rules.us_only.search(text):
@@ -191,6 +193,8 @@ def geography(row, rules):
         if rules.gg_foreign and rules.gg_foreign.search(notes):
             return "International (check India)", 1, ""
         return "US only", 0, "US federal grant with no mention of foreign applicants"
+    if row["source"] == "eu-funding":
+        return "EU call (India usually as partner only)", 0, ""
     if rules.international and rules.international.search(_strip_subregions(text)):
         return "International (check India)", 1, ""
     places = _found(rules.other, text[:400])

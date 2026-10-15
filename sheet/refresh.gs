@@ -23,6 +23,7 @@ const TABS = {
   open: 'Tracker – Open opportunities',
   deadlines: 'Tracker – Deadlines',
   leads: 'Tracker – Leads',
+  watch: 'Tracker – Watched pages',
   setAside: 'Tracker – Set aside',
 };
 const NEW_DAYS = 7;
@@ -46,6 +47,7 @@ function refreshNow() {
     .map(r => keep.map(k => r[col(k)]));
   writeTable(ss, TABS.deadlines, [keep].concat(dated));
   writeTable(ss, TABS.leads, fetchCsv('leads.csv'));
+  writeWatch(ss, fetchCsv('watch.csv'));
   writeSetAside(ss, fetchCsv('filtered_out.csv'));
   writeAbout(ss, fetchCsv('summary.csv'));
   ss.toast(rows.length + ' open opportunities loaded', 'Funding tracker', 5);
@@ -94,6 +96,24 @@ function writeTable(ss, name, rows) {
   }
 }
 
+function writeWatch(ss, rows) {
+  // Funders' apply pages with no feed: changed pages first, then the ones that couldn't be read.
+  if (!rows.length) return writeTable(ss, TABS.watch, rows);
+  const h = rows[0];
+  const keep = [['status', 'Status'], ['name', 'Page'], ['signal', 'What the page says'],
+                ['next_date', 'Next date mentioned'], ['last_changed', 'Last changed'], ['last_checked', 'Last checked'],
+                ['link', 'Link'], ['snippet', 'Call-related text on the page']];
+  const order = r => (r[h.indexOf('status')].indexOf('CHANGED') === 0 ? 0 :
+                      /^(No change|First)/.test(r[h.indexOf('status')]) ? 2 : 1);
+  const body = rows.slice(1).sort((a, b) => order(a) - order(b))
+    .map(r => keep.map(([k]) => r[h.indexOf(k)] || ''));
+  writeTable(ss, TABS.watch, [keep.map(([, label]) => label)].concat(body));
+  const sheet = ss.getSheetByName(TABS.watch);
+  sheet.setColumnWidth(1, 300);
+  sheet.setColumnWidth(2, 280);
+  sheet.setColumnWidth(8, 520);
+}
+
 function writeSetAside(ss, rows) {
   // Listings on topic but removed by a rule, with the reason: check now and then that nothing useful was cut.
   if (!rows.length) return writeTable(ss, TABS.setAside, rows);
@@ -121,6 +141,9 @@ function writeAbout(ss, summary) {
   add('New in the last 7 days', one('new')[4] || '0', 'Tracker – New this week');
   add('Closed or expired today', one('archived')[4] || '0', 'Kept in data/archive/ on GitHub, never deleted');
   add('Set aside by a rule', total[5] || '0', 'Tracker – Set aside, with the reason for each');
+  const w = one('watch');
+  add('Watched funder pages that changed', w[4] || '0', (w[3] || '0') + ' pages watched' +
+      (Number(w[5] || 0) ? '; ' + w[5] + ' could not be read today' : '') + '. See Tracker – Watched pages');
   rowsIn('score').forEach(r => add(r[1], r[4]));
   add('');
   heading('BY FBH AREA');

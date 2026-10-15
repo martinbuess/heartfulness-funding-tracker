@@ -21,6 +21,7 @@ FBH's four program areas, as the tracker understands them:
 | [`data/listings.csv`](data/listings.csv) | Every open listing read today, relevant or not |
 | [`data/archive/`](data/archive) | Relevant listings that closed or passed their deadline, with the date, one file per year. Nothing is deleted. |
 | [`data/calendar.csv`](data/calendar.csv) | Yearly programs with no feed, kept by hand (see below) |
+| [`data/watch.csv`](data/watch.csv) | The watched funder pages: whether each changed, what it says about applications, and the next date it mentions |
 | [`data/summary.csv`](data/summary.csv) | Today's counts and each source's status (feeds the sheet's About tab) |
 | [`profile.toml`](profile.toml) | **The settings**: keywords for each program area, places, who can apply, size limits, and the funders in our pipeline |
 
@@ -45,15 +46,17 @@ Remember that grants from outside India need FCRA registration to receive.
 
 | Source | How | Status |
 | --- | --- | --- |
-| [fundsforNGOs](https://www2.fundsforngos.org/) | Automatic: the site's public post feed (newest posts plus searches for India, biodiversity, forest, restoration, water, climate, agriculture, carbon). Posts leave the feed after a few days, so the tracker keeps each call until its deadline (or 120 days when no deadline is given). | Live |
-| [Grants.gov](https://www.grants.gov) daily extract | Automatic. Only grants that are open to nonprofits **and** mention foreign or international applicants are kept (for example the US Fish & Wildlife Service's Asian elephant and tiger conservation funds). | Live |
-| Calendar of yearly programs | By hand, in `data/calendar.csv` | Live |
-| EU Funding & Tenders portal, UN Partner Portal | To be tested | Planned |
+| [fundsforNGOs](https://www2.fundsforngos.org/) | Automatic: its RSS feed (newest 25 posts), once a day. Each call is kept until its deadline (or 120 days with no deadline), so coverage builds up day by day. | Live |
+| [Terra Viva Grants](https://www.terravivagrants.org/) Funding News | Automatic: its RSS feed, once a day. Open calls for agriculture, environment and natural resources in developing countries. | Live |
+| [EU Funding & Tenders portal](https://ec.europa.eu/info/funding-tenders/opportunities/portal/) | Automatic: the portal's public search, one search per FBH topic word. Indian organisations can usually join EU calls only as consortium partners, so these are marked "verify". | Live |
+| [Grants.gov](https://www.grants.gov) daily extract | Automatic. Only grants open to nonprofits **and** stating that foreign organisations may apply (for example the US Fish & Wildlife Service's Asian elephant fund). | Live |
+| Watched funder pages (Wipro Foundation, Global EbA Fund, GEF Small Grants, Darwin Initiative, CEPF, India Water Portal, IKI, Keidanren, Global Food System Challenge, Mohamed bin Zayed Fund) | Automatic: each page's call-related sentences are compared with the day before; a change is flagged on the **Watched pages** tab for a person to look at. Edit the list under `[[watch.pages]]` in `profile.toml`. | Live |
+| Calendar of yearly programs | By hand, in `data/calendar.csv` (from the Calendar tab of the pipeline sheet) | Live |
+| HCL Foundation (HCLTech Grant), Whitley Award | Their sites ask automated readers not to visit, so they are in the calendar for manual checks | Manual |
+| UN Partner Portal | Calls are visible only after logging in | Manual |
 | Devex Funding, DevelopmentAid, Candid, Instrumentl | Paid or behind a login | Not used |
 
-If a source fails, the others still update, that source's previous listings are kept and flagged "Source down today", and the About tab says so. After 3 failed days in a row the run shows as failed in the Actions tab and GitHub emails you. `data/failures.csv` keeps the count.
-
-Only free, public sources are used. Sites that need a login, or ask not to be read automatically, are left out.
+Every download first checks the site's robots.txt and skips anything the site asks automated readers not to fetch. If a source fails, the others still update, that source's previous listings are kept and flagged "Source down today", and the About tab says so. After 3 failed days in a row the run shows as failed in the Actions tab and GitHub emails you. `data/failures.csv` keeps the count.
 
 ## Calendar of yearly programs
 
@@ -61,7 +64,7 @@ Some funders open once a year on pages with no feed. Keep them in `data/calendar
 
 ## The Google Sheet
 
-[`sheet/refresh.gs`](sheet/refresh.gs) adds these tabs to an existing Google Sheet and refreshes them daily: **Tracker – About**, **New this week**, **Open opportunities**, **Deadlines**, **Leads** and **Set aside**. It only writes to tabs whose names start with "Tracker", so your own tabs are never touched. Setup steps are at the top of the file.
+[`sheet/refresh.gs`](sheet/refresh.gs) adds these tabs to an existing Google Sheet and refreshes them daily: **Tracker – About**, **New this week**, **Open opportunities**, **Deadlines**, **Watched pages**, **Leads** and **Set aside**. It only writes to tabs whose names start with "Tracker", so your own tabs are never touched. Setup steps are at the top of the file.
 
 For a quick read-only view instead, put this in cell A1 of any sheet:
 
