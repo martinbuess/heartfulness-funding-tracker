@@ -1,0 +1,212 @@
+# Your funding profile. Edit this file to change what lands in data/matches.csv.
+# The full pool of open listings is always in data/listings.csv.
+
+name = "GLIA water and water-adjacent cohort"
+
+[filter]
+# A listing matches if its title or summary contains any of these (case-insensitive,
+# matched at the start of a word, so "aquacultur" catches aquaculture and aquacultural).
+keywords = [
+  "water", "wastewater", "stormwater", "storm water", "sewer", "watershed",
+  "coastal", "great lakes", "ocean", "marine", "aquacultur", "fisheries", "seafood",
+  "harbor", "port infrastructure", "seawall", "shoreline", "flood", "pfas", "wetland",
+  "estuar", "drought", "irrigation", "harmful algal", "invasive species", "bycatch",
+  "unmanned", "drone", "digital twin", "climate resilien", "coast resilien",
+  # Added 2026-10-06 after reading the first California and NYC pulls.
+  "sea level", "storm surge", "tidal", "groundwater", "aquifer", "aquatic", "hydrolog",
+  "hydrosphere", "desalinat", "river", "lake", "riparian", "erosion", "dredg", "levee",
+  "culvert", "lead service line", "lead pipe", "shellfish", "oyster", "salmon", "coral",
+  "kelp", "seaweed", "blue carbon", "vessel", "boat", "underwater", "subsea", "bathymetr",
+  "sonar", "buoy", "algae", "nutrient pollution",
+  # Added 2026-10-06 after reading the first MWRD, Chicago and Great Lakes Water Authority bids.
+  "clarifier", "biosolid", "sludge", "water reclamation", "treatment plant", "pump station",
+  "pumping station", "lift station", "hydrant",
+  # Added 2026-10-08 from the incubator feeds (Leads tab).
+  "blue economy",
+]
+
+# Every listing from these funders counts as a keyword match, even when its title
+# has no water words (e.g. a water utility buying maintenance software). The other
+# filters below still apply. Matched against the funder column, ignoring case.
+water_agencies = [
+  "Metropolitan Water Reclamation District",  # MWRD, Chicago area
+  "Great Lakes Water Authority",              # GLWA, Detroit area
+  "Department Of Water Management",           # City of Chicago
+  "Northeast Ohio Regional Sewer District",    # NEORSD, Cleveland area
+  "Milwaukee Metropolitan Sewerage District",  # MMSD, Milwaukee area
+  "Buffalo Sewer Authority",                   # Buffalo, NY
+  "City of Cleveland Division of Water",       # also matches Division of Water Pollution Control
+  "Metropolitan Council Environmental Services",  # Minneapolis-St. Paul wastewater
+]
+
+# Sources that count as matches without water words: "calendar" is the
+# Calendar tab of the Google Sheet (picked by hand), "nsf-sbir" is NSF's
+# small-business research program, which fits every cohort company.
+hand_picked_sources = ["calendar", "nsf-sbir"]
+
+# Drop listings that mention any of these.
+# "Watervliet" is an Army arsenal; "Marine Corps" notices match "marine" but are rarely about water.
+# "Bottled drinking water" and "water cooler" are office supply orders; the rest are
+# building plumbing and pool services that mention water (seen in Massachusetts bids).
+exclude_keywords = [
+  "Watervliet", "Marine Corps", "Marine Forces", "bottled drinking water", "water cooler",
+  "water damage", "water heater", "chilled water", "condensing water", "lifeguard", "swim lesson",
+]
+
+# Keep only listings open to at least one of these applicant types.
+# "Others (see listing)" catches listings that describe eligibility in text;
+# some of those won't allow startups, so check the eligibility column.
+eligibility_any = [
+  "Small businesses",
+  "For-profit organizations",
+  "Unrestricted",
+  "Others (see listing)",
+  "Business",        # California's term for companies
+  "Any vendor",      # city solicitations open to any registered vendor
+  "Any company",     # calendar programs open to any startup
+]
+
+# --- Who can bid -------------------------------------------------------------
+# These rules drop listings a startup could not bid on. Everything they drop is
+# written to data/filtered_out.csv with the reason, so you can check nothing
+# useful was cut. Delete a line (or empty a list) to turn a rule off.
+
+# Set-asides that need a certification most startups don't hold. Matched
+# against the eligibility column. "Small business" set-asides are kept.
+exclude_set_asides = [
+  "8(a)", "HUBZone", "Service-Disabled Veteran", "SDVOSB", "Veteran-Owned",
+  "Women-Owned", "WOSB", "Buy Indian", "Indian Economic", "Target Market",
+]
+
+# Construction and public-works bids go to licensed, bonded contractors.
+# These words are checked in the titles of contracts only, never grants.
+contractor_only_title_words = [
+  "construction", "reconstruction", "paving", "repaving", "sidewalk", "roofing",
+  "roof replacement", "HVAC", "demolition", "general bids", "force main",
+  "water line replacement", "waterline replacement", "water main replacement",
+  "water line extension", "waterline extension", "pump station replacement",
+  "pump station improvements", "bridge replacement", "bridge preservation",
+  "bridge superstructure", "culvert replacement", "tank replacement", "recoating",
+  "pipe lining", "sewer rehab", "rehabilitation of water mains", "rehabilitation of local sewers",
+  "culvert rehabilitation", "dam replacement", "expansion joint", "exterior building", "roof rep",
+]
+# Bids for things a technology startup doesn't sell: supplies, chemicals, grounds,
+# building services and property deals. Many come from water agencies, whose bids
+# all count as matches. Checked in the titles of contracts only, never grants;
+# the technical words below still keep a bid.
+off_topic_title_words = [
+  "rubbish", "refuse collection", "trash collection", "trash removal", "recycling services", "janitorial", "custodial",
+  "elevator", "landscap", "turf", "mowing", "snow removal", "pest control", "flagger",
+  "hypochlorite", "activated carbon", "chemical supply", "florosilicic", "bottled water", "bags of ice",
+  "uniform", "furniture",
+  "snack bar", "statue", "basketball", "morgue", "doors and frames", "real estate",
+  "emergency sewer work", "emergency water main", "water main break",
+]
+# Contract categories that mean construction (Virginia eVA labels every bid).
+contractor_only_topics = ["Category: Construction"]
+# A bid whose title has any of these is kept even when it looks like
+# construction, because a technology or services company could win it.
+not_construction_words = [
+  "monitoring", "instrumentation", "sensor", "SCADA", "inspection", "assessment",
+  "study", "testing", "locating", "optimization", "data", "water quality",
+  "mitigation credit", "mitigation cred",
+]
+
+# Grant text that rules businesses out. Checked in the eligibility notes and
+# summary. Grants that just say "see listing" are kept.
+not_eligible_patterns = [
+  'for[- ]profit (organizations|entities|businesses|companies|applicants)?[^.]{0,40}(are|is) not eligible',
+  'not eligible[^.]{0,40}for[- ]profit',
+  'not open to for[- ]profit',
+  'eligib\w* (applicants|entities) (are|is) limited to (states?|state agencies|local|units of local government|tribes|tribal|federally[- ]recognized|non-?profit|public|institutions of higher education|universities)',
+  'only (states|state agencies|tribes|federally[- ]recognized tribes|units of local government|local governments|non-?profit organizations|public agencies|institutions of higher education) (are eligible|may apply|can apply)',
+]
+
+# Skip funders whose code starts with any of these (HHS is mostly health research).
+exclude_funder_codes = ["HHS"]
+
+# Skip listings whose topics contain any of these. SAM.gov topics carry the
+# federal product/service code (PSC) and industry code (NAICS). These cut
+# construction, building repair and facility operations contracts:
+# PSC Y/Z = construction and repair of buildings and sites, J = equipment repair,
+# M = operating facilities, S = utilities and housekeeping, X = leases,
+# NAICS 23 = construction.
+exclude_topics = ["PSC Y", "PSC Z", "PSC J", "PSC M", "PSC S", "PSC X", "NAICS 23"]
+
+# Federal contracts (SAM.gov) carry a product/service code (PSC) saying what is
+# being bought. Keep only those whose code starts with one of these; listings
+# without a code are not affected. Look codes up at https://www.acquisition.gov/psc-manual
+allowed_codes = [
+  "PSC A",     # research and development
+  "PSC B",     # special studies and analysis (environmental studies, water testing)
+  "PSC C2",    # architect and engineering services
+  "PSC D",     # IT and data services
+  "PSC F",     # natural resources and environmental services
+  "PSC H",     # inspection, testing and quality control
+  "PSC R4",    # professional and engineering services
+  "PSC 1550",  # unmanned aircraft
+  "PSC 46",    # water purification and sewage treatment equipment
+  "PSC 5845",  # underwater sound equipment
+  "PSC 66",    # instruments and laboratory equipment
+  "PSC 7",     # IT equipment and software
+]
+
+[calendar]
+# The Calendar tab of the Google Sheet, read as CSV each run. The sheet must be
+# shared as "anyone with the link can view". Leave blank to use data/calendar.csv only.
+sheet_csv = "https://docs.google.com/spreadsheets/d/1Hdk8iebShtatUGKV1sUEGooQkF8m5A1FL6WhUsMt3ig/gviz/tq?tqx=out:csv&headers=1&sheet=Calendar"
+
+[leads]
+# News feeds of incubators, water clusters and funders. Every run reads them and
+# writes posts that look like a call for startups (apply, prize, deadline, ...)
+# to data/leads.csv and the sheet's Leads tab. Add a feed by copying a block.
+#   needs = "water"    keep only posts that also have a water keyword (feeds covering every industry)
+#   needs = "climate"  water keyword or one of climate_words (general startup hubs)
+#   standing = true    the feed lists open programs, so every post counts however old
+#   format = "wordpress" for a /wp-json/ address; leave it out for an RSS feed
+# Imagine H2O's feed is left out: its host now answers automated requests with a
+# captcha page. Its yearly call is in the Calendar tab instead.
+call_words = [
+  "apply", "applications open", "applications are open", "application deadline", "now accepting",
+  "accepting applications", "call for", "open call", "request for proposals", "request for applications",
+  "nominations open", "entries open", "submissions open",
+]
+# These count only when they are in a post's title ("challenge" alone is in lots of news stories).
+call_title_words = ["prize", "challenge", "competition", "award", "grant", "funding", "deadline", "pitch", "rfp"]
+# Posts whose title has one of these are news about past winners or programs
+# outside the US, not calls our startups can answer. Matched at the start of a word,
+# so "India)" catches "(India)" without catching Indiana.
+skip_title_words = [
+  "winner", "spotlight", "welcomes", "meet cohort", "meet the cohort", "participants", "recap",
+  "India)", "Africa", "Uganda", "Pakistan", "Maldives", "Australia", "Ghana", "Zimbabwe", "UK)",
+]
+climate_words = ["climate", "cleantech", "clean tech", "clean energy", "decarboni", "sustainab", "environment"]
+
+[[leads.feeds]]
+name = "Evergreen Climate Innovations (awards)"
+url = "https://evergreeninno.org/wp-json/wp/v2/awards?per_page=50"
+format = "wordpress"
+standing = true
+
+[[leads.feeds]]
+name = "The Water Council"
+url = "https://thewatercouncil.com/feed/"
+
+[[leads.feeds]]
+name = "Current (Chicago)"
+url = "https://currentwater.org/feed/"
+
+[[leads.feeds]]
+name = "LACI (Los Angeles)"
+url = "https://laincubator.org/feed/"
+
+[[leads.feeds]]
+name = "JumpStart (Ohio)"
+url = "https://www.jumpstartinc.org/feed/"
+needs = "climate"
+
+[[leads.feeds]]
+name = "fundsforcompanies (awards and prizes)"
+url = "https://fundsforcompanies.fundsforngos.org/wp-json/wp/v2/posts?categories=218&per_page=50"
+format = "wordpress"
+needs = "water"

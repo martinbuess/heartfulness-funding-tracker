@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+<channel><title>Sample water cluster</title>
+<item>
+  <title>Applications Open: Stormwater Sensor Challenge</title>
+  <link>https://example.org/news/stormwater-challenge/</link>
+  <pubDate>Mon, 05 Oct 2026 13:00:32 +0000</pubDate>
+  <description><![CDATA[<p>Short teaser&#8230;</p>]]></description>
+  <content:encoded><![CDATA[<p>Startups can apply for a $50,000 prize. Applications are due November 20, 2026 at 5 pm.</p>]]></content:encoded>
+</item>
+<item>
+  <title>Member profile: a river cleanup company</title>
+  <link>https://example.org/news/member-profile/</link>
+  <pubDate>Tue, 06 Oct 2026 13:00:00 +0000</pubDate>
+  <description><![CDATA[<p>How one company cleans plastic out of rivers.</p>]]></description>
+</item>
+<item>
+  <title>Last year&#8217;s pitch competition winners</title>
+  <link>https://example.org/news/old-winners/</link>
+  <pubDate>Mon, 03 Mar 2025 10:00:00 +0000</pubDate>
+  <description><![CDATA[<p>The pitch competition deadline was March 1, 2025.</p>]]></description>
+</item>
+</channel></rss>

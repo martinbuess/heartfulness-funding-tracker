@@ -1,0 +1,25 @@
+[
+  {
+    "request_id": "20260903027",
+    "start_date": "2026-09-14T00:00:00.000",
+    "due_date": "2026-10-08T10:30:00.000",
+    "agency_name": "Environmental Protection",
+    "type_of_notice_description": "Solicitation",
+    "category_description": "Services (other than human services)",
+    "short_title": "Stormwater Sensor Network Pilot",
+    "selection_method_description": "Request for Proposals",
+    "section_name": "Procurement",
+    "additional_description_1": "<p>Sensors for <b>sewer</b> overflow monitoring.</p>"
+  },
+  {
+    "request_id": "20260710002",
+    "start_date": "2026-07-17T00:00:00.000",
+    "due_date": "2026-08-19T12:00:00.000",
+    "agency_name": "Housing Authority",
+    "type_of_notice_description": "Solicitation",
+    "category_description": "Goods",
+    "short_title": "Mortise Locks",
+    "selection_method_description": "Competitive Sealed Bids",
+    "section_name": "Procurement"
+  }
+]

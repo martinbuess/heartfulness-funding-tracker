@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Grants xmlns="http://apply.grants.gov/system/OpportunityDetail-V1.0">
+    <OpportunitySynopsisDetail_1_0>
+        <OpportunityID>100</OpportunityID>
+        <OpportunityTitle>Coastal Resilience Sensing Pilots</OpportunityTitle>
+        <FundingInstrumentType>G</FundingInstrumentType>
+        <CategoryOfFundingActivity>ENV</CategoryOfFundingActivity>
+        <EligibleApplicants>23</EligibleApplicants>
+        <AgencyCode>DOC-NOAA</AgencyCode>
+        <AgencyName>NOAA</AgencyName>
+        <PostDate>09012026</PostDate>
+        <CloseDate>12152026</CloseDate>
+        <AwardCeiling>250000</AwardCeiling>
+        <AwardFloor>50000</AwardFloor>
+        <Description>&lt;p&gt;Pilots that monitor shoreline &amp;amp; harbor structures.&lt;/p&gt;</Description>
+    </OpportunitySynopsisDetail_1_0>
+    <OpportunitySynopsisDetail_1_0>
+        <OpportunityID>101</OpportunityID>
+        <OpportunityTitle>Closed Water Program</OpportunityTitle>
+        <EligibleApplicants>23</EligibleApplicants>
+        <AgencyCode>EPA</AgencyCode>
+        <AgencyName>EPA</AgencyName>
+        <CloseDate>01152026</CloseDate>
+        <Description>Already closed.</Description>
+    </OpportunitySynopsisDetail_1_0>
+    <OpportunitySynopsisDetail_1_0>
+        <OpportunityID>102</OpportunityID>
+        <OpportunityTitle>Drinking Water Research for Universities</OpportunityTitle>
+        <EligibleApplicants>06</EligibleApplicants>
+        <AgencyCode>EPA</AgencyCode>
+        <AgencyName>EPA</AgencyName>
+        <CloseDate>11012026</CloseDate>
+        <Description>Universities only.</Description>
+    </OpportunitySynopsisDetail_1_0>
+    <OpportunityForecastDetail_1_0>
+        <OpportunityID>103</OpportunityID>
+        <OpportunityTitle>Future Stormwater Innovation Awards</OpportunityTitle>
+        <EligibleApplicants>99</EligibleApplicants>
+        <AgencyCode>EPA</AgencyCode>
+        <AgencyName>EPA</AgencyName>
+        <Description>Forecast with no dates yet.</Description>
+    </OpportunityForecastDetail_1_0>
+</Grants>

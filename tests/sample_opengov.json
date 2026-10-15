@@ -1,0 +1,155 @@
+{
+ "count": 5,
+ "rows": [
+  {
+   "closedSubstatus": null,
+   "closeOutReason": null,
+   "copyCount": 0,
+   "created_at": "2026-09-24T13:18:32.509Z",
+   "financialId": "EB-2517",
+   "id": 307121,
+   "isPaused": false,
+   "isPrivate": false,
+   "proposalDeadline": "2026-11-10T18:00:00.000Z",
+   "releaseProjectDate": "2026-10-06T04:00:00.000Z",
+   "status": "open",
+   "summary": "<p>The CSO-203 Relocation Project involves relocating an aging combined sewer overflow (CSO) culvert currently located beneath the E. 55th Street Marina in Cleveland that discharges to Lake Erie.</p><ul type=\"disc\"><li>The project site is located at the East 55th Street Marina in the City of Cleveland. The project will also take place on ODOT property near the entrance and exit ramps for Interstat",
+   "title": "CSO-203 Relocation",
+   "comingSoon": false,
+   "department": {
+    "id": 6826,
+    "name": "Engineering and Construction"
+   },
+   "addendums": [],
+   "template": {
+    "title": "E&C PUBLIC IMPROVEMENT BID"
+   },
+   "government": {
+    "code": "neorsd",
+    "organization": {
+     "name": "Northeast Ohio Regional Sewer District"
+    }
+   }
+  },
+  {
+   "closedSubstatus": null,
+   "closeOutReason": null,
+   "copyCount": 0,
+   "created_at": "2026-06-29T15:33:02.881Z",
+   "financialId": "RFQ-88251",
+   "id": 279486,
+   "isPaused": false,
+   "isPrivate": false,
+   "proposalDeadline": "2026-11-02T18:00:00.000Z",
+   "releaseProjectDate": "2026-10-06T04:00:00.000Z",
+   "status": "open",
+   "summary": "<p><span xml:lang=\"EN-US\" data-contrast=\"none\">The purpose of this bid, and the requirement contrac</span><span xml:lang=\"EN-US\" data-contrast=\"none\">t awarded following an evaluation of the bids received, is to provide rubbish removal and single-stream recycling collection and disposal services at specified Northeast Ohio Regional Sewer District locations. </span></p><p><span xml:lang=\"EN-US\" dat",
+   "title": "Rubbish Removal and Recycling Services",
+   "comingSoon": false,
+   "department": {
+    "id": 7481,
+    "name": "Technical Services Group"
+   },
+   "addendums": [],
+   "template": {
+    "title": "STANDARD BID"
+   },
+   "government": {
+    "code": "neorsd",
+    "organization": {
+     "name": "Northeast Ohio Regional Sewer District"
+    }
+   }
+  },
+  {
+   "closedSubstatus": null,
+   "closeOutReason": null,
+   "copyCount": 0,
+   "created_at": "2026-09-04T16:25:17.203Z",
+   "financialId": "RFQ-89869",
+   "id": 300761,
+   "isPaused": false,
+   "isPrivate": false,
+   "proposalDeadline": "2026-10-14T17:00:00.000Z",
+   "releaseProjectDate": "2026-09-21T04:00:00.000Z",
+   "status": "open",
+   "summary": "<p>The objective of this bid&mdash;and the resulting requirements contract awarded after evaluating all submissions&mdash;is to supply sodium hypochlorite solution for use at the Easterly, Southerly, and Westerly Wastewater Treatment Plants operated by the Northeast Ohio Regional Sewer District (NEORSD). &nbsp;This solution is essential for reducing E. coli concentrations to levels compliant with ",
+   "title": "2026-2027 Sodium Hypochlorite Solution at all Wastewater Treatment Plants",
+   "comingSoon": false,
+   "department": {
+    "id": 6829,
+    "name": "Operations and Maintenance"
+   },
+   "addendums": [],
+   "template": {
+    "title": "STANDARD BID"
+   },
+   "government": {
+    "code": "neorsd",
+    "organization": {
+     "name": "Northeast Ohio Regional Sewer District"
+    }
+   }
+  },
+  {
+   "closedSubstatus": null,
+   "closeOutReason": null,
+   "copyCount": 0,
+   "created_at": "2026-09-04T16:25:17.203Z",
+   "financialId": "RFQ-89869",
+   "id": 1,
+   "isPaused": false,
+   "isPrivate": false,
+   "proposalDeadline": "2026-09-01T17:00:00.000Z",
+   "releaseProjectDate": "2026-09-21T04:00:00.000Z",
+   "status": "open",
+   "summary": "<p>The objective of this bid&mdash;and the resulting requirements contract awarded after evaluating all submissions&mdash;is to supply sodium hypochlorite solution for use at the Easterly, Southerly, and Westerly Wastewater Treatment Plants operated by the Northeast Ohio Regional Sewer District (NEORSD). &nbsp;This solution is essential for reducing E. coli concentrations to levels compliant with ",
+   "title": "Old bid",
+   "comingSoon": false,
+   "department": {
+    "id": 6829,
+    "name": "Operations and Maintenance"
+   },
+   "addendums": [],
+   "template": {
+    "title": "STANDARD BID"
+   },
+   "government": {
+    "code": "neorsd",
+    "organization": {
+     "name": "Northeast Ohio Regional Sewer District"
+    }
+   }
+  },
+  {
+   "closedSubstatus": null,
+   "closeOutReason": null,
+   "copyCount": 0,
+   "created_at": "2026-09-24T13:18:32.509Z",
+   "financialId": "EB-2517",
+   "id": 2,
+   "isPaused": false,
+   "isPrivate": false,
+   "proposalDeadline": null,
+   "releaseProjectDate": "2026-10-06T04:00:00.000Z",
+   "status": "open",
+   "summary": "<p>The CSO-203 Relocation Project involves relocating an aging combined sewer overflow (CSO) culvert currently located beneath the E. 55th Street Marina in Cleveland that discharges to Lake Erie.</p><ul type=\"disc\"><li>The project site is located at the East 55th Street Marina in the City of Cleveland. The project will also take place on ODOT property near the entrance and exit ramps for Interstat",
+   "title": "Flow meter request for information",
+   "comingSoon": true,
+   "department": {
+    "id": 6826,
+    "name": "Engineering and Construction"
+   },
+   "addendums": [],
+   "template": {
+    "title": "STANDARD BID"
+   },
+   "government": {
+    "code": "neorsd",
+    "organization": {
+     "name": "Northeast Ohio Regional Sewer District"
+    }
+   }
+  }
+ ]
+}

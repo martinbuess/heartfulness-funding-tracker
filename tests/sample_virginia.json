@@ -1,0 +1,43 @@
+{
+ "response": {
+  "numFound": 3,
+  "docs": [
+   {
+    "id": "VBO:IFB:A123:1",
+    "app": "VBO",
+    "agencyname": "Hampton Roads Sanitation District",
+    "shortdesc": "Water Quality Sensors",
+    "longdesc": "Furnish <b>sensors</b>.",
+    "doccd": "IFB",
+    "doccddesc": "Invitation for Bid (IFB)",
+    "docdeptcd": "A123",
+    "internalid": "1",
+    "externalid": "99",
+    "version": "1",
+    "status": "Open",
+    "pubdate": "2026-09-01T14:00:00Z",
+    "closedate": "2026-11-01T18:00:00Z",
+    "commdesc": [
+     "Water Testing Equipment"
+    ],
+    "workloc": "Virginia Beach"
+   },
+   {
+    "id": "VBO:IFB:A123:2",
+    "app": "VBO",
+    "agencyname": "Old",
+    "shortdesc": "Stale",
+    "status": "Open",
+    "closedate": "2026-08-01T14:15:00Z"
+   },
+   {
+    "id": "IV1",
+    "app": "IV",
+    "agencyname": "Town",
+    "shortdesc": "Closed one",
+    "status": "Closed",
+    "closedate": "2027-01-01T00:00:00Z"
+   }
+  ]
+ }
+}

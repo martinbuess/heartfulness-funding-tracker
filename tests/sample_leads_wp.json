@@ -1,0 +1,8 @@
+[
+ {"date": "2021-11-15T00:01:04", "link": "https://example.org/award/innovator-award",
+  "title": {"rendered": "The Gas Utility Innovator Award"},
+  "content": {"rendered": "<p>A $25,000 grant for Illinois startups in energy, water and buildings.</p>"}},
+ {"date": "2026-09-01T00:00:00", "link": "https://example.org/award/fintech",
+  "title": {"rendered": "Fintech Founders Prize"},
+  "content": {"rendered": "<p>Apply now. Deadline: December 1, 2026.</p>"}}
+]

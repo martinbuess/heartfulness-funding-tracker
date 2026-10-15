@@ -1,0 +1,29 @@
+name: Daily refresh
+
+on:
+  schedule:
+    - cron: "0 12 * * *"  # every day at 12:00 UTC, after Grants.gov posts its extract
+  workflow_dispatch:       # lets you run it by hand from the Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Pull sources and refresh the pool
+        run: python -m tracker.run
+      - name: Save the updated data
+        # Runs even if one source failed, so the others' updates are kept.
+        if: success() || failure()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/
+          git diff --cached --quiet || git commit -m "Daily refresh $(date -u +%F)"
+          git push
