@@ -1,26 +1,28 @@
 section,name,level,open,matches,set_aside,detail
 run,Last refresh,,,,,2026-10-15
-total,All sources,,1952,80,217,3 sources
-source,fundsforNGOs,Aggregator,529,71,126,"Grant calls for NGOs worldwide, read from the site's public post feed"
+total,All sources,,2129,177,236,5 sources
+source,EU Funding & Tenders,Multilateral,167,94,16,Open and upcoming EU calls on FBH topics (India usually only as a consortium partner)
 source,Grants.gov,US federal,1416,2,91,US federal grants; only those open to foreign or international applicants are kept
-source,Calendar (hand-kept),Programs,7,7,0,"Yearly programs with no feed, kept by hand in data/calendar.csv or the sheet's Calendar tab"
-score,Fit 5,,,5,,
-score,Fit 4,,,4,,
-score,Fit 3,,,17,,
-score,Fit 2,,,27,,
-score,Fit 1,,,27,,
-area,Ecological restoration & biodiversity,,,37,,
-area,General environment / climate,,,25,,
-area,Water & watershed,,,17,,
-area,Agroforestry & regenerative agriculture,,,10,,
-area,Biochar & carbon removal,,,2,,
-set_aside,geography,,,,174,
-set_aside,for individuals or events,,,,21,
+source,Calendar (hand-kept),Programs,7,7,0,"Yearly programs with no feed, kept by hand in data/calendar.csv"
+source,fundsforNGOs,Aggregator,529,72,125,Grant calls for NGOs worldwide (its newest 25 posts each day)
+source,Terra Viva Grants,Aggregator,10,2,4,"Funding News: open calls for agriculture, environment and natural resources in developing countries"
+score,Fit 5,,,6,,
+score,Fit 4,,,5,,
+score,Fit 3,,,50,,
+score,Fit 2,,,63,,
+score,Fit 1,,,53,,
+area,Ecological restoration & biodiversity,,,98,,
+area,General environment / climate,,,48,,
+area,Water & watershed,,,34,,
+area,Agroforestry & regenerative agriculture,,,29,,
+area,Biochar & carbon removal,,,5,,
+set_aside,geography,,,,189,
+set_aside,for individuals or events,,,,24,
 set_aside,too small,,,,10,
 set_aside,not open to nonprofits (Grants.gov applicant types),,,,8,
-set_aside,for companies or start-ups,,,,3,
+set_aside,for companies or start-ups,,,,4,
 set_aside,procurement,,,,1,
-new,New in the last 7 days,,,80,,
+new,New in the last 7 days,,,177,,
 archived,Closed or expired today,,,0,,moved to data/archive/
 calendar_check,Climate Transformation Fund — Nature & Decarbonization,,,,,Round closed; add next round's dates
 calendar_check,Women Entrepreneurs Award,,,,,Round closed; add next round's dates
@@ -32,4 +34,6 @@ calendar_check,GAP Challenge Fund,,,,,Add this round's dates
 calendar_check,Regenerative Fund for Nature,,,,,Round closed; add next round's dates
 calendar_check,Innovation funding calls,,,,,Round closed; add next round's dates
 calendar_check,Threatened-tree conservation calls,,,,,Round closed; add next round's dates
+calendar_check,HCLTech Grant (Water and Biodiversity categories),,,,,Add this round's dates
 leads,New leads today,,,0,,0 leads in the last year
+watch,Watched pages changed,,11,0,0,Tracker – Watched pages tab
