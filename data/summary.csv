@@ -1,17 +1,17 @@
 section,name,level,open,matches,set_aside,detail
-run,Last refresh,,,,,2026-10-15
-total,All sources,,2129,177,236,5 sources
+run,Last refresh,,,,,2026-10-16
+total,All sources,,2129,175,236,5 sources
 source,EU Funding & Tenders,Multilateral,167,94,16,Open and upcoming EU calls on FBH topics (India usually only as a consortium partner)
-source,Grants.gov,US federal,1416,2,91,US federal grants; only those open to foreign or international applicants are kept
-source,Calendar (hand-kept),Programs,7,7,0,"Yearly programs with no feed, kept by hand in data/calendar.csv"
-source,fundsforNGOs,Aggregator,529,72,125,Grant calls for NGOs worldwide (its newest 25 posts each day)
-source,Terra Viva Grants,Aggregator,10,2,4,"Funding News: open calls for agriculture, environment and natural resources in developing countries"
+source,Grants.gov,US federal,1414,2,91,US federal grants; only those open to foreign or international applicants are kept
+source,Calendar (hand-kept),Programs,6,6,0,"Yearly programs with no feed, kept by hand in data/calendar.csv"
+source,fundsforNGOs,Aggregator,533,71,125,Grant calls for NGOs worldwide (its newest 25 posts each day)
+source,Terra Viva Grants,Aggregator,9,2,4,"Funding News: open calls for agriculture, environment and natural resources in developing countries"
 score,Fit 5,,,6,,
 score,Fit 4,,,4,,
 score,Fit 3,,,16,,
-score,Fit 2,,,98,,
-score,Fit 1,,,53,,
-area,Ecological restoration & biodiversity,,,98,,
+score,Fit 2,,,97,,
+score,Fit 1,,,52,,
+area,Ecological restoration & biodiversity,,,96,,
 area,General environment / climate,,,48,,
 area,Water & watershed,,,34,,
 area,Agroforestry & regenerative agriculture,,,29,,
@@ -22,10 +22,11 @@ set_aside,too small,,,,10,
 set_aside,not open to nonprofits (Grants.gov applicant types),,,,8,
 set_aside,for companies or start-ups,,,,4,
 set_aside,procurement,,,,1,
-new,New in the last 7 days,,,177,,
-archived,Closed or expired today,,,0,,moved to data/archive/
+new,New in the last 7 days,,,175,,
+archived,Closed or expired today,,,8,,moved to data/archive/
 calendar_check,Climate Transformation Fund — Nature & Decarbonization,,,,,Round closed; add next round's dates
 calendar_check,Women Entrepreneurs Award,,,,,Round closed; add next round's dates
+calendar_check,Species Conservation Grants,,,,,Round closed; add next round's dates
 calendar_check,New Gen research program,,,,,Add this round's dates
 calendar_check,IGNITE — PIEDS accelerator,,,,,Round closed; add next round's dates
 calendar_check,IGNITE — SINE incubation,,,,,Round closed; add next round's dates
