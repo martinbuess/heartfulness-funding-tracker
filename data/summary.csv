@@ -1,10 +1,10 @@
 section,name,level,open,matches,set_aside,detail
-run,Last refresh,,,,,2026-10-17
-total,All sources,,2116,173,231,5 sources
+run,Last refresh,,,,,2026-10-18
+total,All sources,,2114,173,231,5 sources
 source,EU Funding & Tenders,Multilateral,166,94,16,Open and upcoming EU calls on FBH topics (India usually only as a consortium partner)
-source,Grants.gov,US federal,1412,2,89,US federal grants; only those open to foreign or international applicants are kept
+source,Grants.gov,US federal,1413,2,89,US federal grants; only those open to foreign or international applicants are kept
 source,Calendar (hand-kept),Programs,6,6,0,"Yearly programs with no feed, kept by hand in data/calendar.csv"
-source,fundsforNGOs,Aggregator,523,69,122,Grant calls for NGOs worldwide (its newest 25 posts each day)
+source,fundsforNGOs,Aggregator,520,69,122,Grant calls for NGOs worldwide (its newest 25 posts each day)
 source,Terra Viva Grants,Aggregator,9,2,4,"Funding News: open calls for agriculture, environment and natural resources in developing countries"
 score,Fit 5,,,6,,
 score,Fit 4,,,3,,
@@ -23,7 +23,7 @@ set_aside,not open to nonprofits (Grants.gov applicant types),,,,8,
 set_aside,for companies or start-ups,,,,4,
 set_aside,procurement,,,,1,
 new,New in the last 7 days,,,173,,
-archived,Closed or expired today,,,7,,moved to data/archive/
+archived,Closed or expired today,,,0,,moved to data/archive/
 calendar_check,Climate Transformation Fund — Nature & Decarbonization,,,,,Round closed; add next round's dates
 calendar_check,Women Entrepreneurs Award,,,,,Round closed; add next round's dates
 calendar_check,Species Conservation Grants,,,,,Round closed; add next round's dates
