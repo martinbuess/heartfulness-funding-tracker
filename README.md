@@ -78,7 +78,9 @@ Some funders open once a year on pages with no feed. Keep them in `data/calendar
 | **Decisions** | Every decision you've made, kept permanently. The daily refresh never clears it. |
 | **Dashboard** | Start here: headline numbers, deadlines in the next 30 days (red within a week), the best calls waiting for a decision, your shortlist, funder pages that changed, open calls by FBH area and project, and source health |
 
-Pick a **Decision** in column A (Pursue, Contact funder, Clarify, Later, Discard) and a few words in **My notes**. It is saved straight away, and the call leaves To review at the next refresh.
+Pick a **Decision** in column A (Pursue, Contact funder, Clarify, Later, Discard) and a few words in **My notes**. It is saved straight away, and the Shortlist, Deadlines and Dashboard update a few seconds later. Decided calls stay (shaded) in To review until the next full refresh, so rows don't jump while you work; **Funding tracker → Refresh now** clears them out at once.
+
+**When it runs:** the GitHub job collects new calls every day at 12:00 UTC, and the sheet pulls them in every day at 13:00 UTC (and whenever you choose Refresh now).
 
 ## Changing what it looks for
 

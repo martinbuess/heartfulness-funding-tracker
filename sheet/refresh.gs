@@ -17,7 +17,12 @@
  *   - Pick a Decision in column A (Pursue, Contact funder, Clarify, Later, Discard) and add a few
  *     words in "My notes" (for Discard, say why: "coastal focus", "not India"...).
  *   - Every decision is saved straight away in "Tracker – Decisions", which the daily refresh
- *     never clears. Decided calls leave To review at the next refresh.
+ *     never clears. The Shortlist, Deadlines and Dashboard update a few seconds later. Decided
+ *     calls stay (shaded) in To review until the next full refresh, so rows don't jump while
+ *     you work; choose Funding tracker > Refresh now to clear them out at once.
+ *
+ * When it runs: the GitHub job collects new calls every day at 12:00 UTC; this sheet pulls them
+ * in every day at 13:00 UTC, and whenever you choose Funding tracker > Refresh now.
  *   - "Tracker – Shortlist" shows everything marked Pursue, Contact funder or Clarify, by deadline.
  *   - "Tracker – All open" shows every open call with its decision, including fit 1-2.
  * You can change a decision in any of these tabs, or in the Decisions tab itself.
@@ -52,14 +57,28 @@ const STORE_HEADER = ['ID', 'Decision', 'My notes', 'Decided on', 'Funder', 'Gra
 const REVIEW_MIN_SCORE = 3;
 const VIEWS = [TABS.review, TABS.shortlist, TABS.all];
 
+/** Full refresh: new results from GitHub, then every Tracker tab. Runs daily and from the menu. */
 function refreshNow() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  render(SpreadsheetApp.getActiveSpreadsheet(), true);
+}
+
+/**
+ * Quick update after you make a decision: redraws the Shortlist, Deadlines and Dashboard from the
+ * latest results and your saved decisions. To review and All open are left as they are (the row
+ * you decided on is shaded) so rows don't jump while you work; decided calls leave To review at
+ * the next full refresh, or when you choose Funding tracker > Refresh now.
+ */
+function updateShortlistAndDashboard() {
+  render(SpreadsheetApp.getActiveSpreadsheet(), false);
+}
+
+function render(ss, full) {
   const all = fetchCsv('opportunities.csv');
   const header = all[0];
   const rows = all.slice(1);
   const col = name => header.indexOf(name);
   const decisions = readDecisions(ss);
-  markStillOpen(ss, decisions, new Set(rows.map(r => r[col('ID')])));
+  if (full) markStillOpen(ss, decisions, new Set(rows.map(r => r[col('ID')])));
 
   const viewHeader = ['Decision', 'My notes'].concat(header);
   const withDecision = rows.map(r => {
@@ -72,9 +91,11 @@ function refreshNow() {
 
   const review = withDecision.filter(r => !r[0] && score(r) >= REVIEW_MIN_SCORE);
   const shortlist = withDecision.filter(r => ACTIVE.indexOf(r[0]) >= 0).sort(byDeadline);
-  writeView(ss, TABS.review, viewHeader, review);
+  if (full) {
+    writeView(ss, TABS.review, viewHeader, review);
+    writeView(ss, TABS.all, viewHeader, withDecision);
+  }
   writeView(ss, TABS.shortlist, viewHeader, shortlist);
-  writeView(ss, TABS.all, viewHeader, withDecision);
 
   const keep = ['Decision', 'Deadline', 'Flag', 'Fit (1-5)', 'Funder', 'Grant / program', 'Amount',
                 'Best-fit FBH projects', 'Link'];
@@ -82,13 +103,19 @@ function refreshNow() {
     .sort(byDeadline).map(r => keep.map(k => r[viewHeader.indexOf(k)]));
   writeTable(ss, TABS.deadlines, [keep].concat(dated));
   const watchRows = fetchCsv('watch.csv');
-  writeWatch(ss, watchRows);
-  writeSetAside(ss, fetchCsv('filtered_out.csv'));
+  if (full) {
+    writeWatch(ss, watchRows);
+    writeSetAside(ss, fetchCsv('filtered_out.csv'));
+  }
 
   writeDashboard(ss, { header: viewHeader, rows: withDecision, review: review, shortlist: shortlist,
                        summary: fetchCsv('summary.csv'), watch: watchRows });
-  OLD_TABS.forEach(name => { const s = ss.getSheetByName(name); if (s) ss.deleteSheet(s); });
-  ss.toast(review.length + ' calls to review, ' + shortlist.length + ' on the shortlist', 'Funding tracker', 6);
+  if (full) {
+    OLD_TABS.forEach(name => { const s = ss.getSheetByName(name); if (s) ss.deleteSheet(s); });
+    ss.toast(review.length + ' calls to review, ' + shortlist.length + ' on the shortlist', 'Funding tracker', 6);
+  } else {
+    ss.toast('Shortlist and dashboard updated (' + shortlist.length + ' on the shortlist)', 'Funding tracker', 4);
+  }
 }
 
 // --- decisions ----------------------------------------------------------------------------
@@ -146,18 +173,37 @@ function dropdown() {
   return SpreadsheetApp.newDataValidation().requireValueInList(DECISIONS, true).setAllowInvalid(false).build();
 }
 
-/** Saves a decision as soon as you pick it in a Tracker view, and shades the row. */
-function onEdit(e) {
+/**
+ * Runs on every edit (set up by setUp). Saves a decision as soon as you pick it in a Tracker view,
+ * shades the row, then updates the Shortlist, Deadlines and Dashboard.
+ */
+function handleEdit(e) {
+  if (saveEdit(e)) {
+    // One update at a time; a decision made while one is running is included in the next one.
+    const lock = LockService.getDocumentLock();
+    if (!lock.tryLock(60000)) return;
+    try {
+      render(e.source, false);
+    } finally {
+      lock.releaseLock();
+    }
+  }
+}
+
+/** Saves the decisions in an edited range. Returns true when something was saved. */
+function saveEdit(e) {
   const sheet = e.range.getSheet();
   const name = sheet.getName();
   if (name === TABS.decisions) {
-    if (e.range.getColumn() <= 3 && e.range.getLastColumn() >= 2 && e.range.getRow() > 1) {
+    if (e.range.getColumn() <= 3 && e.range.getLastColumn() >= 2 && e.range.getLastRow() > 1) {
       const today = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd');
-      sheet.getRange(e.range.getRow(), 4, e.range.getNumRows(), 1).setValue(today);
+      const first = Math.max(2, e.range.getRow());
+      sheet.getRange(first, 4, e.range.getLastRow() - first + 1, 1).setValue(today);
+      return true;
     }
-    return;
+    return false;
   }
-  if (VIEWS.indexOf(name) < 0 || e.range.getColumn() > 2 || e.range.getLastRow() < 2) return;
+  if (VIEWS.indexOf(name) < 0 || e.range.getColumn() > 2 || e.range.getLastRow() < 2) return false;
   const width = sheet.getLastColumn();
   const header = sheet.getRange(1, 1, 1, width).getValues()[0];
   const at = h => header.indexOf(h);
@@ -169,6 +215,7 @@ function onEdit(e) {
                              title: r[at('Grant / program')], deadline: r[at('Deadline')], link: r[at('Link')] });
     sheet.getRange(first + i, 1, 1, width).setBackground(SHADE[r[0]] || null);
   });
+  return true;
 }
 
 // --- adding a call to the Pipeline tab ------------------------------------------------------
@@ -229,6 +276,7 @@ function addToPipeline() {
                      title: get('Grant / program'), deadline: get('Deadline'), link: get('Link') });
   sheet.getRange(row, 1, 1, width).setBackground(SHADE['Pursue']);
   ss.toast('Added to ' + PIPELINE_TAB, 'Funding tracker', 4);
+  updateShortlistAndDashboard();
 }
 
 // --- writing tabs ---------------------------------------------------------------------------
@@ -506,16 +554,20 @@ function writeDashboard(ss, d) {
 
 function onOpen() {
   SpreadsheetApp.getUi().createMenu('Funding tracker')
-    .addItem('Refresh now', 'refreshNow')
+    .addItem('Refresh now (new results + all tabs)', 'refreshNow')
+    .addItem('Update shortlist & dashboard', 'updateShortlistAndDashboard')
     .addItem('Add selected call to Pipeline', 'addToPipeline')
     .addToUi();
 }
 
 function setUp() {
-  // One daily refresh, an hour after the GitHub job (12:00 UTC). Removes only this script's own timers.
+  // A daily refresh an hour after the GitHub job (12:00 UTC), and the edit handler that saves
+  // decisions and updates the shortlist and dashboard. Removes only this script's own triggers.
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
   ScriptApp.getProjectTriggers()
-    .filter(t => t.getHandlerFunction() === 'refreshNow')
+    .filter(t => ['refreshNow', 'handleEdit'].indexOf(t.getHandlerFunction()) >= 0)
     .forEach(t => ScriptApp.deleteTrigger(t));
   ScriptApp.newTrigger('refreshNow').timeBased().everyDays(1).atHour(13).inTimezone('Etc/UTC').create();
+  ScriptApp.newTrigger('handleEdit').forSpreadsheet(ss).onEdit().create();
   refreshNow();
 }
