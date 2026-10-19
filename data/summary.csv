@@ -13,9 +13,9 @@ score,Fit 2,,,84,,
 score,Fit 1,,,56,,
 area,Ecological restoration & biodiversity,,,84,,
 area,General environment / climate,,,46,,
-area,Water & watershed,,,28,,
-area,Agroforestry & regenerative agriculture,,,28,,
-area,Biochar & carbon removal,,,5,,
+area,Water & watershed restoration,,,28,,
+area,Regenerative agriculture & rural livelihoods,,,28,,
+area,Carbon & climate solutions,,,8,,
 set_aside,geography,,,,198,
 set_aside,for individuals or events,,,,26,
 set_aside,not open to nonprofits (Grants.gov applicant types),,,,8,
@@ -23,7 +23,7 @@ set_aside,too small,,,,6,
 set_aside,for companies or start-ups,,,,4,
 set_aside,procurement,,,,1,
 new,New in the last 7 days,,,156,,
-archived,Closed or expired today,,,6,,moved to data/archive/
+archived,Closed or expired today,,,0,,moved to data/archive/
 calendar_check,Climate Transformation Fund — Nature & Decarbonization,,,,,Round closed; add next round's dates
 calendar_check,Women Entrepreneurs Award,,,,,Round closed; add next round's dates
 calendar_check,Species Conservation Grants,,,,,Round closed; add next round's dates
