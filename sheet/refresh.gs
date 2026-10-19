@@ -21,13 +21,17 @@
  *   - "Tracker – Shortlist" shows everything marked Pursue, Contact funder or Clarify, by deadline.
  *   - "Tracker – All open" shows every open call with its decision, including fit 1-2.
  * You can change a decision in any of these tabs, or in the Decisions tab itself.
+ *
+ * "Tracker – Dashboard" is the place to start each week: headline numbers, deadlines in the next
+ * 30 days, the best calls waiting for a decision, your shortlist, funder pages that changed,
+ * where the open calls are by FBH area and project, and whether every source was read.
  */
 
 const REPO = 'martinbuess/heartfulness-funding-tracker';
 const DATA_URL = 'https://raw.githubusercontent.com/' + REPO + '/main/data/';
 const PIPELINE_TAB = 'Pipeline';
 const TABS = {
-  about: 'Tracker – About',
+  dashboard: 'Tracker – Dashboard',
   review: 'Tracker – To review',
   shortlist: 'Tracker – Shortlist',
   all: 'Tracker – All open',
@@ -37,7 +41,7 @@ const TABS = {
   decisions: 'Tracker – Decisions',
 };
 // Tabs from earlier versions of this script, removed on refresh.
-const OLD_TABS = ['Tracker – New this week', 'Tracker – Open opportunities', 'Tracker – Leads'];
+const OLD_TABS = ['Tracker – New this week', 'Tracker – Open opportunities', 'Tracker – Leads', 'Tracker – About'];
 const DECISIONS = ['Pursue', 'Contact funder', 'Clarify', 'Later', 'Discard'];
 const ACTIVE = ['Pursue', 'Contact funder', 'Clarify'];
 const SHADE = { 'Pursue': '#d9efc9', 'Contact funder': '#d9efc9', 'Clarify': '#fff2cc', 'Later': '#eeeeee',
@@ -77,13 +81,12 @@ function refreshNow() {
   const dated = withDecision.filter(r => r[0] !== 'Discard' && /^\d{4}-\d{2}-\d{2}$/.test(deadline(r)))
     .sort(byDeadline).map(r => keep.map(k => r[viewHeader.indexOf(k)]));
   writeTable(ss, TABS.deadlines, [keep].concat(dated));
-  writeWatch(ss, fetchCsv('watch.csv'));
+  const watchRows = fetchCsv('watch.csv');
+  writeWatch(ss, watchRows);
   writeSetAside(ss, fetchCsv('filtered_out.csv'));
 
-  const counts = { review: review.length, newReview: review.filter(r => /NEW/.test(r[2 + col('Flag')])).length,
-                   below: withDecision.filter(r => !r[0] && score(r) < REVIEW_MIN_SCORE).length };
-  DECISIONS.forEach(d => { counts[d] = withDecision.filter(r => r[0] === d).length; });
-  writeAbout(ss, fetchCsv('summary.csv'), counts);
+  writeDashboard(ss, { header: viewHeader, rows: withDecision, review: review, shortlist: shortlist,
+                       summary: fetchCsv('summary.csv'), watch: watchRows });
   OLD_TABS.forEach(name => { const s = ss.getSheetByName(name); if (s) ss.deleteSheet(s); });
   ss.toast(review.length + ' calls to review, ' + shortlist.length + ' on the shortlist', 'Funding tracker', 6);
 }
@@ -309,68 +312,196 @@ function writeSetAside(ss, rows) {
   writeTable(ss, TABS.setAside, rows.map(r => idx.map(i => (i >= 0 ? r[i] : ''))));
 }
 
-function writeAbout(ss, summary, counts) {
-  // summary.csv columns: section, name, level, open, matches, set_aside, detail
-  const rowsIn = section => summary.slice(1).filter(r => r[0] === section);
-  const one = section => rowsIn(section)[0] || [];
-  const total = one('total');
-  const out = [];
-  const bold = [];
-  const add = (...cells) => out.push(cells);
-  const heading = text => { bold.push(out.length + 1); add(text); };
+// --- the dashboard ------------------------------------------------------------------------
 
-  add('Forests by Heartfulness – funding tracker');
-  add('Last refreshed ' + (one('run')[6] || '') + '. The Tracker tabs are rewritten every day; your decisions are kept.');
-  add('');
-  heading('YOUR REVIEW');
-  add('To review', counts.review, counts.newReview + ' new this week. Tracker – To review (fit ' + REVIEW_MIN_SCORE +
-      '+, not yet decided)');
-  add('Shortlist', counts['Pursue'] + counts['Contact funder'] + counts['Clarify'],
-      'Pursue ' + counts['Pursue'] + ', Contact funder ' + counts['Contact funder'] + ', Clarify ' + counts['Clarify'] +
-      '. Tracker – Shortlist');
-  add('Later', counts['Later']);
-  add('Discarded', counts['Discard']);
-  add('Weaker calls not shown in To review', counts.below, 'Fit 1-2, undecided. Still listed in Tracker – All open');
-  add('');
-  heading('THIS WEEK');
-  add('Open calls that fit FBH', total[4] || '0');
-  add('Closed or expired today', one('archived')[4] || '0', 'Kept in data/archive/ on GitHub, never deleted');
-  add('Set aside by a rule', total[5] || '0', 'Tracker – Set aside, with the reason for each');
-  const w = one('watch');
-  add('Watched funder pages that changed', w[4] || '0', (w[3] || '0') + ' pages watched' +
-      (Number(w[5] || 0) ? '; ' + w[5] + ' could not be read today' : '') + '. See Tracker – Watched pages');
-  rowsIn('score').forEach(r => add(r[1], r[4]));
-  add('');
-  heading('SOURCES (check this when numbers look odd)');
-  bold.push(out.length + 1);
-  add('Source', 'Type', 'Open today', 'Fit FBH', 'Set aside', 'Status / what it covers');
-  rowsIn('source').forEach(r => add(r[1], r[2], r[3], r[4], r[5], r[6]));
-  add('');
-  const checks = rowsIn('calendar_check');
-  if (checks.length) {
-    heading('CALENDAR ROWS THAT NEED AN UPDATE');
-    checks.forEach(r => add(r[1], '', '', '', '', r[6]));
-    add('');
+const GREEN = '#274e13', LIGHT = '#e6f0e3', PALE = '#f6faf4', RED = '#f4cccc', AMBER = '#fff2cc', OK = '#d9ead3';
+const DASH_WIDTH = 8;
+
+function daysUntil(iso) {
+  const today = new Date(Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd') + 'T00:00:00Z');
+  return Math.round((new Date(iso + 'T00:00:00Z') - today) / 86400000);
+}
+
+function bar(n, max) {
+  // A small text bar chart that works in any sheet language.
+  return max ? '▇'.repeat(Math.max(n ? 1 : 0, Math.round(16 * n / max))) : '';
+}
+
+function link(text, url) {
+  const b = SpreadsheetApp.newRichTextValue().setText(String(text || url || ''));
+  return (url ? b.setLinkUrl(url) : b).build();
+}
+
+function writeDashboard(ss, d) {
+  let sheet = ss.getSheetByName(TABS.dashboard);
+  if (!sheet) {
+    const old = ss.getSheetByName('Tracker – About');
+    const at = old ? old.getIndex() - 1 : ss.getSheets().length;
+    sheet = ss.insertSheet(TABS.dashboard, at);
   }
-  heading('HOW TO READ THE SCORE');
-  add('Why this score', 'Starts with the sum: topic (0-2) + place (0-2) + applicants (0-1) + size (-1 to 1) + pipeline (0-1), then any cap.');
-  add('Caps', 'At most 3 when the call does not say where the work can happen; at most 2 when its main focus is outside FBH (marine, coastal, redwoods, animal welfare...) or it is an EU consortium call.');
-  add('Confirmed vs. Verify', 'Confirmed = the listing says so. Verify = our assumption; check before applying.');
-  add('Best-fit FBH projects', 'FBH projects or topics whose words appear in the call');
-  add('Flag', 'NEW (first seen in the last 7 days), Closing soon (deadline within 21 days), Source down (not re-checked today)');
-  add('');
-  add('Settings and full data', 'https://github.com/' + REPO);
-
-  const width = 6;
-  const grid = out.map(r => r.map(String).concat(Array(width).fill('')).slice(0, width));
-  const sheet = tab(ss, TABS.about);
   sheet.clear();
-  sheet.getRange(1, 1, grid.length, width).setNumberFormat('@').setValues(grid).setVerticalAlignment('top');
-  sheet.getRange(1, 1).setFontSize(16).setFontWeight('bold');
-  bold.forEach(row => sheet.getRange(row, 1, 1, width).setFontWeight('bold'));
-  sheet.setColumnWidth(1, 300);
-  sheet.setColumnWidths(2, 4, 100);
-  sheet.setColumnWidth(6, 520);
+  sheet.getRange(1, 1, sheet.getMaxRows(), sheet.getMaxColumns()).clearDataValidations().breakApart();
+  sheet.setHiddenGridlines(true);
+  [110, 95, 60, 190, 330, 250, 120, 230].forEach((w, i) => sheet.setColumnWidth(i + 1, w));
+
+  const h = d.header;
+  const at = name => h.indexOf(name);
+  const get = (r, name) => String(r[at(name)] || '');
+  const summary = d.summary.slice(1);
+  const rowsIn = section => summary.filter(r => r[0] === section);
+  const one = section => rowsIn(section)[0] || [];
+  const isDate = v => /^\d{4}-\d{2}-\d{2}$/.test(v);
+  const project = r => get(r, 'Best-fit FBH projects').split('; ')[0].replace(/ \(.*$/, '');
+  const call = r => link(get(r, 'Grant / program'), get(r, 'Link'));
+  let row = 1;
+
+  // Title and status line.
+  sheet.getRange(row, 1, 1, DASH_WIDTH).merge().setValue('Forests by Heartfulness · Funding dashboard')
+    .setFontSize(18).setFontWeight('bold').setFontColor(GREEN);
+  row++;
+  const failed = rowsIn('source').filter(r => /FAILED/.test(r[6]));
+  const status = failed.length ? '⚠ ' + failed.map(r => r[1]).join(', ') + ' could not be read; their listings may be out of date.'
+                               : '✓ All ' + rowsIn('source').length + ' sources checked successfully.';
+  sheet.getRange(row, 1, 1, DASH_WIDTH).merge()
+    .setValue('Updated ' + (one('run')[6] || '') + '   ' + status + '   Your decisions are kept between refreshes.')
+    .setFontColor(failed.length ? '#990000' : '#38761d').setFontStyle('italic');
+  row += 2;
+
+  // Headline numbers.
+  // Deadlines worth acting on: shortlisted calls, and undecided calls scoring 3+.
+  const worth = r => ACTIVE.indexOf(r[0]) >= 0 || (!r[0] && Number(get(r, 'Fit (1-5)')) >= REVIEW_MIN_SCORE);
+  const due30 = d.rows.filter(r => worth(r) && isDate(get(r, 'Deadline')) &&
+                                   daysUntil(get(r, 'Deadline')) >= 0 && daysUntil(get(r, 'Deadline')) <= 30);
+  const changed = d.watch.slice(1).filter(r => /^CHANGED/.test(r[d.watch[0].indexOf('status')]));
+  const fresh = d.review.filter(r => /NEW/.test(get(r, 'Flag'))).length;
+  const tiles = [
+    [1, 2, d.review.length, 'To review', fresh + ' new this week', d.review.length ? AMBER : OK],
+    [3, 2, d.shortlist.length, 'On the shortlist', 'Pursue · Contact · Clarify', LIGHT],
+    [5, 1, due30.length, 'Deadlines in 30 days', 'shortlist + fit 3+', due30.length ? AMBER : OK],
+    [6, 1, changed.length, 'Funder pages changed', 'see Watched pages', changed.length ? AMBER : OK],
+    [7, 2, d.rows.filter(r => r[0] === 'Discard').length, 'Discarded', 'kept in Decisions', '#eeeeee'],
+  ];
+  tiles.forEach(([c, span, n, label, note, colour]) => {
+    sheet.getRange(row, c, 1, span).merge().setValue(n).setFontSize(26).setFontWeight('bold')
+      .setHorizontalAlignment('center').setBackground(colour).setFontColor(GREEN);
+    sheet.getRange(row + 1, c, 1, span).merge().setValue(label).setFontWeight('bold')
+      .setHorizontalAlignment('center').setBackground(colour);
+    sheet.getRange(row + 2, c, 1, span).merge().setValue(note).setFontSize(9).setFontColor('#666666')
+      .setHorizontalAlignment('center').setBackground(colour);
+  });
+  sheet.setRowHeight(row, 46);
+  row += 4;
+
+  // A titled table; cells may be plain values or rich-text links.
+  const block = (title, note, header, body, empty, shade) => {
+    sheet.getRange(row, 1, 1, DASH_WIDTH).merge().setValue(title).setFontWeight('bold').setFontColor('#ffffff')
+      .setBackground(GREEN).setFontSize(11);
+    row++;
+    if (note) {
+      sheet.getRange(row, 1, 1, DASH_WIDTH).merge().setValue(note).setFontColor('#666666').setFontSize(9);
+      row++;
+    }
+    if (!body.length) {
+      sheet.getRange(row, 1, 1, DASH_WIDTH).merge().setValue(empty).setFontStyle('italic').setFontColor('#666666');
+      row += 2;
+      return;
+    }
+    const pad = r => r.concat(Array(DASH_WIDTH).fill('')).slice(0, DASH_WIDTH);
+    sheet.getRange(row, 1, 1, DASH_WIDTH).setValues([pad(header)]).setFontWeight('bold').setBackground(LIGHT);
+    row++;
+    body.forEach((cells, i) => {
+      const range = sheet.getRange(row + i, 1, 1, DASH_WIDTH);
+      range.setNumberFormat('@').setValues([pad(cells.map(c => (c && c.getText ? c.getText() : c)))])
+        .setVerticalAlignment('top').setBackground(i % 2 ? PALE : null);
+      cells.forEach((c, j) => { if (c && c.getText) sheet.getRange(row + i, j + 1).setRichTextValue(c); });
+      if (shade) {
+        const colour = shade(i);
+        if (colour) sheet.getRange(row + i, 1).setBackground(colour);
+      }
+    });
+    row += body.length + 1;
+  };
+
+  // 1. Deadlines coming up.
+  const soon = due30.slice().sort((a, b) => get(a, 'Deadline').localeCompare(get(b, 'Deadline'))).slice(0, 12);
+  block('⏰  DEADLINES IN THE NEXT 30 DAYS', 'Your shortlist and undecided calls scoring ' + REVIEW_MIN_SCORE + '+, soonest first. Red: within a week. Amber: within 3 weeks.',
+        ['Days left', 'Deadline', 'Fit', 'Funder', 'Call', 'Best-fit FBH project', 'Decision', 'Amount'],
+        soon.map(r => [String(daysUntil(get(r, 'Deadline'))), get(r, 'Deadline'), get(r, 'Fit (1-5)'),
+                       get(r, 'Funder'), call(r), project(r), r[0] || 'not decided', get(r, 'Amount')]),
+        'No deadlines in the next 30 days.',
+        i => (daysUntil(get(soon[i], 'Deadline')) <= 7 ? RED : daysUntil(get(soon[i], 'Deadline')) <= 21 ? AMBER : null));
+
+  // 2. Best calls still waiting for a decision.
+  const top = d.review.slice(0, 10);
+  block('📥  BEST CALLS WAITING FOR YOUR DECISION',
+        'Top of Tracker – To review. Pick a Decision there (column A); they leave this list at the next refresh.',
+        ['Fit', 'Flag', 'Deadline', 'Funder', 'Call', 'Best-fit FBH project', 'Geography', 'Amount'],
+        top.map(r => [get(r, 'Fit (1-5)'), get(r, 'Flag'), get(r, 'Deadline'), get(r, 'Funder'), call(r), project(r),
+                      get(r, 'Geography'), get(r, 'Amount')]),
+        'Nothing waiting: To review is empty. 🎉');
+
+  // 3. The shortlist.
+  block('⭐  YOUR SHORTLIST', 'Calls marked Pursue, Contact funder or Clarify, soonest deadline first.',
+        ['Decision', 'Deadline', 'Fit', 'Funder', 'Call', 'My notes', 'In pipeline', 'Best-fit FBH project'],
+        d.shortlist.slice(0, 12).map(r => [r[0], get(r, 'Deadline'), get(r, 'Fit (1-5)'), get(r, 'Funder'), call(r),
+                                           String(r[1] || ''), get(r, 'In pipeline'), project(r)]),
+        'Nothing shortlisted yet. Mark calls Pursue, Contact funder or Clarify in Tracker – To review.');
+
+  // 4. Funder pages that changed.
+  const wh = d.watch[0] || [];
+  const w = name => wh.indexOf(name);
+  block('🔔  FUNDER PAGES THAT CHANGED', 'Open the page to see what is new. The full list is in Tracker – Watched pages.',
+        ['Changed on', '', '', 'What the page says', 'Page', 'Next date mentioned', '', ''],
+        changed.map(r => [r[w('last_changed')], '', '', r[w('signal')], link(r[w('name')], r[w('link')]),
+                          r[w('next_date')], '', '']),
+        'No watched page changed in the last 7 days.');
+
+  // 5. Where the open calls are, by area and by project (fit 3 and up, not discarded).
+  const strong = d.rows.filter(r => r[0] !== 'Discard' && Number(get(r, 'Fit (1-5)')) >= REVIEW_MIN_SCORE);
+  const tally = (key, split) => {
+    const out = {};
+    strong.forEach(r => split(r).forEach(k => {
+      if (!k) return;
+      out[k] = out[k] || [0, 0];
+      out[k][0]++;
+      if (ACTIVE.indexOf(r[0]) >= 0) out[k][1]++;
+    }));
+    return Object.keys(out).map(k => [k, out[k][0], out[k][1]]).sort((a, b) => b[1] - a[1]);
+  };
+  const areas = tally('area', r => get(r, 'FBH area').split('; '));
+  const projects = tally('project', r => get(r, 'Best-fit FBH projects').split('; ').map(p => p.replace(/ \(.*$/, '')));
+  const most = Math.max(1, ...areas.map(a => a[1]), ...projects.map(p => p[1]));
+  block('📊  WHERE THE OPEN CALLS ARE', 'Calls scoring ' + REVIEW_MIN_SCORE + '+ that are not discarded. A call can count for more than one area or project.',
+        ['Open calls', 'Shortlisted', '', 'FBH area', '', '', '', ''],
+        areas.map(a => [String(a[1]), String(a[2]), '', a[0], bar(a[1], most), '', '', '']), 'No open calls yet.');
+  block('🌱  BY FBH PROJECT', 'Which projects the open calls fit best (from the summary deck).',
+        ['Open calls', 'Shortlisted', '', 'FBH project', '', '', '', ''],
+        projects.map(p => [String(p[1]), String(p[2]), '', p[0], bar(p[1], most), '', '', '']),
+        'No calls matched a project yet.');
+
+  // 6. Source health.
+  const sources = rowsIn('source');
+  block('🛰  SOURCES', 'Checked every morning. A source that fails 3 days running also sends GitHub an alert email.',
+        ['Status', 'Open today', 'Fit FBH', 'Source', 'What it covers', '', '', ''],
+        sources.map(r => [/FAILED/.test(r[6]) ? 'FAILED' : 'OK', String(r[3]), String(r[4]), r[1],
+                          r[6].replace(/^FAILED[^.]*\.\s*/, ''), '', '', '']),
+        '', i => (/FAILED/.test(sources[i][6]) ? RED : OK));
+
+  // 7. Calendar rows to update.
+  const checks = rowsIn('calendar_check');
+  block('🗓  CALENDAR ROWS TO UPDATE', 'Yearly programs in data/calendar.csv whose dates need a look.',
+        ['', '', '', 'Program', 'What to do', '', '', ''],
+        checks.slice(0, 10).map(r => ['', '', '', r[1], r[6], '', '', '']), 'All calendar rows are up to date.');
+
+  // 8. How to read the score (kept short).
+  block('ℹ  HOW TO READ THE SCORE', '',
+        ['', '', '', 'Column', 'Meaning', '', '', ''],
+        [['', '', '', 'Fit (1-5)', 'topic (0-2) + place (0-2) + NGOs eligible (0-1) + size (-1 to 1) + pipeline funder (0-1)'],
+         ['', '', '', 'Caps', 'At most 3 when the call does not say where the work happens; at most 2 when its focus is outside FBH or it is an EU consortium call'],
+         ['', '', '', 'Confirmed / Verify', 'Confirmed = the listing says so. Verify = our assumption; check before applying'],
+         ['', '', '', 'Flag', 'NEW = first seen in the last 7 days · Closing soon = deadline within 21 days'],
+         ['', '', '', 'Settings and data', link('github.com/' + REPO, 'https://github.com/' + REPO)]], '');
+  sheet.setFrozenRows(0);
 }
 
 function onOpen() {

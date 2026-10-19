@@ -76,7 +76,7 @@ Some funders open once a year on pages with no feed. Keep them in `data/calendar
 | **Watched pages** | Funder pages that changed (open them) |
 | **Set aside** | What the rules removed, with the reason. Skim monthly. |
 | **Decisions** | Every decision you've made, kept permanently. The daily refresh never clears it. |
-| **About** | Counts, source health, and how the score works |
+| **Dashboard** | Start here: headline numbers, deadlines in the next 30 days (red within a week), the best calls waiting for a decision, your shortlist, funder pages that changed, open calls by FBH area and project, and source health |
 
 Pick a **Decision** in column A (Pursue, Contact funder, Clarify, Later, Discard) and a few words in **My notes**. It is saved straight away, and the call leaves To review at the next refresh.
 
