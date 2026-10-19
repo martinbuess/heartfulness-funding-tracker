@@ -313,7 +313,16 @@ def assess(row, rules):
 
     area_label = "; ".join(anywhere) or ("General environment / climate" if general else "")
     text = f"{row['title']} {row['summary']} {row.get('eligibility_notes', '')}"
-    topics = [name for name, pattern in rules.projects if pattern and pattern.search(text)]
+    # Projects whose words appear, best match first, with the words that matched.
+    hits = [(name, _found(pattern, text)) for name, pattern in rules.projects if pattern]
+    # A project named in the title ranks first; then more matching words rank higher.
+    title_at = {}
+    for name, pattern in rules.projects:
+        found = pattern.search(row["title"]) if pattern else None
+        if found:
+            title_at[name] = found.start()
+    hits = sorted((h for h in hits if h[1]), key=lambda h: (title_at.get(h[0], 10**6), -len(h[1])))
+    topics = [f"{name} ({', '.join(found[:3])})" for name, found in hits]
     match = ", ".join(words[:4] or general[:3])
     reason = [breakdown,
               f"Matches {match} ({'title' if in_title else 'description'})" if match else "Hand-picked program",
@@ -326,7 +335,7 @@ def assess(row, rules):
         reason.append("Read from a roundup post with little detail: open the link")
     row.update({
         "fbh_area": area_label,
-        "fbh_topics": "; ".join(topics[:4]),
+        "fbh_topics": "; ".join(topics[:3]),
         "geography": geo,
         "who_can_apply": who,
         "eligibility_check": "; ".join(filter(None, [

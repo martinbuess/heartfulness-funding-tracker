@@ -17,34 +17,38 @@ name = "Forests by Heartfulness"
 # more than a word only in the description.
 
 [areas]
+# Named as in the FBH summary deck ("We work on four connected fronts").
 "Ecological restoration & biodiversity" = [
   "afforest", "reforest", "forest", "tree planting", "tree-planting", "trees", "native tree", "native species",
   "miyawaki", "ecological restoration", "ecosystem restoration", "land restoration", "landscape restoration",
   "forest landscape restoration", "degraded land", "degraded forest", "land degradation", "desertification",
-  "biodiversity", "wildlife", "habitat", "ecosystem", "rewild", "mangrove", "grassland", "nature-based solution",
-  "nature based solution", "nature-positive", "nature positive", "green cover", "urban forest", "seed bank",
-  "endangered species", "threatened species", "species conservation", "protected area", "pollinat",
+  "hill greening", "biodiversity", "wildlife", "habitat", "ecosystem", "rewild", "grassland", "nature-based solution",
+  "nature based solution", "nature-positive", "nature positive", "green cover", "urban forest", "urban green",
+  "urban biodiversity", "heat island", "green infrastructure", "seed bank", "nurser", "sapling", "endemic",
+  "endangered species", "threatened species", "endangered tree", "threatened tree", "species conservation",
+  "plant conservation", "protected area", "joint forest management", "community forest", "pollinat",
   "deforestation", "elephant", "tiger", "nature conservation", "conservation of nature", "restoration",
 ]
-"Water & watershed" = [
-  "lake", "pond", "wetland", "watershed", "check dam", "check-dam", "groundwater", "aquifer", "recharge",
-  "rainwater harvest", "water harvesting", "water conservation", "water security", "water scarcity",
-  "water resource", "water management", "freshwater", "river", "rejuvenat", "desilt", "catchment", "springshed",
-  "spring revival", "riparian", "drought", "flood", "climate resilien", "climate adaptation",
-  "ecosystem-based adaptation", "ecosystem based adaptation", "adaptation",
+"Water & watershed restoration" = [
+  "lake", "pond", "wetland", "water body", "water bodies", "watershed", "check dam", "check-dam", "groundwater",
+  "aquifer", "recharge", "rainwater harvest", "water harvesting", "water conservation", "water security",
+  "water scarcity", "water stress", "water resource", "water management", "freshwater", "river", "rejuvenat",
+  "desilt", "catchment", "springshed", "spring revival", "riparian", "drought", "flood", "climate resilien",
+  "climate adaptation", "ecosystem-based adaptation", "ecosystem based adaptation", "adaptation",
 ]
-"Agroforestry & regenerative agriculture" = [
+"Carbon & climate solutions" = [
+  "biochar", "bio-char", "carbon removal", "carbon dioxide removal", "CDR", "carbon sequestration", "sequester",
+  "carbon sink", "soil carbon", "carbon farming", "carbon credit", "carbon market", "carbon offset",
+  "negative emission", "pyrolysis", "crop residue", "stubble burning", "agricultural residue", "biomass",
+  "enhanced weathering", "climate mitigation", "nature-based carbon",
+]
+"Regenerative agriculture & rural livelihoods" = [
   "agroforest", "agro-forest", "regenerative agricultur", "regenerative farm", "agroecolog", "agro-ecolog",
   "sustainable agricultur", "climate-smart agricultur", "climate smart agricultur", "natural farming",
   "organic farming", "soil health", "soil fertility", "soil regenerat", "soil restoration", "smallholder",
-  "farmer", "farming communit", "rural livelihood", "livelihood", "food security", "food system", "permaculture",
-  "silvopast", "farm forestry", "horticultur", "farmer producer", "land use",
-]
-"Biochar & carbon removal" = [
-  "biochar", "bio-char", "carbon removal", "carbon dioxide removal", "CDR", "carbon sequestration", "sequester",
-  "carbon sink", "soil carbon", "carbon farming", "carbon credit", "carbon market", "negative emission",
-  "pyrolysis", "crop residue", "stubble burning", "agricultural residue", "biomass", "enhanced weathering",
-  "blue carbon",
+  "farmer", "farming communit", "rural livelihood", "livelihood", "rural income", "rural enterprise",
+  "rural entrepreneur", "green jobs", "food security", "food system", "permaculture", "silvopast", "farm forestry",
+  "horticultur", "fruit tree", "farmer producer", "women farmers", "land use",
 ]
 
 [filter]
@@ -189,6 +193,9 @@ nonprofit = [
   "NGO", "NGOs", "non-governmental", "nongovernmental", "nonprofit", "non-profit", "not-for-profit",
   "civil society", "CSO", "CSOs", "charit", "community-based organi", "community based organi", "CBO",
   "voluntary organi", "section 8 compan", "trusts and societies", "grassroots organi",
+  # Heartfulness Institute is accredited by UNCCD and IUCN (summary deck), so calls for
+  # IUCN Members or UNCCD-accredited CSOs count as open to us. Check membership before applying.
+  "IUCN Member", "IUCN members", "UNCCD-accredited", "accredited to the UNCCD",
 ]
 # Words that mean a partner or consortium may be needed. Shown as "check".
 partnership = [
@@ -373,54 +380,48 @@ funders = [
   { name = "Boston Scientific", status = "TBD", match = ["Boston Scientific"] },
 ]
 
-# --- 7. FBH projects and topics ----------------------------------------------
-# The "Fits these FBH topics" column lists every entry whose words appear in a
-# call. DRAFT, from the program description in the original brief; to be replaced
-# with FBH's actual projects from the overview deck. Add or rename freely.
+# --- 7. FBH projects ------------------------------------------------------------
+# The "Best-fit FBH projects" column lists the projects whose words appear in a call,
+# best match first, with the words that matched. From the FBH summary deck (featured
+# opportunities and capabilities) and the Gachibowli urban rainforest proposal,
+# October 2026. Add a project by copying a block.
 [[projects]]
-name = "Native forests (Miyawaki / afforestation)"
-keywords = ["afforest", "reforest", "tree planting", "native tree", "native species", "miyawaki", "urban forest", "green cover"]
+name = "Shivgarh landscape restoration (MP)"
+keywords = ["degraded forest", "forest restoration", "landscape restoration", "forest landscape", "reforest", "afforest",
+            "protected forest", "hill greening", "land degradation", "degraded land", "desertification",
+            "ecosystem restoration", "joint forest management", "community forest", "carbon sequestration",
+            "forest management", "resilient forest", "ecosystem-based adaptation", "ecosystem based adaptation",
+            "nature-based solution", "nature based solution"]
 
 [[projects]]
-name = "Degraded forest & landscape restoration"
-keywords = ["forest landscape restoration", "landscape restoration", "degraded land", "degraded forest", "land degradation",
-            "desertification", "ecosystem restoration", "rewild"]
+name = "Peddaveedu pond & water security (Hyderabad)"
+keywords = ["pond", "lake", "water body", "water bodies", "wetland", "flood", "water security", "water storage",
+            "rainwater harvest", "water harvesting", "groundwater", "recharge", "check dam", "check-dam", "watershed",
+            "desilt", "rejuvenat", "catchment", "climate resilien", "climate adaptation", "ecosystem-based adaptation",
+            "ecosystem based adaptation"]
 
 [[projects]]
-name = "Biodiversity conservation"
-keywords = ["biodiversity", "habitat", "wildlife", "pollinat", "species conservation", "threatened species", "endangered"]
+name = "Village-scale biochar"
+keywords = ["biochar", "bio-char", "pyrolysis", "carbon removal", "carbon dioxide removal", "CDR", "carbon credit",
+            "carbon market", "soil carbon", "crop residue", "stubble burning", "agricultural residue", "biomass",
+            "biofertili", "organic fertili"]
 
 [[projects]]
-name = "Lake & wetland restoration"
-keywords = ["lake", "pond", "wetland", "desilt", "rejuvenat"]
+name = "Agroforestry livelihoods"
+keywords = ["agroforest", "agro-forest", "smallholder", "farmer", "fruit tree", "horticultur", "regenerative agricultur",
+            "natural farming", "agroecolog", "soil health", "rural livelihood", "rural income", "farm forestry",
+            "silvopast", "women farmers"]
 
 [[projects]]
-name = "Check dams, groundwater & watersheds"
-keywords = ["check dam", "check-dam", "groundwater", "aquifer", "recharge", "watershed", "catchment", "rainwater harvest",
-            "water harvesting", "springshed", "water conservation", "water security"]
+name = "Gachibowli urban rainforest (Biodiversity Park)"
+keywords = ["urban forest", "urban green", "urban biodiversity", "urban climate", "urban heat", "heat island",
+            "green infrastructure", "green space", "miyawaki", "dense forest", "urban rainforest", "biodiversity park"]
 
 [[projects]]
-name = "Climate resilience & adaptation"
-keywords = ["climate resilien", "climate adaptation", "ecosystem-based adaptation", "ecosystem based adaptation", "drought",
-            "flood", "nature-based solution", "nature based solution"]
-
-[[projects]]
-name = "Agroforestry with farmers"
-keywords = ["agroforest", "agro-forest", "farm forestry", "silvopast", "smallholder", "farmer"]
-
-[[projects]]
-name = "Regenerative & natural farming, soil health"
-keywords = ["regenerative agricultur", "regenerative farm", "agroecolog", "natural farming", "organic farming",
-            "soil health", "soil fertility", "soil regenerat", "sustainable agricultur", "climate-smart agricultur"]
-
-[[projects]]
-name = "Village-scale biochar & carbon removal"
-keywords = ["biochar", "bio-char", "pyrolysis", "crop residue", "stubble burning", "carbon removal", "carbon dioxide removal",
-            "soil carbon", "carbon sequestration", "carbon credit"]
-
-[[projects]]
-name = "Rural livelihoods"
-keywords = ["livelihood", "farmer producer", "women farmers", "rural communit", "food security"]
+name = "Endangered native trees & nursery network"
+keywords = ["endangered species", "threatened species", "endangered tree", "threatened tree", "endemic", "native tree",
+            "native species", "nurser", "sapling", "seed bank", "seed collection", "germplasm", "tissue culture",
+            "ex-situ", "ex situ", "plant conservation", "species recovery", "red list"]
 
 # --- 8. Sources -----------------------------------------------------------------
 # Aggregators: RSS feeds of sites that publish grant calls. Each run reads each feed

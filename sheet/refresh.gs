@@ -73,7 +73,7 @@ function refreshNow() {
   writeView(ss, TABS.all, viewHeader, withDecision);
 
   const keep = ['Decision', 'Deadline', 'Flag', 'Fit (1-5)', 'Funder', 'Grant / program', 'Amount',
-                'Fits these FBH topics', 'Link'];
+                'Best-fit FBH projects', 'Link'];
   const dated = withDecision.filter(r => r[0] !== 'Discard' && /^\d{4}-\d{2}-\d{2}$/.test(deadline(r)))
     .sort(byDeadline).map(r => keep.map(k => r[viewHeader.indexOf(k)]));
   writeTable(ss, TABS.deadlines, [keep].concat(dated));
@@ -216,7 +216,7 @@ function addToPipeline() {
     if (cStatus >= 0) values[cStatus] = 'TBD';
     if (cNext >= 0) values[cNext] = 'Review open call: ' + call;
     if (cComments >= 0) values[cComments] = get('Link') + ' | Tracker fit ' + get('Fit (1-5)') + ': ' +
-                                             get('Fits these FBH topics');
+                                             get('Best-fit FBH projects');
     pipe.appendRow(values);
   }
   if (!r[0]) {
@@ -270,7 +270,7 @@ function writeTable(ss, name, rows) {
   sheet.setFrozenRows(1);
   const header = rows[0];
   const widths = { 'Grant / program': 340, 'Funder': 180, 'Why this score': 420, 'Summary': 420, 'title': 340,
-                   'Eligibility: confirmed vs. to verify': 320, 'Fits these FBH topics': 240, 'Link': 220,
+                   'Eligibility: confirmed vs. to verify': 320, 'Best-fit FBH projects': 240, 'Link': 220,
                    'Geography': 220, 'summary': 420 };
   header.forEach((h, i) => { if (widths[h]) sheet.setColumnWidth(i + 1, widths[h]); });
   const score = header.indexOf('Fit (1-5)');
@@ -356,7 +356,7 @@ function writeAbout(ss, summary, counts) {
   add('Why this score', 'Starts with the sum: topic (0-2) + place (0-2) + applicants (0-1) + size (-1 to 1) + pipeline (0-1), then any cap.');
   add('Caps', 'At most 3 when the call does not say where the work can happen; at most 2 when its main focus is outside FBH (marine, coastal, redwoods, animal welfare...) or it is an EU consortium call.');
   add('Confirmed vs. Verify', 'Confirmed = the listing says so. Verify = our assumption; check before applying.');
-  add('Fits these FBH topics', 'FBH projects or topics whose words appear in the call');
+  add('Best-fit FBH projects', 'FBH projects or topics whose words appear in the call');
   add('Flag', 'NEW (first seen in the last 7 days), Closing soon (deadline within 21 days), Source down (not re-checked today)');
   add('');
   add('Settings and full data', 'https://github.com/' + REPO);

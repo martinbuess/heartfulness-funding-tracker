@@ -2,14 +2,14 @@
 
 A free, self-running list of open grant opportunities for [Forests by Heartfulness](https://heartfulness.org/) (FBH), the environmental initiative of the Heartfulness Institute. Adapted from Gaurav Shikhar Gandhi's [GLIA Funding Tracker](https://github.com/gauravshikhargandhi-web/glia-funding-tracker).
 
-Every day a GitHub job reads public funding sources, keeps the calls that fit FBH's four program areas and can be carried out in India, gives each one a fit score from 1 to 5 with the reasons, and saves the results. A Google Sheet picks them up an hour later.
+Every day a GitHub job reads public funding sources, keeps the calls that fit FBH's four program areas, named as in the FBH summary deck:
 
-FBH's four program areas, as the tracker understands them:
+1. **Ecological restoration & biodiversity**: native afforestation, hill greening, degraded forest and landscape restoration, endangered native species, nurseries, urban forests
+2. **Water & watershed restoration**: lakes and ponds, rainwater harvesting, groundwater recharge, watersheds, climate resilience
+3. **Carbon & climate solutions**: biochar, soil carbon, carbon sequestration, nature-based carbon removal
+4. **Regenerative agriculture & rural livelihoods**: agroforestry, soil health, horticulture, rural incomes
 
-1. **Ecological restoration & biodiversity**: native afforestation, forest and landscape restoration, biodiversity, habitats
-2. **Water & watershed**: lakes, check dams, groundwater recharge, watersheds, climate resilience
-3. **Agroforestry & regenerative agriculture**: farmer livelihoods, soil health, agroecology
-4. **Biochar & carbon removal**: biochar, soil carbon, carbon sequestration, nature-based carbon removal
+Each call is also matched to FBH's projects (the **Best-fit FBH projects** column): Shivgarh landscape restoration, Peddaveedu pond & water security, village-scale biochar, agroforestry livelihoods, the Gachibowli urban rainforest, and the endangered native trees & nursery network. Edit them under `[[projects]]` in `profile.toml`.
 
 ## What's in it
 
@@ -30,7 +30,7 @@ FBH's four program areas, as the tracker understands them:
 | Column | What it means |
 | --- | --- |
 | Fit (1-5) | Topic: an FBH area word in the title (2) or description (1), or 0 when the call's main focus is outside FBH (marine, coastal, redwoods, animal welfare… see `off_focus` in `profile.toml`). Place: India listed or named (2), open internationally (1). Applicants: NGOs named as eligible (1). Size: US$50,000 or more (1), under (−1). Pipeline funder (1). Then capped: at most 3 when the call doesn't say where the work can happen, at most 2 for off-focus calls and EU consortium calls. "Why this score" starts with the sum. |
-| Fits these FBH topics | FBH projects or topics whose words appear in the call (`[[projects]]` in `profile.toml`) |
+| Best-fit FBH projects | FBH projects whose words appear in the call, best match first, with the words that matched (`[[projects]]` in `profile.toml`) |
 | FBH area | Which of the four program areas matched |
 | Geography | India named, International (check India), or Unclear |
 | Who can apply | NGOs eligible, Anyone, Check listing; "partner may be needed" when a consortium is mentioned |

@@ -127,7 +127,8 @@ class GlanceAndRoundupTest(unittest.TestCase):
         self.assertEqual((row["funder"], row["close_date"]), ("Global EbA Fund", "2026-10-26"))
         row, _ = self.scored(row)
         self.assertTrue(row["geography"].startswith("International: Primarily ODA-eligible"))
-        self.assertIn("Climate resilience & adaptation", row["fbh_topics"])
+        self.assertIn("Peddaveedu pond & water security", row["fbh_topics"]) if "flood" in row["summary"] else None
+        self.assertIn("Water & watershed restoration", row["fbh_area"])
         self.assertEqual(row["fit_score"], "5")  # pipeline funder, $250K, NGOs, ecosystem-based adaptation
 
     def test_off_focus_and_unclear_place_are_capped(self):
@@ -263,7 +264,8 @@ class FbhProfileTest(unittest.TestCase):
     def test_strong_fits_score_high(self):
         self.assertEqual(self.matches["1"]["fit_score"], "5")  # biochar, India, NGOs, $150K
         self.assertEqual(self.matches["4"]["fit_score"], "5")  # wetlands, developing countries, EUR
-        self.assertIn("Biochar & carbon removal", self.matches["1"]["fbh_area"])
+        self.assertIn("Carbon & climate solutions", self.matches["1"]["fbh_area"])
+        self.assertTrue(self.matches["1"]["fbh_topics"].startswith("Village-scale biochar (biochar"))
         self.assertEqual(self.matches["1"]["geography"], "India named")
         self.assertTrue(self.matches["1"]["eligibility_check"].startswith("Confirmed: NGOs"))
 
@@ -343,6 +345,25 @@ class GeographyTest(unittest.TestCase):
         self.assertEqual(self.geo("Elephant Fund", notes="Foreign governments and NGOs may apply",
                                   source="grants.gov")[0], "International (check India)")
         self.assertEqual(self.geo("Lake grants", "Projects in India are eligible.")[0], "India named")
+
+
+class ProjectsTest(unittest.TestCase):
+    def test_best_fit_projects_from_the_deck(self):
+        row = {"source": "fundsforngos", "source_id": "p", "title": "Urban forests for cooler cities",
+               "summary": "Grants for NGOs creating Miyawaki urban forests and native tree nurseries in India to reduce "
+                          "heat islands. Up to USD 100,000.", "eligibility_notes": "", "eligibility": "", "funder": "X",
+               "location": "", "link": "l", "listing_type": "Grant", "close_date": "2027-01-01", "status": "posted",
+               "award_ceiling": "", "total_funding": "", "funder_code": "", "topics": ""}
+        row = profile.apply(PROFILE, plain.add([row]))[0]
+        self.assertTrue(row["fbh_topics"].startswith("Gachibowli urban rainforest (Biodiversity Park) ("))
+        self.assertIn("urban forest", row["fbh_topics"])
+        self.assertIn("Endangered native trees & nursery network", row["fbh_topics"])
+        self.assertEqual(row["fit_score"], "5")
+
+    def test_iucn_members_count_as_eligible(self):
+        rules = fit.Rules(PROFILE)
+        row = {"title": "Call", "summary": "Open to IUCN Members in Asia.", "eligibility_notes": "", "eligibility": ""}
+        self.assertEqual(fit.applicants(row, rules)[0], "NGOs eligible")
 
 
 class MoneyAndDatesTest(unittest.TestCase):

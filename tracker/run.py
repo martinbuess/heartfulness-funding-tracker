@@ -39,7 +39,7 @@ ABOUT = {
 # The columns of data/opportunities.csv, the file the Google Sheet shows, in order.
 OPPORTUNITY_COLUMNS = [
     ("flag", "Flag"), ("fit_score", "Fit (1-5)"), ("funder", "Funder"), ("title", "Grant / program"),
-    ("deadline", "Deadline"), ("amount", "Amount"), ("fbh_topics", "Fits these FBH topics"), ("fbh_area", "FBH area"),
+    ("deadline", "Deadline"), ("amount", "Amount"), ("fbh_topics", "Best-fit FBH projects"), ("fbh_area", "FBH area"),
     ("geography", "Geography"), ("who_can_apply", "Who can apply"),
     ("eligibility_check", "Eligibility: confirmed vs. to verify"), ("fit_reason", "Why this score"), ("link", "Link"),
     ("in_pipeline", "In pipeline"), ("kind", "Kind"), ("source_label", "Source"), ("last_seen", "Last verified"),
