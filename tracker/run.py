@@ -38,12 +38,12 @@ ABOUT = {
 
 # The columns of data/opportunities.csv, the file the Google Sheet shows, in order.
 OPPORTUNITY_COLUMNS = [
-    ("flag", "Flag"), ("fit_score", "Fit (1-5)"), ("fbh_area", "FBH area"), ("funder", "Funder"),
-    ("title", "Grant / program"), ("amount", "Amount"), ("deadline", "Deadline"), ("geography", "Geography"),
-    ("who_can_apply", "Who can apply"), ("eligibility_check", "Eligibility: confirmed vs. to verify"),
-    ("fit_reason", "Why this score"), ("link", "Link"), ("in_pipeline", "In pipeline"),
-    ("kind", "Kind"), ("source_label", "Source"), ("last_seen", "Last verified"), ("first_seen", "First seen"),
-    ("short_summary", "Summary"),
+    ("flag", "Flag"), ("fit_score", "Fit (1-5)"), ("funder", "Funder"), ("title", "Grant / program"),
+    ("deadline", "Deadline"), ("amount", "Amount"), ("fbh_topics", "Fits these FBH topics"), ("fbh_area", "FBH area"),
+    ("geography", "Geography"), ("who_can_apply", "Who can apply"),
+    ("eligibility_check", "Eligibility: confirmed vs. to verify"), ("fit_reason", "Why this score"), ("link", "Link"),
+    ("in_pipeline", "In pipeline"), ("kind", "Kind"), ("source_label", "Source"), ("last_seen", "Last verified"),
+    ("first_seen", "First seen"), ("short_summary", "Summary"), ("uid", "ID"),
 ]
 
 
@@ -79,7 +79,8 @@ def main():
             failed.append(name)
             continue
         if name in aggregators:
-            fresh = _keep_until_deadline(rows, name, fresh, today, aggregators[name].get("keep_days", 120))
+            fresh = _keep_until_deadline(rows, name, fresh, today, aggregators[name].get("keep_days", 120),
+                                         aggregators[name].get("title_separator", ""))
         gone = pool.closed(rows, name, fresh)
         if not fresh and len(gone) >= 10:
             # A big source that suddenly returns nothing has more likely broken than closed everything.
@@ -134,12 +135,26 @@ def main():
         print(f"sources failed today (not yet {FAIL_AFTER_DAYS} days in a row): {', '.join(failed)}")
 
 
-def _keep_until_deadline(previous, source, fresh, today, keep_days):
-    """Add back this source's earlier listings that left the feed but are still open."""
+def _keep_until_deadline(previous, source, fresh, today, keep_days, separator=""):
+    """Add back this source's earlier listings that left the feed but are still open.
+
+    Listings saved before the feed reader understood labelled fields are read
+    again from their saved text, and old whole-roundup listings are dropped
+    (each call in a roundup is now its own listing).
+    """
     seen = {r["source_id"] for r in fresh}
-    kept = [r for r in previous if r["source"] == source and r["source_id"] not in seen
-            and feeds.still_open(r, today, keep_days)]
-    return fresh + [dict(r) for r in kept]
+    links = {r["link"] for r in fresh}
+    kept = []
+    for row in previous:
+        if row["source"] != source or row["source_id"] in seen or row["link"] in links or "/listing/" in row["link"]:
+            continue
+        row = dict(row)
+        if not row.get("details"):
+            row = feeds.reread(row, separator)
+        if feeds.still_open(row, today, keep_days):
+            kept.append(row)
+            links.add(row["link"])
+    return fresh + kept
 
 
 def flag(row, today, failed):
@@ -163,7 +178,8 @@ def save_opportunities(path, matches, today, failed):
         writer = csv.writer(f)
         writer.writerow([label for _, label in OPPORTUNITY_COLUMNS])
         for row in matches:
-            row = dict(row, flag=flag(row, today, failed), source_label=ABOUT.get(row["source"], (row["source"],))[0])
+            row = dict(row, flag=flag(row, today, failed), source_label=ABOUT.get(row["source"], (row["source"],))[0],
+                       uid=f"{row['source']}:{row['source_id']}", funder=row["funder"] or "(see link)")
             writer.writerow([row.get(key, "") for key, _ in OPPORTUNITY_COLUMNS])
 
 

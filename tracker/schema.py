@@ -21,14 +21,17 @@ FIELDS = [
     "award_floor",     # dollars, blank when not given
     "award_ceiling",
     "total_funding",
+    "amount_text",     # the source's own words on grant size, e.g. "Up to US$250,000"
     "eligibility",     # source's applicant types, "; " separated
     "eligibility_notes",  # source's own words on who may apply, when it gives them
     "topics",          # source's categories, "; " separated
     "location",        # where the applicant or work must be; "National" for federal
     "link",            # the original listing page
     "summary",         # first part of the description
+    "details",         # "structured" when the source gave labelled fields; "from roundup: ..." for roundup items
     # How well the listing fits FBH (filled in by tracker/fit.py for matches)
     "fbh_area",        # which FBH program area(s) it matches
+    "fbh_topics",      # which FBH projects or topics fit (from [[projects]] in profile.toml)
     "geography",       # India named, International (check India), Unclear, ...
     "eligibility_check",  # "Confirmed: ..." facts from the listing; "Verify: ..." assumptions to check
     "amount_usd",      # rough size in US dollars, for the size rule

@@ -55,6 +55,17 @@ general_keywords = [
   "nature", "conservation", "net zero", "net-zero", "SDG 13", "SDG 15", "SDG 6",
 ]
 
+# Calls whose main focus (title or first sentences) is one of these are outside FBH's
+# programs, even when they also say "restoration" or "biodiversity". They score no
+# topic points and at most 2. Added 2026-10-19 after spot checks (Redwood grants,
+# UNEP coastal small grants, animal welfare roundups).
+off_focus = [
+  "marine", "coastal", "coast", "ocean", "oceans", "high seas", "sea level", "seagrass", "coral", "reef", "fisheries",
+  "fishery", "fishing communit", "blue economy", "kelp", "salmon", "whale", "shark", "sea turtle", "marine mammal",
+  "redwood", "sequoia", "arctic", "antarctic", "polar", "animal welfare", "pet ", "pets", "veterinar", "companion animal",
+  "human-animal", "wildlife trafficking", "invasive species", "space science", "cybersecurity",
+]
+
 # Drop listings that mention any of these: other meanings of our words.
 exclude_keywords = [
   "dental", "historic preservation", "historic restoration", "building restoration", "art restoration",
@@ -72,7 +83,8 @@ individual_title_words = [
   "scholarship", "fellowship", "phd", "ph.d", "doctoral", "postdoc", "master's", "masters", "internship",
   "student", "journalis", "photograph", "film", "essay", "poetry", "summer school", "online course",
   "training course", "webinar", "conference", "youth summit", "residency", "artist", "writers",
-  "art competition", "art contest", "children's", "drawing competition", "photo contest",
+  "art competition", "art contest", "children's", "drawing competition", "photo contest", "photo competition",
+  "photography", "story competition", "storytelling competition", "students", "school",
 ]
 
 # Procurement and consultancy: buying services, not giving grants. Checked in the title.
@@ -115,6 +127,9 @@ international = [
   "developing nations", "low- and middle-income", "low and middle income", "LMIC", "LMICs", "Global South",
   "emerging economies", "emerging markets", "ODA-eligible", "ODA eligible", "DAC list", "Asia", "Asia-Pacific",
   "Asia Pacific", "Commonwealth", "foreign", "non-U.S.", "non-US", "outside the United States",
+  "ODA", "ODA-eligible countries", "LDCs", "least developed countries", "SIDS", "small island developing",
+  "low-income countries", "middle-income countries", "all regions", "open to all", "no geographic restriction",
+  "Not restricted",
 ]
 # Places that, when named in the title (or in the funder, e.g. "U.S. Mission to Cambodia")
 # without India, mean the call is for somewhere else.
@@ -143,7 +158,7 @@ other_places = [
   "Pakistan", "Bangladesh", "Nepal", "Sri Lanka", "Bhutan", "Maldives", "Southeast Asia", "South-East Asia",
   "ASEAN", "Brunei", "Cambodia", "Indonesia", "Laos", "Lao PDR", "Malaysia", "Myanmar", "Philippines", "Singapore",
   "Thailand", "Timor-Leste", "Vietnam", "Viet Nam", "East Asia", "China", "Hong Kong", "Taiwan", "Mongolia",
-  "Japan", "Korea", "Australia", "New Zealand", "Pacific Islands", "Pacific Island", "Fiji", "Kiribati",
+  "Japan", "Korea", "Australia", "New Zealand", "Indo-Burma", "Mekong", "Amazonia", "Amazon basin", "Congo Basin", "Pacific Islands", "Pacific Island", "Fiji", "Kiribati",
   "Marshall Islands", "Micronesia", "Nauru", "Palau", "Papua New Guinea", "Samoa", "Solomon Islands", "Tonga",
   "Tuvalu", "Vanuatu",
 ]
@@ -284,7 +299,7 @@ funders = [
   { name = "India Climate Collaborative", status = "TBD", match = ["India Climate Collaborative"] },
   { name = "Harit Bharat Fund", status = "TBD", match = ["Harit Bharat Fund"] },
   { name = "Dasra / ClimateRISE", status = "TBD", match = ["Dasra", "ClimateRISE"] },
-  { name = "GEF SGP India", status = "TBD", match = ["GEF Small Grants", "GEF SGP", "Small Grants Programme"] },
+  { name = "GEF SGP India", status = "TBD", match = ["GEF Small Grants", "GEF SGP"] },
   { name = "Samhita / CGF", status = "TBD", match = ["Samhita"] },
   { name = "The/Nudge Institute", status = "TBD", match = ["Nudge Institute"] },
   { name = "EarthON Foundation", status = "TBD", match = ["EarthON Foundation"] },
@@ -358,7 +373,56 @@ funders = [
   { name = "Boston Scientific", status = "TBD", match = ["Boston Scientific"] },
 ]
 
-# --- 7. Sources -----------------------------------------------------------------
+# --- 7. FBH projects and topics ----------------------------------------------
+# The "Fits these FBH topics" column lists every entry whose words appear in a
+# call. DRAFT, from the program description in the original brief; to be replaced
+# with FBH's actual projects from the overview deck. Add or rename freely.
+[[projects]]
+name = "Native forests (Miyawaki / afforestation)"
+keywords = ["afforest", "reforest", "tree planting", "native tree", "native species", "miyawaki", "urban forest", "green cover"]
+
+[[projects]]
+name = "Degraded forest & landscape restoration"
+keywords = ["forest landscape restoration", "landscape restoration", "degraded land", "degraded forest", "land degradation",
+            "desertification", "ecosystem restoration", "rewild"]
+
+[[projects]]
+name = "Biodiversity conservation"
+keywords = ["biodiversity", "habitat", "wildlife", "pollinat", "species conservation", "threatened species", "endangered"]
+
+[[projects]]
+name = "Lake & wetland restoration"
+keywords = ["lake", "pond", "wetland", "desilt", "rejuvenat"]
+
+[[projects]]
+name = "Check dams, groundwater & watersheds"
+keywords = ["check dam", "check-dam", "groundwater", "aquifer", "recharge", "watershed", "catchment", "rainwater harvest",
+            "water harvesting", "springshed", "water conservation", "water security"]
+
+[[projects]]
+name = "Climate resilience & adaptation"
+keywords = ["climate resilien", "climate adaptation", "ecosystem-based adaptation", "ecosystem based adaptation", "drought",
+            "flood", "nature-based solution", "nature based solution"]
+
+[[projects]]
+name = "Agroforestry with farmers"
+keywords = ["agroforest", "agro-forest", "farm forestry", "silvopast", "smallholder", "farmer"]
+
+[[projects]]
+name = "Regenerative & natural farming, soil health"
+keywords = ["regenerative agricultur", "regenerative farm", "agroecolog", "natural farming", "organic farming",
+            "soil health", "soil fertility", "soil regenerat", "sustainable agricultur", "climate-smart agricultur"]
+
+[[projects]]
+name = "Village-scale biochar & carbon removal"
+keywords = ["biochar", "bio-char", "pyrolysis", "crop residue", "stubble burning", "carbon removal", "carbon dioxide removal",
+            "soil carbon", "carbon sequestration", "carbon credit"]
+
+[[projects]]
+name = "Rural livelihoods"
+keywords = ["livelihood", "farmer producer", "women farmers", "rural communit", "food security"]
+
+# --- 8. Sources -----------------------------------------------------------------
 # Aggregators: RSS feeds of sites that publish grant calls. Each run reads each feed
 # once (nothing else on the site) and keeps each call until its deadline passes, or
 # keep_days when no deadline is given. Add one by copying a block.
@@ -373,6 +437,7 @@ keep_days = 120
 source = "terraviva"
 name = "Terra Viva Grants"
 url = "https://www.terravivagrants.org/feed/"
+title_separator = " — "   # its titles are "Funder — Program"
 about = "Funding News: open calls for agriculture, environment and natural resources in developing countries"
 keep_days = 120
 skip_title_words = ["Monthly Update"]   # summaries of past posts, not calls

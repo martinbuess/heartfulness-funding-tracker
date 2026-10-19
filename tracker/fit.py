@@ -98,6 +98,11 @@ def size(row, usd_per):
                 return float(row[field]), ""
             except ValueError:
                 pass
+    if row.get("amount_text"):
+        found = amounts(row["amount_text"], usd_per)
+        if found:
+            usd, text = max(found)
+            return usd, row["amount_text"][:80]
     found = amounts(f"{row['title']} {row['summary']}", usd_per)
     if not found:
         return None, ""
@@ -115,6 +120,8 @@ class Rules:
         self.areas = {name: prefix_words(words) for name, words in profile.get("areas", {}).items()}
         f = profile.get("filter", {})
         self.general = prefix_words(f.get("general_keywords", []))
+        self.off_focus = prefix_words(f.get("off_focus", []))
+        self.projects = [(p["name"], prefix_words(p.get("keywords", []))) for p in profile.get("projects", [])]
         geo = profile.get("geography", {})
         self.india = whole_words(geo.get("india", []))
         self.international = whole_words(geo.get("international", []))
@@ -170,14 +177,24 @@ def _strip_subregions(text):
 
 
 def geography(row, rules):
-    """(label, points, reason to set aside or "")."""
+    """(label, points, reason to set aside or "", confirmed by the source?)."""
+    # The source's own "Eligible countries" / "Geographic focus" field, when it has one.
+    where = row.get("location", "") if row["source"] in ("fundsforngos", "terraviva") else ""
+    if where:
+        if rules.india and rules.india.search(where):
+            return "India listed as eligible", 2, "", True
+        if rules.international and rules.international.search(_strip_subregions(where)):
+            return f"International: {where[:70]} (check India)", 1, "", False
+        listed = _found(rules.other, where)
+        if listed:
+            return "Elsewhere", 0, f"eligible countries are {where[:90]}", True
     # The EU note is our own words (it mentions India), so it isn't read as the call's geography.
     notes = "" if row["source"] == "eu-funding" else row.get("eligibility_notes", "")
     text = f"{row['title']} {row['summary']} {notes} {row.get('location', '')}"
     if rules.india and rules.india.search(text):
-        return "India named", 2, ""
+        return "India named", 2, "", False
     if rules.us_only and rules.us_only.search(text):
-        return "US only", 0, "US-based work or applicants only"
+        return "US only", 0, "US-based work or applicants only", False
     # A place named in the title or the funder (e.g. "U.S. Mission to Cambodia") without India.
     # A title that also says "global" or "Asia" (e.g. "Africa and Asia") is not restricted.
     title_places = _found(rules.other, f"{row['title']} {_embassy(row['funder'])}")
@@ -186,21 +203,25 @@ def geography(row, rules):
     if re.search(r"\bUS\b", row["title"]):
         title_places.append("US")
     if title_places and not title_intl:
-        return "Elsewhere", 0, f"for {', '.join(_place(p) for p in title_places[:3])}, not India"
+        return "Elsewhere", 0, f"for {', '.join(_place(p) for p in title_places[:3])}, not India", False
     if row["source"] == "grants.gov":
         # Federal grants are for US applicants unless the listing says foreign organisations may apply.
         notes = f"{row['summary']} {row.get('eligibility_notes', '')}"
         if rules.gg_foreign and rules.gg_foreign.search(notes):
-            return "International (check India)", 1, ""
-        return "US only", 0, "US federal grant with no mention of foreign applicants"
+            return "International (check India)", 1, "", False
+        return "US only", 0, "US federal grant with no mention of foreign applicants", False
     if row["source"] == "eu-funding":
-        return "EU call (India usually as partner only)", 0, ""
+        return "EU call (India usually as partner only)", 0, "", False
     if rules.international and rules.international.search(_strip_subregions(text)):
-        return "International (check India)", 1, ""
-    places = _found(rules.other, text[:400])
+        return "International (check India)", 1, "", False
+    # Two or more countries named near the top, none of them India: a call for those countries.
+    places = [p for p in _found(rules.other, _strip_subregions(f"{row['title']} {row['summary'][:600]}"))
+              if p.lower() not in ("america", "americas", "europe", "european")]
+    if len(places) >= 2:
+        return "Elsewhere", 0, f"names {', '.join(_place(p) for p in places[:4])} but not India", False
     if places:
-        return f"Unclear (mentions {', '.join(p.title() for p in places[:2])})", 0, ""
-    return "Unclear", 0, ""
+        return f"Unclear (mentions {_place(places[0])})", 0, "", False
+    return "Unclear", 0, "", False
 
 
 def applicants(row, rules):
@@ -209,7 +230,7 @@ def applicants(row, rules):
     elig = row.get("eligibility", "").lower()
     text = f"{row['summary']} {row.get('eligibility_notes', '')}"
     points = 0
-    if "nonprofit" in elig or (rules.nonprofit and rules.nonprofit.search(f"{row['title']} {text}")):
+    if "nonprofit" in elig or (rules.nonprofit and rules.nonprofit.search(f"{row['title']} {elig} {text}")):
         who, points = "NGOs eligible", 1
         confirmed.append("NGOs/nonprofits named as eligible")
     elif "unrestricted" in elig:
@@ -236,7 +257,7 @@ def assess(row, rules):
     """Fill the fit columns. Returns a reason to set the listing aside, or ""."""
     in_title, anywhere, words = areas(row, rules)
     general = _found(rules.general, f"{row['title']} {row['summary']}")
-    geo, geo_points, geo_out = geography(row, rules)
+    geo, geo_points, geo_out, geo_confirmed = geography(row, rules)
     who, app_points, confirmed, verify = applicants(row, rules)
     usd, usd_text = size(row, rules.usd_per)
 
@@ -245,7 +266,11 @@ def assess(row, rules):
     if usd is not None and usd < rules.minimum:
         return f"too small: about {_money(usd) if usd >= 1000 else f'${usd:.0f}'} (under {_money(rules.minimum)})"
 
-    program = 2 if in_title else (1 if anywhere else 0)
+    # Topic. A call whose main focus is outside FBH's work (marine, coastal, redwoods,
+    # animal welfare, ...) scores no topic points, even if it says "restoration".
+    lead = f"{row['title']} {row['summary'][:300]}"
+    off = _found(rules.off_focus, lead)
+    topic = 0 if off else (2 if in_title else (1 if anywhere else 0))
     if usd is None:
         size_points, size_note = 0, "amount not published"
     elif usd >= rules.priority_min:
@@ -253,36 +278,55 @@ def assess(row, rules):
     else:
         size_points, size_note = -1, f"smaller grant, about {_money(usd)}"
     if usd_text:
-        size_note += f" (from \"{usd_text}\"; may be the total budget)"
+        size_note += f" (source says \"{usd_text}\")"
     funder_text = f"{row['funder']} {row['title']} {row['summary']}"
     pipeline = next(((name, status) for name, status, pattern in rules.watchlist if pattern.search(funder_text)), None)
     bonus = 1 if pipeline and pipeline[1].lower() not in rules.no_bonus else 0
 
-    score = max(1, min(5, program + geo_points + app_points + size_points + bonus))
+    total = topic + geo_points + app_points + size_points + bonus
+    score = max(1, min(5, total))
+    caps = []
+    if off:
+        caps.append((2, f"main focus is {', '.join(off[:2])}, outside FBH's programs"))
     if geo.startswith("EU call"):
-        # European-led research consortia: rarely a realistic route for FBH, so never above 2.
-        score = min(score, 2)
+        caps.append((2, "EU call: FBH could usually only join a European-led consortium"))
+    if geo.startswith("Unclear"):
+        caps.append((3, "where the work can happen is not stated"))
+    for cap, why in caps:
+        if score > cap:
+            score = cap
+    breakdown = (f"Score {score}: topic {topic:+d}, place {geo_points:+d}, applicants {app_points:+d}, "
+                 f"size {size_points:+d}" + (f", pipeline {bonus:+d}" if bonus else ""))
+    if caps and min(c for c, _ in caps) < total:
+        breakdown += f"; capped at {min(c for c, _ in caps)} because " + " and ".join(w for _, w in caps)
 
-    if geo == "India named":
-        confirmed.append("India named")
-    elif geo.startswith("International"):
-        verify.append("India eligibility (open internationally)")
+    if geo_confirmed and not geo.startswith("Elsewhere"):
+        confirmed.append(geo.split(" (")[0])
+    elif geo.startswith("India named"):
+        verify.append("India is mentioned, but check it is an eligible country")
+    elif geo.startswith(("International", "EU call")):
+        verify.append("India eligibility")
     else:
         verify.append("India eligibility (not stated)")
     if usd is None:
         verify.append("grant size")
 
     area_label = "; ".join(anywhere) or ("General environment / climate" if general else "")
+    text = f"{row['title']} {row['summary']} {row.get('eligibility_notes', '')}"
+    topics = [name for name, pattern in rules.projects if pattern and pattern.search(text)]
     match = ", ".join(words[:4] or general[:3])
-    where = "title" if in_title else "description"
-    reason = [f"Matches {match} ({where})" if match else "Hand-picked program",
+    reason = [breakdown,
+              f"Matches {match} ({'title' if in_title else 'description'})" if match else "Hand-picked program",
               geo, who, size_note]
-    if geo.startswith("EU call"):
-        reason.append("EU calls are capped at 2: FBH could usually only join a European-led consortium")
+    if off:
+        reason.insert(1, f"Main focus looks like {', '.join(off[:2])}, outside FBH's programs")
     if pipeline:
         reason.append(f"{pipeline[0]} is in our pipeline ({pipeline[1] or 'no status'})")
+    if row.get("details", "").startswith("from roundup"):
+        reason.append("Read from a roundup post with little detail: open the link")
     row.update({
         "fbh_area": area_label,
+        "fbh_topics": "; ".join(topics[:4]),
         "geography": geo,
         "who_can_apply": who,
         "eligibility_check": "; ".join(filter(None, [
@@ -293,6 +337,8 @@ def assess(row, rules):
         "fit_score": str(score),
         "fit_reason": ". ".join(reason) + ".",
     })
-    if not row.get("amount") and usd is not None:
-        row["amount"] = (usd_text or "Up to " + _money(usd))
+    if usd_text:
+        row["amount"] = usd_text
+    elif not row.get("amount") and usd is not None:
+        row["amount"] = "Up to " + _money(usd)
     return ""

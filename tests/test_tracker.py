@@ -80,6 +80,108 @@ class FeedsTest(unittest.TestCase):
             feeds.collect(TODAY, FEED, text="<html>Access denied</html>")
 
 
+class GlanceAndRoundupTest(unittest.TestCase):
+    """Cases from the 2026-10-19 spot checks."""
+
+    INDO_BURMA = ("The Critical Ecosystem Partnership Fund (CEPF) and the IUCN Asia Regional Office invite local civil "
+                  "society organizations to submit Letters of Inquiry. Opportunity at a Glance Funding organization: "
+                  "The Critical Ecosystem Partnership Fund (CEPF) Regional Implementation Team (RIT): IUCN Asia Regional "
+                  "Office Eligible countries: Cambodia , China, Lao PDR, Myanmar, Thailand, Vietnam Opening date: "
+                  "28 September 2026 Grant size (small): up to US$50,000 Grant size (large): US$50,000 to US$250,000 "
+                  "Eligible priorities (overall call focus): Strategic Directions 1 and 2")
+    EBA = ("The Global EbA Fund invites proposals for its 8th Call for Proposals for Small-Size Grants, supporting "
+           "Ecosystem-based Adaptation. Opportunity at a Glance Funding organization: Global EbA Fund Opportunity type: "
+           "Call for proposals (Small-Size Grants) Grant size: Each grant up to USD 250,000 Submission window (online): "
+           "28 September to 26 October, 2026 Geographic focus: Primarily ODA-eligible SIDS and LDCs ; other "
+           "ODA-eligible countries may be considered Eligible applicants: NGOs, INGOs, CBOs, universities")
+    REDWOOD = ("Save the Redwoods League is inviting applications for the Redwood Research Grants, aimed at supporting "
+               "research that enhances the conservation and restoration of redwood forests amidst climate change. "
+               "Opportunity at a Glance Provider: Save the Redwoods League Funding Amount: $30,000 to $50,000 Eligible "
+               "Applicants: Nonprofit organizations, universities Eligible Locations: Not specified Deadline for "
+               "Pre-proposals: 16 December 2026 About the Opportunity The grants aim to deepen understanding.")
+
+    def item(self, title, text, link="https://www2.fundsforngos.org/x/"):
+        return {"id": "1", "title": title, "link": link, "posted": "2026-10-10", "text": text, "html": text}
+
+    def scored(self, row):
+        dropped = []
+        kept = profile.apply(PROFILE, plain.add([row]), dropped)
+        return (kept[0], "") if kept else (row, dropped[0][1])
+
+    def test_glance_fields(self):
+        fields = feeds.glance(self.INDO_BURMA)
+        self.assertEqual(fields["funder"], "The Critical Ecosystem Partnership Fund (CEPF)")
+        self.assertEqual(fields["countries"], "Cambodia , China, Lao PDR, Myanmar, Thailand, Vietnam")
+        self.assertEqual(fields["amount"], "up to US$50,000; US$50,000 to US$250,000")
+        self.assertEqual(feeds.glance("Deadline: 1 May 2027. Apply now."), {})  # one label is not a block
+
+    def test_listed_countries_without_india_are_set_aside(self):
+        row = feeds.normalize(self.item("Indo-Burma Second Call for Letters of Inquiry for Biodiversity Grants",
+                                        self.INDO_BURMA), "fundsforngos")
+        self.assertEqual(row["funder"], "Critical Ecosystem Partnership Fund (CEPF)")
+        _, reason = self.scored(dict(row, close_date="2026-11-02"))
+        self.assertTrue(reason.startswith("geography: eligible countries are Cambodia"))
+
+    def test_funder_deadline_and_place_from_the_block(self):
+        row = feeds.normalize(self.item("8th Call for Proposals for Small-Size Grants", self.EBA), "fundsforngos")
+        self.assertEqual((row["funder"], row["close_date"]), ("Global EbA Fund", "2026-10-26"))
+        row, _ = self.scored(row)
+        self.assertTrue(row["geography"].startswith("International: Primarily ODA-eligible"))
+        self.assertIn("Climate resilience & adaptation", row["fbh_topics"])
+        self.assertEqual(row["fit_score"], "5")  # pipeline funder, $250K, NGOs, ecosystem-based adaptation
+
+    def test_off_focus_and_unclear_place_are_capped(self):
+        row = feeds.normalize(self.item("Redwood Research Grants: Advancing Conservation and Restoration Science",
+                                        self.REDWOOD), "fundsforngos")
+        self.assertEqual((row["funder"], row["close_date"], row["location"]),
+                         ("Save the Redwoods League", "2026-12-16", ""))
+        row, _ = self.scored(row)
+        self.assertEqual(row["fit_score"], "2")
+        self.assertIn("redwood", row["fit_reason"])
+        coastal = dict(row, title="Call for Proposal: UNEP Small Grants Programme", funder="UNEP", amount_text="",
+                       summary="Community-based conservation and restoration of marine and coastal ecosystems.")
+        self.assertEqual(self.scored(coastal)[0]["fit_score"], "1")
+
+    def test_unclear_place_caps_at_3(self):
+        row = dict(feeds.normalize(self.item("Forest restoration grants", "Grants of up to USD 200,000 for NGOs "
+                                             "restoring native forests."), "fundsforngos"), close_date="2027-01-01")
+        row, _ = self.scored(row)
+        self.assertEqual(row["fit_score"], "3")
+        self.assertIn("capped at 3", row["fit_reason"])
+
+    def test_two_named_countries_without_india_are_set_aside(self):
+        row = dict(feeds.normalize(self.item("Wetland grants", "Supports NGOs restoring wetlands in Kenya and Uganda."),
+                                   "fundsforngos"), close_date="2027-01-01")
+        self.assertTrue(self.scored(row)[1].startswith("geography: names Kenya, Uganda"))
+
+    def test_roundup_becomes_separate_calls(self):
+        page = ('<p>Find funding.</p><h3><a href="https://www2.fundsforngos.org/science/whitley-award/">Call for '
+                'Nominations: Whitley Award for Wildlife and Biodiversity Conservation</a></h3><p>Deadline : '
+                '30-October-2026</p><p>The Whitley Fund for Nature supports conservation leaders…[ <a href="https://'
+                'www2.fundsforngos.org/science/whitley-award/">more</a> ]</p><h3><a href="https://www2.fundsforngos.org/'
+                'x/pets/">Apply for Cold Noses Foundation Grant Program</a></h3><p>Deadline : 31 October 2026</p>'
+                '<p>Pets…</p><div><a href="https://www2.fundsforngos.org/y/sidebar-card/">A featured listing card '
+                'without a date</a></div>')
+        item = {"id": "9", "title": "New Funding Pathways for Animal Welfare", "posted": "2026-10-10",
+                "link": "https://www2.fundsforngos.org/listing/new-funding-pathways/", "text": "", "html": page}
+        calls = feeds.roundup_calls(item, "fundsforngos")
+        self.assertEqual([(c["title"][:31], c["close_date"]) for c in calls],
+                         [("Call for Nominations: Whitley A", "2026-10-30"), ("Apply for Cold Noses Foundation", "2026-10-31")])
+        self.assertEqual(calls[0]["link"], "https://www2.fundsforngos.org/science/whitley-award/")
+        self.assertIn("Whitley Fund for Nature", calls[0]["summary"])
+
+    def test_terra_viva_funder_from_title(self):
+        row = feeds.normalize(self.item("Global EbA Fund — Small Grants for Scaling EbA", "Grants for adaptation."),
+                              "terraviva", " — ")
+        self.assertEqual(row["funder"], "Global EbA Fund")
+
+    def test_old_rows_are_reread(self):
+        old = {"title": "8th Call", "summary": self.EBA, "eligibility_notes": "", "funder": "", "location": "",
+               "close_date": "", "link": "x"}
+        row = feeds.reread(old)
+        self.assertEqual((row["funder"], row["close_date"]), ("Global EbA Fund", "2026-10-26"))
+
+
 class EuFundingTest(unittest.TestCase):
     def setUp(self):
         with open(os.path.join(HERE, "sample_eufunding.json"), encoding="utf-8") as f:
@@ -221,7 +323,7 @@ class GeographyTest(unittest.TestCase):
     def geo(self, title, summary="", funder="", source="fundsforngos", notes=""):
         row = {"title": title, "summary": summary, "funder": funder, "source": source,
                "eligibility_notes": notes, "location": ""}
-        return fit.geography(row, fit.Rules(PROFILE))
+        return fit.geography(row, fit.Rules(PROFILE))[:3]
 
     def test_country_in_title_or_embassy_funder_is_elsewhere(self):
         self.assertEqual(self.geo("GEF Small Grants Program (Palau)", "Global Environment Facility")[2],
@@ -313,10 +415,15 @@ class RunTest(unittest.TestCase):
 
     def test_feed_listings_stay_until_deadline(self):
         today = datetime.date(2026, 10, 15)
-        previous = [{"source": "fundsforngos", "source_id": "1", "close_date": "2026-11-01", "first_seen": "2026-10-01"},
-                    {"source": "fundsforngos", "source_id": "2", "close_date": "2026-10-01", "first_seen": "2026-09-01"},
-                    {"source": "grants.gov", "source_id": "9", "close_date": "", "first_seen": "2026-09-01"}]
-        fresh = [{"source": "fundsforngos", "source_id": "3", "close_date": ""}]
+        base = {"details": "structured", "title": "t", "summary": ""}
+        previous = [dict(base, source="fundsforngos", source_id="1", close_date="2026-11-01", first_seen="2026-10-01",
+                         link="https://a/1"),
+                    dict(base, source="fundsforngos", source_id="2", close_date="2026-10-01", first_seen="2026-09-01",
+                         link="https://a/2"),
+                    dict(base, source="fundsforngos", source_id="4", close_date="2026-12-01", first_seen="2026-10-01",
+                         link="https://a/listing/roundup/"),  # old whole-roundup row: dropped
+                    dict(base, source="grants.gov", source_id="9", close_date="", first_seen="2026-09-01", link="g")]
+        fresh = [{"source": "fundsforngos", "source_id": "3", "close_date": "", "link": "https://a/3"}]
         kept = run._keep_until_deadline(previous, "fundsforngos", fresh, today, 120)  # any aggregator
         self.assertEqual([r["source_id"] for r in kept], ["3", "1"])
 
@@ -329,7 +436,8 @@ class RunTest(unittest.TestCase):
             run.save_opportunities(path, rows, datetime.date(2026, 10, 15), [])
             with open(path, encoding="utf-8") as f:
                 lines = f.read().splitlines()
-        self.assertTrue(lines[0].startswith("Flag,Fit (1-5),FBH area,Funder,Grant / program"))
+        self.assertTrue(lines[0].startswith("Flag,Fit (1-5),Funder,Grant / program,Deadline"))
+        self.assertTrue(lines[0].endswith(",ID"))
         self.assertEqual(len(lines), len(rows) + 1)
 
 

@@ -29,7 +29,8 @@ FBH's four program areas, as the tracker understands them:
 
 | Column | What it means |
 | --- | --- |
-| Fit (1-5) | Points for: an FBH area word in the title (2) or description (1); India named (2) or open internationally (1); NGOs named as eligible (1); size known and US$50,000 or more (1, or −1 when under $50K); funder already in our pipeline (1). Capped at 5. |
+| Fit (1-5) | Topic: an FBH area word in the title (2) or description (1), or 0 when the call's main focus is outside FBH (marine, coastal, redwoods, animal welfare… see `off_focus` in `profile.toml`). Place: India listed or named (2), open internationally (1). Applicants: NGOs named as eligible (1). Size: US$50,000 or more (1), under (−1). Pipeline funder (1). Then capped: at most 3 when the call doesn't say where the work can happen, at most 2 for off-focus calls and EU consortium calls. "Why this score" starts with the sum. |
+| Fits these FBH topics | FBH projects or topics whose words appear in the call (`[[projects]]` in `profile.toml`) |
 | FBH area | Which of the four program areas matched |
 | Geography | India named, International (check India), or Unclear |
 | Who can apply | NGOs eligible, Anyone, Check listing; "partner may be needed" when a consortium is mentioned |
@@ -46,7 +47,7 @@ Remember that grants from outside India need FCRA registration to receive.
 
 | Source | How | Status |
 | --- | --- | --- |
-| [fundsforNGOs](https://www2.fundsforngos.org/) | Automatic: its RSS feed (newest 25 posts), once a day. Each call is kept until its deadline (or 120 days with no deadline), so coverage builds up day by day. | Live |
+| [fundsforNGOs](https://www2.fundsforngos.org/) | Automatic: its RSS feed (newest 25 posts), once a day. The labelled "Opportunity at a Glance" fields (funding organization, eligible countries, grant size, deadline) are read first. Roundup posts are split into their separate calls. Each call is kept until its deadline (or 120 days with no deadline). | Live |
 | [Terra Viva Grants](https://www.terravivagrants.org/) Funding News | Automatic: its RSS feed, once a day. Open calls for agriculture, environment and natural resources in developing countries. | Live |
 | [EU Funding & Tenders portal](https://ec.europa.eu/info/funding-tenders/opportunities/portal/) | Automatic: the portal's public search, one search per FBH topic word. Indian organisations can usually join EU calls only as consortium partners, so these are marked "verify". | Live |
 | [Grants.gov](https://www.grants.gov) daily extract | Automatic. Only grants open to nonprofits **and** stating that foreign organisations may apply (for example the US Fish & Wildlife Service's Asian elephant fund). | Live |
@@ -62,15 +63,22 @@ Every download first checks the site's robots.txt and skips anything the site as
 
 Some funders open once a year on pages with no feed. Keep them in `data/calendar.csv` (edit it on GitHub with the pencil icon), one row per program per round. Dates are YYYY-MM-DD. Rows that are open or rolling ("yes" in the rolling column) always appear in the results. The About tab lists rows that need dates or haven't been checked in 90 days.
 
-## The Google Sheet
+## The Google Sheet and the weekly review
 
-[`sheet/refresh.gs`](sheet/refresh.gs) adds these tabs to an existing Google Sheet and refreshes them daily: **Tracker – About**, **New this week**, **Open opportunities**, **Deadlines**, **Watched pages**, **Leads** and **Set aside**. It only writes to tabs whose names start with "Tracker", so your own tabs are never touched. Setup steps are at the top of the file.
+[`sheet/refresh.gs`](sheet/refresh.gs) adds "Tracker –" tabs to the pipeline Google Sheet and refreshes them daily. It never changes your own tabs, except when you choose **Funding tracker → Add selected call to Pipeline**. Setup steps are at the top of the file.
 
-For a quick read-only view instead, put this in cell A1 of any sheet:
+| Tab | What it is for |
+| --- | --- |
+| **To review** | Open calls (fit 3+) you haven't decided on yet, best first. Your weekly inbox. |
+| **Shortlist** | Calls marked Pursue, Contact funder or Clarify, soonest deadline first |
+| **All open** | Every open call with its decision, including fit 1–2 |
+| **Deadlines** | Everything not discarded that has a date, soonest first |
+| **Watched pages** | Funder pages that changed (open them) |
+| **Set aside** | What the rules removed, with the reason. Skim monthly. |
+| **Decisions** | Every decision you've made, kept permanently. The daily refresh never clears it. |
+| **About** | Counts, source health, and how the score works |
 
-```
-=IMPORTDATA("https://raw.githubusercontent.com/martinbuess/heartfulness-funding-tracker/main/data/opportunities.csv")
-```
+Pick a **Decision** in column A (Pursue, Contact funder, Clarify, Later, Discard) and a few words in **My notes**. It is saved straight away, and the call leaves To review at the next refresh.
 
 ## Changing what it looks for
 
