@@ -183,6 +183,27 @@ class GlanceAndRoundupTest(unittest.TestCase):
         self.assertEqual((row["funder"], row["close_date"]), ("Global EbA Fund", "2026-10-26"))
 
 
+class FeedPagesTest(unittest.TestCase):
+    def test_reads_older_pages_until_one_is_missing_or_repeats(self):
+        def item(n):
+            return (f"<item><title>Forest grant {n}</title><link>https://x/{n}/</link><guid>https://x/?p={n}</guid>"
+                    f"<description>Grants for NGOs restoring forests.</description></item>")
+        pages = {"https://x/feed/": item(1) + item(2), "https://x/feed/?paged=2": item(3),
+                 "https://x/feed/?paged=3": item(3)}  # page 3 repeats: stop
+
+        def fake(url, timeout=0):
+            if url not in pages:
+                raise OSError("404")
+            return f"<rss>{pages[url]}</rss>".encode()
+        feed = {"source": "fundsforngos", "url": "https://x/feed/", "pages": 4}
+        with mock.patch.object(feeds, "fetch", fake):
+            rows = feeds.collect(TODAY, feed)
+        self.assertEqual(sorted(r["source_id"] for r in rows), ["1", "2", "3"])
+        pages.pop("https://x/feed/?paged=2")
+        with mock.patch.object(feeds, "fetch", fake):
+            self.assertEqual(len(feeds.collect(TODAY, feed)), 2)  # a missing page is not a failure
+
+
 class EuFundingTest(unittest.TestCase):
     def setUp(self):
         with open(os.path.join(HERE, "sample_eufunding.json"), encoding="utf-8") as f:

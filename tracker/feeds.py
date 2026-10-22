@@ -244,6 +244,22 @@ def collect(today, feed, text=None):
     items = parse(text)
     if not items:
         raise RuntimeError(f"no items in the feed (got {text[:120]!r})")
+    # A feed shows only its newest posts (25 on fundsforNGOs). On busy days more than that are
+    # published, so older pages of the same feed are read too (WordPress: ?paged=2, 3, ...).
+    # A missing extra page only means fewer posts today; it never fails the source.
+    seen = {item["id"] for item in items}
+    for page in range(2, feed.get("pages", 1) + 1):
+        joiner = "&" if "?" in feed["url"] else "?"
+        try:
+            more = parse(fetch(f"{feed['url']}{joiner}paged={page}", timeout=120).decode("utf-8", "replace"))
+        except Exception as exc:
+            print(f"{feed['source']}: page {page} not read ({exc})")
+            break
+        more = [item for item in more if item["id"] not in seen]
+        if not more:
+            break
+        seen.update(item["id"] for item in more)
+        items += more
     skip = [w.lower() for w in feed.get("skip_title_words", [])]
     separator = feed.get("title_separator", "")
     rows = []

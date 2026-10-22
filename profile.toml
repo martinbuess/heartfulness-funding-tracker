@@ -431,7 +431,8 @@ keywords = ["endangered species", "threatened species", "endangered tree", "thre
 source = "fundsforngos"
 name = "fundsforNGOs"
 url = "https://www2.fundsforngos.org/feed/"
-about = "Grant calls for NGOs worldwide (its newest 25 posts each day)"
+about = "Grant calls for NGOs worldwide (its newest 100 posts each day)"
+pages = 4          # 25 posts per page; busy days have more than 25 new posts
 keep_days = 120
 
 [[aggregators]]
