@@ -59,7 +59,24 @@ const VIEWS = [TABS.review, TABS.shortlist, TABS.all];
 
 /** Full refresh: new results from GitHub, then every Tracker tab. Runs daily and from the menu. */
 function refreshNow() {
-  render(SpreadsheetApp.getActiveSpreadsheet(), true);
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  try {
+    render(ss, true);
+  } catch (err) {
+    reportFailure(ss, err);
+    throw err;  // also shows in Apps Script > Executions, and Google emails the owner
+  }
+}
+
+/** Writes a failed refresh on the Dashboard's status line, so it can't go unnoticed. */
+function reportFailure(ss, err) {
+  const sheet = ss.getSheetByName(TABS.dashboard);
+  if (!sheet) return;
+  const when = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm');
+  sheet.getRange(2, 1, 1, DASH_WIDTH).breakApart().merge()
+    .setValue('⚠ The sheet refresh on ' + when + ' failed: ' + String(err && err.message || err).slice(0, 300) +
+              '  Try Funding tracker > Refresh now; if it fails again, send this message to Claude.')
+    .setFontColor('#990000').setFontWeight('bold').setFontStyle('normal');
 }
 
 /**
@@ -411,7 +428,8 @@ function writeDashboard(ss, d) {
   const status = failed.length ? '⚠ ' + failed.map(r => r[1]).join(', ') + ' could not be read; their listings may be out of date.'
                                : '✓ All ' + rowsIn('source').length + ' sources checked successfully.';
   sheet.getRange(row, 1, 1, DASH_WIDTH).merge()
-    .setValue('Updated ' + (one('run')[6] || '') + '   ' + status + '   Your decisions are kept between refreshes.')
+    .setValue('Results from ' + (one('run')[6] || '') + ' · sheet refreshed ' +
+              Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm') + '   ' + status)
     .setFontColor(failed.length ? '#990000' : '#38761d').setFontStyle('italic');
   row += 2;
 
@@ -553,6 +571,15 @@ function writeDashboard(ss, d) {
 }
 
 function onOpen() {
+  // Warn when the dashboard hasn't been refreshed for more than a day (the daily refresh isn't running).
+  const dash = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(TABS.dashboard);
+  const line = dash ? String(dash.getRange(2, 1).getValue()) : '';
+  const found = line.match(/sheet refreshed (\d{4}-\d{2}-\d{2})/);
+  const yesterday = Utilities.formatDate(new Date(Date.now() - 36 * 3600000), 'Etc/UTC', 'yyyy-MM-dd');
+  if (dash && (!found || found[1] < yesterday)) {
+    SpreadsheetApp.getActiveSpreadsheet().toast('The daily refresh has not run recently. Choose Funding tracker > ' +
+      'Refresh now, then run setUp in Extensions > Apps Script to restart the daily refresh.', 'Funding tracker', 20);
+  }
   SpreadsheetApp.getUi().createMenu('Funding tracker')
     .addItem('Refresh now (new results + all tabs)', 'refreshNow')
     .addItem('Update shortlist & dashboard', 'updateShortlistAndDashboard')
