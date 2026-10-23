@@ -1,29 +1,29 @@
 section,name,level,open,matches,set_aside,detail
-run,Last refresh,,,,,2026-10-22
-total,All sources,,2213,163,253,5 sources
+run,Last refresh,,,,,2026-10-23
+total,All sources,,2280,162,265,5 sources
 source,EU Funding & Tenders,Multilateral,169,94,16,Open and upcoming EU calls on FBH topics (India usually only as a consortium partner)
-source,Grants.gov,US federal,1420,3,90,US federal grants; only those open to foreign or international applicants are kept
+source,Grants.gov,US federal,1415,3,92,US federal grants; only those open to foreign or international applicants are kept
 source,Calendar (hand-kept),Programs,6,6,0,"Yearly programs with no feed, kept by hand in data/calendar.csv"
-source,fundsforNGOs,Aggregator,599,54,141,Grant calls for NGOs worldwide (its newest 100 posts each day)
+source,fundsforNGOs,Aggregator,671,53,151,Grant calls for NGOs worldwide (its newest 100 posts each day)
 source,Terra Viva Grants,Aggregator,19,6,6,"Funding News: open calls for agriculture, environment and natural resources in developing countries"
 score,Fit 5,,,4,,
 score,Fit 4,,,2,,
 score,Fit 3,,,10,,
-score,Fit 2,,,88,,
+score,Fit 2,,,87,,
 score,Fit 1,,,59,,
 area,Ecological restoration & biodiversity,,,87,,
-area,General environment / climate,,,50,,
+area,General environment / climate,,,49,,
 area,Water & watershed restoration,,,29,,
 area,Regenerative agriculture & rural livelihoods,,,28,,
 area,Carbon & climate solutions,,,8,,
-set_aside,geography,,,,204,
-set_aside,for individuals or events,,,,29,
+set_aside,geography,,,,209,
+set_aside,for individuals or events,,,,34,
 set_aside,not open to nonprofits (Grants.gov applicant types),,,,10,
 set_aside,too small,,,,6,
-set_aside,for companies or start-ups,,,,3,
+set_aside,for companies or start-ups,,,,5,
 set_aside,procurement,,,,1,
-new,New in the last 7 days,,,163,,
-archived,Closed or expired today,,,0,,moved to data/archive/
+new,New in the last 7 days,,,8,,
+archived,Closed or expired today,,,2,,moved to data/archive/
 calendar_check,Climate Transformation Fund — Nature & Decarbonization,,,,,Round closed; add next round's dates
 calendar_check,Women Entrepreneurs Award,,,,,Round closed; add next round's dates
 calendar_check,Species Conservation Grants,,,,,Round closed; add next round's dates
