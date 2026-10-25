@@ -1,10 +1,10 @@
 section,name,level,open,matches,set_aside,detail
-run,Last refresh,,,,,2026-10-24
-total,All sources,,2271,161,260,5 sources
+run,Last refresh,,,,,2026-10-25
+total,All sources,,2268,161,259,5 sources
 source,EU Funding & Tenders,Multilateral,169,94,16,Open and upcoming EU calls on FBH topics (India usually only as a consortium partner)
-source,Grants.gov,US federal,1415,3,92,US federal grants; only those open to foreign or international applicants are kept
+source,Grants.gov,US federal,1414,3,91,US federal grants; only those open to foreign or international applicants are kept
 source,Calendar (hand-kept),Programs,6,6,0,"Yearly programs with no feed, kept by hand in data/calendar.csv"
-source,fundsforNGOs,Aggregator,662,52,146,Grant calls for NGOs worldwide (its newest 100 posts each day)
+source,fundsforNGOs,Aggregator,660,52,146,Grant calls for NGOs worldwide (its newest 100 posts each day)
 source,Terra Viva Grants,Aggregator,19,6,6,"Funding News: open calls for agriculture, environment and natural resources in developing countries"
 score,Fit 5,,,4,,
 score,Fit 4,,,2,,
@@ -16,14 +16,14 @@ area,General environment / climate,,,48,,
 area,Water & watershed restoration,,,29,,
 area,Regenerative agriculture & rural livelihoods,,,28,,
 area,Carbon & climate solutions,,,8,,
-set_aside,geography,,,,205,
+set_aside,geography,,,,204,
 set_aside,for individuals or events,,,,33,
 set_aside,not open to nonprofits (Grants.gov applicant types),,,,10,
 set_aside,too small,,,,6,
 set_aside,for companies or start-ups,,,,5,
 set_aside,procurement,,,,1,
 new,New in the last 7 days,,,7,,
-archived,Closed or expired today,,,6,,moved to data/archive/
+archived,Closed or expired today,,,1,,moved to data/archive/
 calendar_check,Climate Transformation Fund — Nature & Decarbonization,,,,,Round closed; add next round's dates
 calendar_check,Women Entrepreneurs Award,,,,,Round closed; add next round's dates
 calendar_check,Species Conservation Grants,,,,,Round closed; add next round's dates
@@ -37,4 +37,4 @@ calendar_check,Innovation funding calls,,,,,Round closed; add next round's dates
 calendar_check,Threatened-tree conservation calls,,,,,Round closed; add next round's dates
 calendar_check,HCLTech Grant (Water and Biodiversity categories),,,,,Add this round's dates
 leads,New leads today,,,0,,0 leads in the last year
-watch,Watched pages changed,,11,3,0,Tracker – Watched pages tab
+watch,Watched pages changed,,11,2,0,Tracker – Watched pages tab
