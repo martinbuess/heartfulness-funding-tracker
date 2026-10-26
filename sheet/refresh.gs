@@ -16,8 +16,9 @@
  *   - "Tracker – To review" lists open calls you haven't decided on yet (fit 3 and up), best first.
  *   - Pick a Decision in column A (Pursue, Contact funder, Clarify, Later, Discard) and add a few
  *     words in "My notes" (for Discard, say why: "coastal focus", "not India"...).
- *   - Every decision is saved straight away in "Tracker – Decisions", which the daily refresh
- *     never clears. The Shortlist, Deadlines and Dashboard update a few seconds later. Decided
+ *   - Every decision is saved straight away in "Tracker – Decisions" (this works even before setUp
+ *     has been run), which the daily refresh never clears. A refresh also first saves any decision
+ *     still showing in the review tabs, so nothing you typed is lost. The Shortlist, Deadlines and Dashboard update a few seconds later. Decided
  *     calls stay (shaded) in To review until the next full refresh, so rows don't jump while
  *     you work; choose Funding tracker > Refresh now to clear them out at once.
  *
@@ -94,6 +95,7 @@ function render(ss, full) {
   const header = all[0];
   const rows = all.slice(1);
   const col = name => header.indexOf(name);
+  if (full) rescueUnsaved(ss);
   const decisions = readDecisions(ss);
   if (full) markStillOpen(ss, decisions, new Set(rows.map(r => r[col('ID')])));
 
@@ -177,6 +179,36 @@ function saveDecision(ss, rec) {
   }
 }
 
+/**
+ * Safety net: before the review tabs are redrawn, any decision or note visible in them that is
+ * missing from the Decisions tab is saved there, so a refresh can never wipe it. A decision you
+ * changed in the Decisions tab itself is not overwritten.
+ */
+function rescueUnsaved(ss) {
+  const saved = readDecisions(ss);
+  VIEWS.forEach(name => {
+    const sheet = ss.getSheetByName(name);
+    if (!sheet || sheet.getLastRow() < 2) return;
+    const width = sheet.getLastColumn();
+    const values = sheet.getRange(1, 1, sheet.getLastRow(), width).getValues();
+    const header = values[0];
+    const at = h => header.indexOf(h);
+    if (at('ID') < 0 || header[0] !== 'Decision') return;
+    values.slice(1).forEach(r => {
+      const id = String(r[at('ID')] || '');
+      const decision = String(r[0] || ''), notes = String(r[1] || '');
+      if (!id || (!decision && !notes)) return;
+      const old = saved[id];
+      if (old && (old.decision || !decision) && (old.notes || !notes)) return;
+      const rec = { id: id, decision: (old && old.decision) || decision, notes: (old && old.notes) || notes,
+                    funder: r[at('Funder')], title: r[at('Grant / program')], deadline: r[at('Deadline')],
+                    link: r[at('Link')] };
+      saveDecision(ss, rec);
+      saved[id] = { decision: rec.decision, notes: rec.notes };
+    });
+  });
+}
+
 function markStillOpen(ss, decisions, openIds) {
   const sheet = storeSheet(ss);
   const last = sheet.getLastRow();
@@ -191,8 +223,17 @@ function dropdown() {
 }
 
 /**
- * Runs on every edit (set up by setUp). Saves a decision as soon as you pick it in a Tracker view,
- * shades the row, then updates the Shortlist, Deadlines and Dashboard.
+ * Saves a decision as soon as you pick it. This is a "simple trigger": Google runs it on every
+ * edit with no setup at all, so decisions are saved even if setUp was never run.
+ */
+function onEdit(e) {
+  saveEdit(e);
+}
+
+/**
+ * Runs on every edit once setUp has been run. Saves the decision too (harmless if onEdit already
+ * did), then updates the Shortlist, Deadlines and Dashboard, which needs permission to download
+ * from GitHub and so can't be done by onEdit alone.
  */
 function handleEdit(e) {
   if (saveEdit(e)) {
