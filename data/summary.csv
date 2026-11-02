@@ -1,20 +1,20 @@
 section,name,level,open,matches,set_aside,detail
 run,Last refresh,,,,,2026-11-02
-total,All sources,,2646,176,318,5 sources
-source,EU Funding & Tenders,Multilateral,169,95,16,Open and upcoming EU calls on FBH topics (India usually only as a consortium partner)
+total,All sources,,2646,167,318,5 sources
+source,EU Funding & Tenders,Multilateral,169,92,16,Open and upcoming EU calls on FBH topics (India usually only as a consortium partner)
 source,Grants.gov,US federal,1410,3,100,US federal grants; only those open to foreign or international applicants are kept
-source,Calendar (hand-kept),Programs,4,4,0,"Yearly programs with no feed, kept by hand in data/calendar.csv"
-source,fundsforNGOs,Aggregator,1033,61,189,Grant calls for NGOs worldwide (its newest 100 posts each day)
-source,Terra Viva Grants,Aggregator,30,13,13,"Funding News: open calls for agriculture, environment and natural resources in developing countries"
-score,Fit 5,,,5,,
+source,Calendar (hand-kept),Programs,4,2,0,"Yearly programs with no feed, kept by hand in data/calendar.csv"
+source,fundsforNGOs,Aggregator,1033,58,189,Grant calls for NGOs worldwide (its newest 100 posts each day)
+source,Terra Viva Grants,Aggregator,30,12,13,"Funding News: open calls for agriculture, environment and natural resources in developing countries"
+score,Fit 5,,,4,,
 score,Fit 4,,,2,,
-score,Fit 3,,,14,,
-score,Fit 2,,,93,,
-score,Fit 1,,,62,,
-area,Ecological restoration & biodiversity,,,94,,
-area,General environment / climate,,,54,,
-area,Water & watershed restoration,,,35,,
-area,Regenerative agriculture & rural livelihoods,,,29,,
+score,Fit 3,,,13,,
+score,Fit 2,,,89,,
+score,Fit 1,,,59,,
+area,Ecological restoration & biodiversity,,,89,,
+area,General environment / climate,,,53,,
+area,Water & watershed restoration,,,31,,
+area,Regenerative agriculture & rural livelihoods,,,28,,
 area,Carbon & climate solutions,,,8,,
 set_aside,geography,,,,259,
 set_aside,for individuals or events,,,,41,
@@ -22,8 +22,8 @@ set_aside,not open to nonprofits (Grants.gov applicant types),,,,7,
 set_aside,too small,,,,6,
 set_aside,for companies or start-ups,,,,4,
 set_aside,procurement,,,,1,
-new,New in the last 7 days,,,27,,
-archived,Closed or expired today,,,2,,moved to data/archive/
+new,New in the last 7 days,,,23,,
+archived,Closed or expired today,,,0,,moved to data/archive/
 calendar_check,Climate Transformation Fund — Nature & Decarbonization,,,,,Round closed; add next round's dates
 calendar_check,Women Entrepreneurs Award,,,,,Round closed; add next round's dates
 calendar_check,Species Conservation Grants,,,,,Round closed; add next round's dates
