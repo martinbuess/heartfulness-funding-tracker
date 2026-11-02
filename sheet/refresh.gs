@@ -97,11 +97,15 @@ function render(ss, full) {
   const col = name => header.indexOf(name);
   if (full) rescueUnsaved(ss);
   const decisions = readDecisions(ss);
-  if (full) markStillOpen(ss, decisions, new Set(rows.map(r => r[col('ID')])));
+  if (full) markStillOpen(ss, decisions, new Set([].concat(...rows.map(r => [r[col('ID')]].concat(
+    col('Other IDs') >= 0 ? String(r[col('Other IDs')] || '').split('; ') : [])))));
 
   const viewHeader = ['Decision', 'My notes'].concat(header);
+  // A call listed by several sources is one row; a decision made on any of its copies counts.
   const withDecision = rows.map(r => {
-    const d = decisions[r[col('ID')]] || {};
+    const ids = [r[col('ID')]].concat(col('Other IDs') >= 0 ? String(r[col('Other IDs')] || '').split('; ') : []);
+    const found = ids.filter(id => id && decisions[id] && (decisions[id].decision || decisions[id].notes));
+    const d = found.length ? decisions[found[0]] : {};
     return [d.decision || '', d.notes || ''].concat(r);
   });
   const score = r => Number(r[2 + col('Fit (1-5)')] || 0);
@@ -380,7 +384,7 @@ function writeTable(ss, name, rows) {
   const header = rows[0];
   const widths = { 'Grant / program': 340, 'Funder': 180, 'Why this score': 420, 'Summary': 420, 'title': 340,
                    'Eligibility: confirmed vs. to verify': 320, 'Best-fit FBH projects': 240, 'Link': 220,
-                   'Geography': 220, 'summary': 420 };
+                   'Geography': 220, 'summary': 420, 'Also listed as': 300 };
   header.forEach((h, i) => { if (widths[h]) sheet.setColumnWidth(i + 1, widths[h]); });
   const score = header.indexOf('Fit (1-5)');
   if (score >= 0 && grid.length > 1) {

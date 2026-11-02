@@ -10,7 +10,7 @@ import csv
 import datetime
 import os
 
-from tracker import eufunding, feeds, grantsgov, leads, plain, pool, profile, programs, watch
+from tracker import dedupe, eufunding, feeds, grantsgov, leads, plain, pool, profile, programs, watch
 
 POOL_PATH = "data/listings.csv"
 MATCHES_PATH = "data/matches.csv"
@@ -43,7 +43,8 @@ OPPORTUNITY_COLUMNS = [
     ("geography", "Geography"), ("who_can_apply", "Who can apply"),
     ("eligibility_check", "Eligibility: confirmed vs. to verify"), ("fit_reason", "Why this score"), ("link", "Link"),
     ("in_pipeline", "In pipeline"), ("kind", "Kind"), ("source_label", "Source"), ("last_seen", "Last verified"),
-    ("first_seen", "First seen"), ("short_summary", "Summary"), ("uid", "ID"),
+    ("first_seen", "First seen"), ("short_summary", "Summary"), ("also_listed", "Also listed as"), ("uid", "ID"),
+    ("alias_ids", "Other IDs"),
 ]
 
 
@@ -117,6 +118,11 @@ def main():
     to_archive = profile.on_topic(prof, closed)
     archive_path = ARCHIVE_PATH.format(year=today.year)
     archived = pool.archive(archive_path, to_archive, today)
+    # One row per call: copies of the same call from different sources are merged.
+    recent = pool.load(ARCHIVE_PATH.format(year=today.year - 1)) + pool.load(archive_path)
+    before = len(matches)
+    matches = dedupe.merge(matches, recent, today)
+    print(f"merged {before - len(matches)} duplicate listings of the same calls")
     print(f"archive: {len(to_archive)} relevant listings closed or expired today, {archived} in {archive_path}")
     pool.save(MATCHES_PATH, matches)
     save_opportunities(OPPORTUNITIES_PATH, matches, today, failed)

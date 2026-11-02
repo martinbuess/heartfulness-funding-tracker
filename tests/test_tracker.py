@@ -7,7 +7,7 @@ import unittest
 import urllib.error
 from unittest import mock
 
-from tracker import eufunding, feeds, fit, grantsgov, leads, plain, pool, profile, programs, run, text, watch
+from tracker import dedupe, eufunding, feeds, fit, grantsgov, leads, plain, pool, profile, programs, run, text, watch
 
 HERE = os.path.dirname(__file__)
 SAMPLE = os.path.join(HERE, "sample_extract.xml")
@@ -202,6 +202,63 @@ class FeedPagesTest(unittest.TestCase):
         pages.pop("https://x/feed/?paged=2")
         with mock.patch.object(feeds, "fetch", fake):
             self.assertEqual(len(feeds.collect(TODAY, feed)), 2)  # a missing page is not a failure
+
+
+class DedupeTest(unittest.TestCase):
+    """Cases from the 2026-11-02 sheet: the same call posted by several sources."""
+
+    def row(self, source, sid, title, funder="", close="", fit="3", first="2026-10-15"):
+        return {"source": source, "source_id": sid, "title": title, "funder": funder, "close_date": close,
+                "deadline": close or "Not set", "fit_score": fit, "first_seen": first, "link": f"https://{source}/{sid}",
+                "details": "", "amount": ""}
+
+    def test_same_call_from_different_sources(self):
+        S = dedupe.same_call
+        eba_ffn = self.row("fundsforngos", "499228", "Global EbA Fund Medium-Size Grants", "Global EbA Fund", "2026-11-16")
+        eba_tv = self.row("terraviva", "112350", "Global EbA Fund — Medium-Size Grants", "Global EbA Fund")
+        eba_small = self.row("terraviva", "107036", "Global EbA Fund — Small Grants for Scaling Ecosystem-based "
+                             "Adaptation", "Global EbA Fund")
+        eba_8th = self.row("fundsforngos", "497008", "8th Call for Proposals for Small-Size Grants", "Global EbA Fund",
+                           "2026-10-26")
+        self.assertTrue(S(eba_ffn, eba_tv))
+        self.assertTrue(S(eba_small, eba_8th))
+        self.assertFalse(S(eba_ffn, eba_small))  # medium vs small grants are different calls
+        iki_cal = self.row("calendar", "iki-medium-grants-2026", "IKI Medium Grants",
+                           "Germany’s International Climate Initiative", "2027-01-12")
+        iki_tv = self.row("terraviva", "23874", "German Government — International Climate Initiative Medium Grants",
+                          "German Government")
+        self.assertTrue(S(iki_cal, iki_tv))
+        kncf_cal = self.row("calendar", "x", "Nature Conservation Grants", "Keidanren Nature Conservation Fund",
+                            "2026-12-01")
+        kncf_ffn = self.row("fundsforngos", "497917", "Apply for Keidanren Nature Conservation Fund Grant Program",
+                            "Keidanren Nature Conservation Fund (KNCF)", "2026-12-01")
+        self.assertTrue(S(kncf_cal, kncf_ffn))
+        self.assertFalse(S(kncf_cal, dict(kncf_ffn, close_date="2027-12-01")))  # next year's round
+
+    def test_different_calls_stay_apart(self):
+        S = dedupe.same_call
+        self.assertFalse(S(self.row("fundsforngos", "1", "Call for Nominations: Community-Led Climate Action Award (India)"),
+                           self.row("fundsforngos", "2", "Nominations Open for Communicators for Climate Action Award")))
+        eu1 = self.row("eu-funding", "BIODIV-03", "Technical innovation to protect ecosystems and to scale up their "
+                       "restoration", "European Commission", "2027-09-22")
+        eu2 = self.row("eu-funding", "CLIMATE-03", "Carbon farming innovation and scale-up", "European Commission",
+                       "2027-09-23")
+        self.assertFalse(S(eu1, eu2))
+
+    def test_merge_keeps_best_copy_earliest_date_and_all_ids(self):
+        ffn = self.row("fundsforngos", "499228", "Global EbA Fund Medium-Size Grants", "Global EbA Fund", "2026-11-16",
+                       fit="5")
+        tv = self.row("terraviva", "112350", "Global EbA Fund — Medium-Size Grants", "Global EbA Fund", fit="5",
+                      first="2026-11-02")
+        old = dict(self.row("fundsforngos", "400000", "Global EbA Fund Medium-Size Grants", "Global EbA Fund"),
+                   closed_on="2026-09-01", first_seen="2026-08-01")
+        merged = dedupe.merge([tv, ffn], [old], datetime.date(2026, 11, 2))
+        self.assertEqual(len(merged), 1)
+        row = merged[0]
+        self.assertEqual(row["source_id"], "499228")  # has the deadline
+        self.assertEqual(row["alias_ids"], "terraviva:112350; fundsforngos:400000")
+        self.assertEqual(row["first_seen"], "2026-08-01")  # not NEW again
+        self.assertIn("Terra Viva Grants: https://terraviva/112350", row["also_listed"])
 
 
 class EuFundingTest(unittest.TestCase):
@@ -479,7 +536,7 @@ class RunTest(unittest.TestCase):
             with open(path, encoding="utf-8") as f:
                 lines = f.read().splitlines()
         self.assertTrue(lines[0].startswith("Flag,Fit (1-5),Funder,Grant / program,Deadline"))
-        self.assertTrue(lines[0].endswith(",ID"))
+        self.assertTrue(lines[0].endswith(",ID,Other IDs"))
         self.assertEqual(len(lines), len(rows) + 1)
 
 

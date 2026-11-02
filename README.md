@@ -57,6 +57,8 @@ Remember that grants from outside India need FCRA registration to receive.
 | UN Partner Portal | Calls are visible only after logging in | Manual |
 | Devex Funding, DevelopmentAid, Candid, Instrumentl | Paid or behind a login | Not used |
 
+The same call is often posted by several sources (fundsforNGOs, Terra Viva Grants, the calendar). Such copies are merged into one row (see [`tracker/dedupe.py`](tracker/dedupe.py)); the other copies are listed under **Also listed as**, and a decision made on any copy counts for the merged row.
+
 Every download first checks the site's robots.txt and skips anything the site asks automated readers not to fetch. If a source fails, the others still update, that source's previous listings are kept and flagged "Source down today", and the About tab says so. After 3 failed days in a row the run shows as failed in the Actions tab and GitHub emails you. `data/failures.csv` keeps the count.
 
 ## Calendar of yearly programs
