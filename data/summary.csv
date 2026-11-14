@@ -1,10 +1,10 @@
 section,name,level,open,matches,set_aside,detail
-run,Last refresh,,,,,2026-11-13
-total,All sources,,3051,181,363,5 sources
+run,Last refresh,,,,,2026-11-14
+total,All sources,,3021,181,361,5 sources
 source,EU Funding & Tenders,Multilateral,167,92,16,Open and upcoming EU calls on FBH topics (India usually only as a consortium partner)
-source,Grants.gov,US federal,1399,4,116,US federal grants; only those open to foreign or international applicants are kept
+source,Grants.gov,US federal,1384,4,116,US federal grants; only those open to foreign or international applicants are kept
 source,Calendar (hand-kept),Programs,4,2,0,"Yearly programs with no feed, kept by hand in data/calendar.csv"
-source,fundsforNGOs,Aggregator,1448,71,219,Grant calls for NGOs worldwide (its newest 100 posts each day)
+source,fundsforNGOs,Aggregator,1433,71,217,FAILED today; showing yesterday's listings. Grant calls for NGOs worldwide (its newest 100 posts each day)
 source,Terra Viva Grants,Aggregator,33,12,12,"Funding News: open calls for agriculture, environment and natural resources in developing countries"
 score,Fit 5,,,4,,
 score,Fit 4,,,2,,
@@ -16,14 +16,14 @@ area,General environment / climate,,,63,,
 area,Regenerative agriculture & rural livelihoods,,,35,,
 area,Water & watershed restoration,,,27,,
 area,Carbon & climate solutions,,,9,,
-set_aside,geography,,,,298,
+set_aside,geography,,,,296,
 set_aside,for individuals or events,,,,44,
 set_aside,for companies or start-ups,,,,7,
 set_aside,not open to nonprofits (Grants.gov applicant types),,,,7,
 set_aside,too small,,,,6,
 set_aside,procurement,,,,1,
-new,New in the last 7 days,,,18,,
-archived,Closed or expired today,,,4,,moved to data/archive/
+new,New in the last 7 days,,,16,,
+archived,Closed or expired today,,,2,,moved to data/archive/
 calendar_check,Climate Transformation Fund — Nature & Decarbonization,,,,,Round closed; add next round's dates
 calendar_check,Women Entrepreneurs Award,,,,,Round closed; add next round's dates
 calendar_check,Species Conservation Grants,,,,,Round closed; add next round's dates
