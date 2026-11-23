@@ -1,28 +1,28 @@
 section,name,level,open,matches,set_aside,detail
-run,Last refresh,,,,,2026-11-22
-total,All sources,,3088,186,346,5 sources
+run,Last refresh,,,,,2026-11-23
+total,All sources,,3144,190,351,5 sources
 source,EU Funding & Tenders,Multilateral,168,91,17,Open and upcoming EU calls on FBH topics (India usually only as a consortium partner)
 source,Grants.gov,US federal,1332,4,103,US federal grants; only those open to foreign or international applicants are kept
 source,Calendar (hand-kept),Programs,4,2,0,"Yearly programs with no feed, kept by hand in data/calendar.csv"
-source,fundsforNGOs,Aggregator,1548,75,211,Grant calls for NGOs worldwide (its newest 100 posts each day)
+source,fundsforNGOs,Aggregator,1604,79,216,Grant calls for NGOs worldwide (its newest 100 posts each day)
 source,Terra Viva Grants,Aggregator,36,14,15,"Funding News: open calls for agriculture, environment and natural resources in developing countries"
 score,Fit 5,,,4,,
 score,Fit 4,,,1,,
 score,Fit 3,,,18,,
-score,Fit 2,,,91,,
-score,Fit 1,,,72,,
-area,Ecological restoration & biodiversity,,,87,,
-area,General environment / climate,,,68,,
-area,Regenerative agriculture & rural livelihoods,,,35,,
+score,Fit 2,,,93,,
+score,Fit 1,,,74,,
+area,Ecological restoration & biodiversity,,,89,,
+area,General environment / climate,,,69,,
+area,Regenerative agriculture & rural livelihoods,,,36,,
 area,Water & watershed restoration,,,27,,
 area,Carbon & climate solutions,,,9,,
-set_aside,geography,,,,280,
-set_aside,for individuals or events,,,,44,
+set_aside,geography,,,,282,
+set_aside,for individuals or events,,,,47,
 set_aside,too small,,,,8,
 set_aside,for companies or start-ups,,,,7,
 set_aside,not open to nonprofits (Grants.gov applicant types),,,,6,
 set_aside,procurement,,,,1,
-new,New in the last 7 days,,,12,,
+new,New in the last 7 days,,,16,,
 archived,Closed or expired today,,,0,,moved to data/archive/
 calendar_check,Climate Transformation Fund — Nature & Decarbonization,,,,,Round closed; add next round's dates
 calendar_check,Women Entrepreneurs Award,,,,,Round closed; add next round's dates
