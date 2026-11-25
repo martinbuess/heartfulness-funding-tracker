@@ -7,7 +7,7 @@ import unittest
 import urllib.error
 from unittest import mock
 
-from tracker import dedupe, eufunding, feeds, fit, grantsgov, leads, plain, pool, profile, programs, run, text, watch
+from tracker import dedupe, eufunding, feeds, screen, verify, fit, grantsgov, leads, plain, pool, profile, programs, run, text, watch
 
 HERE = os.path.dirname(__file__)
 SAMPLE = os.path.join(HERE, "sample_extract.xml")
@@ -144,14 +144,15 @@ class GlanceAndRoundupTest(unittest.TestCase):
         self.assertEqual(self.scored(coastal)[0]["fit_score"], "1")
 
     def test_unclear_place_caps_at_3(self):
-        row = dict(feeds.normalize(self.item("Forest restoration grants", "Grants of up to USD 200,000 for NGOs "
-                                             "restoring native forests."), "fundsforngos"), close_date="2027-01-01")
+        row = dict(feeds.normalize(self.item("Forest restoration grants", "The Fund invites proposals: grants of up to USD "
+                                             "200,000 for NGOs restoring native forests."), "fundsforngos"), close_date="2027-01-01")
         row, _ = self.scored(row)
         self.assertEqual(row["fit_score"], "3")
         self.assertIn("capped at 3", row["fit_reason"])
 
     def test_two_named_countries_without_india_are_set_aside(self):
-        row = dict(feeds.normalize(self.item("Wetland grants", "Supports NGOs restoring wetlands in Kenya and Uganda."),
+        row = dict(feeds.normalize(self.item("Wetland grants", "Call for proposals: supports NGOs restoring wetlands "
+                                   "in Kenya and Uganda."),
                                    "fundsforngos"), close_date="2027-01-01")
         self.assertTrue(self.scored(row)[1].startswith("geography: names Kenya, Uganda"))
 
@@ -202,6 +203,139 @@ class FeedPagesTest(unittest.TestCase):
         pages.pop("https://x/feed/?paged=2")
         with mock.patch.object(feeds, "fetch", fake):
             self.assertEqual(len(feeds.collect(TODAY, feed)), 2)  # a missing page is not a failure
+
+
+class ScreenTest(unittest.TestCase):
+    """Is a listing an actionable call? Cases from the tracker's data, 2026-11-25."""
+
+    TODAY = datetime.date(2026, 11, 25)
+    FFN = "https://www2.fundsforngos.org"
+
+    def status(self, title, text="", link="", source="fundsforngos", close="", **extra):
+        row = dict({"source": source, "title": title, "link": link or f"{self.FFN}/innovation/x/", "close_date": close},
+                   **extra)
+        return screen.classify(row, text=text, today=self.TODAY)[0]
+
+    # General fundraising information: never in the tracker.
+    def test_the_flagged_article_is_not_a_call(self):
+        title = "5 Grantmakers for Indian NGOs Working With Women Farmers and Producer Collectives"
+        text = ("5 Grantmakers Supporting Indian NGOs for Women Farmers and Producer Collectives Empowering women "
+                "farmers and strengthening producer collectives are critical for achieving inclusive and sustainable "
+                "agricultural development in India... [Read More]")
+        self.assertEqual(self.status(title, text, f"{self.FFN}/articles-searching-grants-and-donors/5-grantmakers/"),
+                         "Not a call")
+        # Even outside the article section, and even though it mentions India and women farmers.
+        self.assertEqual(self.status(title, text, f"{self.FFN}/cat/5-grantmakers/"), "Not a call")
+
+    def test_other_information_articles(self):
+        for title in ["Who Funds Drought Preparedness in Turkana and Marsabit Before an Emergency Is Declared?",
+                      "What Do Past Grants From Kenyan Corporate Foundations Reveal About the Projects They Fund",
+                      "8 Climate Adaptation Grants to Explore for Locally Led Pilots",
+                      "How to Use Community Rainfall Records as Evidence in a Drought Adaptation Proposal",
+                      "Adaptation or Mitigation? A Climate Grant Cheat Sheet With Project Examples",
+                      "Foundation Announces 2026 Grantees for Forest Restoration",
+                      "Winners Announced: Earth Care Awards 2026"]:
+            self.assertEqual(self.status(title, "Funding for forests and water."), "Not a call", title)
+
+    # Open calls.
+    def test_open_calls(self):
+        self.assertEqual(self.status("Call for Proposals: Biochar for Smallholder Soil Health in India",
+                                     "Deadline: 30-Nov-2026 The Foundation invites Indian NGOs to submit proposals."),
+                         "Open")
+        self.assertEqual(self.status("Global EbA Fund — Medium-Size Grants",
+                                     "The Global EbA Fund invites proposals that address systemic barriers to scaling "
+                                     "ecosystem-based adaptation.", source="terraviva",
+                                     link="https://www.terravivagrants.org/x/"), "Open")
+        self.assertEqual(self.status("Rainforest Trust Opens Conservation Grants for Protecting Endangered Species",
+                                     "Rainforest Trust offers funding for non-profit organizations."), "Open")
+        self.assertEqual(self.status("ACA Grants in Biodiversity (Canada)",
+                                     "Applications must be submitted by 1 December 2026, 4 p.m."), "Open")
+        self.assertEqual(self.status("Call for SEPLS Strategic Partner Grant – GEF SGP OP8 (Indonesia)",
+                                     "The GEF Small Grants Programme Indonesia offers funding."), "Open")
+        # A call with a deadline ahead but no grant amount is still actionable.
+        self.assertEqual(self.status("Apply for First FOREST Partnership Joint Call", "", close="2026-12-02"), "Open")
+
+    def test_open_call_from_a_roundup_post(self):
+        page = ('<h3><a href="https://www2.fundsforngos.org/science/whitley-award/">Call for Nominations: Whitley '
+                'Award for Wildlife Conservation</a></h3><p>Deadline : 30-December-2026</p><p>Supports leaders…</p>')
+        item = {"id": "9", "title": "New Funding Pathways for Wildlife", "posted": "2026-11-20",
+                "link": f"{self.FFN}/listing/new-funding-pathways/", "text": "", "html": page}
+        calls = feeds.roundup_calls(item, "fundsforngos")
+        self.assertEqual([(c["call_status"], c["close_date"]) for c in calls], [("Open", "2026-12-30")])
+
+    # Rolling programmes: only when the listing says so.
+    def test_rolling(self):
+        self.assertEqual(self.status("Nominations Open for Right Livelihood Award for Change-Makers",
+                                     "Submissions are open year-round, with a focus on projects that drive change."),
+                         "Rolling")
+        self.assertEqual(self.status("Forest Restoration Small Grants",
+                                     "Letters of inquiry are accepted on a rolling basis from NGOs in Asia."),
+                         "Rolling")
+
+    def test_no_deadline_is_not_rolling_and_not_open(self):
+        text = ("The Waterloo Foundation offers the Tropical Rainforests Grant Program aimed at protecting tropical "
+                "rainforests by supporting strategic and local initiatives.")
+        self.assertEqual(self.status("The Waterloo Foundation Tropical Rainforests Grant Program", text),
+                         "Unconfirmed")
+
+    def test_publication_date_is_not_an_opening_date(self):
+        # The post was published on 20 November; nothing says applications are open.
+        self.assertEqual(self.status("Rainforest Grants Program", "A foundation that supports rainforest NGOs.",
+                                     post_date="2026-11-20"), "Unconfirmed")
+
+    # Upcoming calls.
+    def test_upcoming(self):
+        self.assertEqual(self.status("Global Food System Challenge 2027",
+                                     "Applications will open on 1 January 2027 for food system solutions."),
+                         "Upcoming")
+        self.assertEqual(self.status("Lake Restoration Fund", "Coming soon: the 2027 round for NGOs."), "Upcoming")
+        self.assertEqual(self.status("Asian Elephant Fund", source="grants.gov", status="forecast"), "Upcoming")
+        self.assertEqual(self.status("Agroforestry topic", source="eu-funding", status="forecast",
+                                     close="2027-04-08"), "Upcoming")
+        self.assertEqual(self.status("Darwin Initiative", source="calendar", status="forecast",
+                                     post_date="2027-03-01"), "Upcoming")
+        # "Applications open for X" is open now, not upcoming.
+        self.assertEqual(self.status("Applications Open for Rainforest Trust Program", ""), "Open")
+
+    # Expired and closed calls.
+    def test_expired_and_closed(self):
+        self.assertEqual(self.status("Tyler Prize — Student Ambassador Program",
+                                     "Ambassadors receive training. Applications close 30 October 2026.",
+                                     source="terraviva", link="https://www.terravivagrants.org/tyler/"), "Closed")
+        self.assertEqual(self.status("Darwin Initiative Round 32", "Applications are now closed for this round."),
+                         "Closed")
+
+    def test_screening_sets_aside_with_a_reason(self):
+        rows = [{"source": "fundsforngos", "source_id": "a", "title": "5 Grantmakers for Indian NGOs Working With "
+                 "Women Farmers", "summary": "Women farmers, agroforestry and soil health in India.", "funder": "",
+                 "link": f"{self.FFN}/articles-searching-grants-and-donors/5-grantmakers/", "close_date": "",
+                 "eligibility_notes": "", "eligibility": "", "location": "", "listing_type": "Grant", "status": "posted",
+                 "award_ceiling": "", "total_funding": "", "funder_code": "", "topics": ""}]
+        dropped = []
+        self.assertEqual(profile.apply(PROFILE, plain.add(rows), dropped), [])
+        self.assertTrue(dropped[0][1].startswith("not a funding call: fundsforNGOs article section"))
+
+    # The funder's own page.
+    def test_funder_page_check(self):
+        row = {"official_link": "https://funder.example/call", "fit_score": "4", "call_status": "Open",
+               "status_evidence": "invites proposals"}
+        closed = verify.check([dict(row)], self.TODAY, get=lambda url: "<p>Applications are now closed.</p>")
+        self.assertEqual(closed, 1)
+        r = dict(row)
+        verify.check([r], self.TODAY, get=lambda url: "<p>Applications are now open. Apply now.</p>")
+        self.assertIn("confirmed on the funder's page", r["status_evidence"])
+        r = dict(row)
+        verify.check([r], self.TODAY, get=lambda url: (_ for _ in ()).throw(OSError("403")))
+        self.assertEqual(r["call_status"], "Open")
+        self.assertIn("could not be read", r["primary_check"])
+        # Checked at most once a week.
+        self.assertFalse(verify.due(dict(row, primary_check="2026-11-22: says open"), self.TODAY))
+
+    def test_funders_link_from_a_terra_viva_post(self):
+        html = ('<p>Grants up to US$500,000.</p><p><a href="https://www.terravivagrants.org/category/x/">More</a> '
+                '<a href="https://www.globalebafund.org/calls/medium">Link to announcement</a> '
+                '<a href="https://twitter.com/share">Share</a></p>')
+        self.assertEqual(feeds.official_link(html), "https://www.globalebafund.org/calls/medium")
 
 
 class DedupeTest(unittest.TestCase):
@@ -535,7 +669,7 @@ class RunTest(unittest.TestCase):
             run.save_opportunities(path, rows, datetime.date(2026, 10, 15), [])
             with open(path, encoding="utf-8") as f:
                 lines = f.read().splitlines()
-        self.assertTrue(lines[0].startswith("Flag,Fit (1-5),Funder,Grant / program,Deadline"))
+        self.assertTrue(lines[0].startswith("Flag,Fit (1-5),Call status,Funder,Grant / program,Deadline"))
         self.assertTrue(lines[0].endswith(",ID,Other IDs"))
         self.assertEqual(len(lines), len(rows) + 1)
 

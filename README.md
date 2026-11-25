@@ -25,6 +25,20 @@ Each call is also matched to FBH's projects (the **Best-fit FBH projects** colum
 | [`data/summary.csv`](data/summary.csv) | Today's counts and each source's status (feeds the sheet's About tab) |
 | [`profile.toml`](profile.toml) | **The settings**: keywords for each program area, places, who can apply, size limits, and the funders in our pipeline |
 
+## Screening: only actionable calls
+
+Before anything is scored, every listing is checked for evidence that it is a call FBH could act on ([`tracker/screen.py`](tracker/screen.py)). Only three kinds go into the tracker, shown in the **Call status** column with the words that prove it in **Evidence it is open**:
+
+| Call status | Meaning |
+| --- | --- |
+| Open | A specific call accepting applications now: a call for proposals, RFP, prize, challenge, EOI…, or an application deadline still ahead |
+| Upcoming | Announced, with an opening date ahead or "coming soon" (also Grants.gov forecasts and EU "forthcoming" topics) |
+| Rolling | The listing says applications or LOIs are accepted on a rolling or ongoing basis |
+
+Everything else is set aside with the reason (**Tracker – Set aside**, `data/filtered_out.csv`): **not a funding call** (articles listing grantmakers, donor profiles, advice, case studies, past grants, winners announced), **call closed** (it says applications are closed, or the deadline it states has passed), or **not confirmed as an open call** (nothing in it says applications are open, upcoming or rolling). A post's publication date is never treated as an opening date, and a missing deadline is never treated as "rolling". Nothing is invented: a missing funder, amount or deadline stays blank and is listed under "Verify".
+
+Where a listing links to the funder's own page (Terra Viva Grants posts do), calls scoring 3+ are checked against that page once a week ([`tracker/verify.py`](tracker/verify.py)); if the funder says applications are closed, the call is set aside. fundsforNGOs' feed carries only a short teaser of each post and its pages refuse automated readers, so its posts are screened on the title and teaser alone and always say "Verify: that it is open, and how to apply, on the funder's own site".
+
 ## How each opportunity is scored
 
 | Column | What it means |

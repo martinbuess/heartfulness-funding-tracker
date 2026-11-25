@@ -310,6 +310,17 @@ def assess(row, rules):
         verify.append("India eligibility (not stated)")
     if usd is None:
         verify.append("grant size")
+    # The call's status: what the screening found, and what is still to check.
+    status = row.get("call_status", "")
+    if row["source"] in ("fundsforngos", "terraviva"):
+        if "confirmed on the funder's page" in row.get("status_evidence", ""):
+            confirmed.append("open (funder's page)")
+        else:
+            verify.append("that it is open, and how to apply, on the funder's own site")
+    if status == "Upcoming":
+        verify.append("the opening date")
+    if not row.get("funder"):
+        verify.append("funder (not named in the listing)")
 
     area_label = "; ".join(anywhere) or ("General environment / climate" if general else "")
     text = f"{row['title']} {row['summary']} {row.get('eligibility_notes', '')}"

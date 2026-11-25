@@ -29,6 +29,10 @@ FIELDS = [
     "link",            # the original listing page
     "summary",         # first part of the description
     "details",         # "structured" when the source gave labelled fields; "from roundup: ..." for roundup items
+    "call_status",     # Open, Upcoming, Rolling (or Not a call, Closed, Unconfirmed: set aside); tracker/screen.py
+    "status_evidence", # the words in the listing that show its status
+    "official_link",   # the funder's own page, when the listing links to it
+    "primary_check",   # "2026-11-25: says open" after the funder's page was read (tracker/verify.py)
     # How well the listing fits FBH (filled in by tracker/fit.py for matches)
     "fbh_area",        # which FBH program area(s) it matches
     "fbh_topics",      # which FBH projects or topics fit (from [[projects]] in profile.toml)

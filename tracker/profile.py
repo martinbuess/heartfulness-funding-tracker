@@ -8,7 +8,7 @@ nothing is dropped silently except plainly off-topic listings.
 
 import tomllib
 
-from tracker import fit
+from tracker import fit, screen
 
 # Sources picked by a person: every listing counts, and no rule sets it aside.
 HAND_PICKED = ("calendar",)
@@ -79,6 +79,14 @@ def apply(profile, rows, dropped=None):
         if not f.on_topic(row):
             continue
         hand_picked = row["source"] in HAND_PICKED
+        # First: is it an actionable call (open, upcoming or rolling)? Aggregator posts were
+        # screened when read (with their full text); other sources are screened from their fields.
+        if not row.get("call_status") or row["source"] not in ("fundsforngos", "terraviva"):
+            row["call_status"], row["status_evidence"] = screen.classify(row)
+        if row["call_status"] not in screen.ACTIONABLE:
+            if dropped is not None:
+                dropped.append((row, screen.reason(row["call_status"], row["status_evidence"])))
+            continue
         reason = "" if hand_picked else f.set_aside(row)
         if not reason:
             reason = fit.assess(row, f.fit)

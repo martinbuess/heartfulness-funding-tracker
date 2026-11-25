@@ -24,6 +24,7 @@ import email.utils
 import html
 import re
 
+from tracker import screen
 from tracker.text import clean, dates, deadline_in, fetch
 
 # --- the "Opportunity at a Glance" block ---------------------------------------
@@ -165,6 +166,22 @@ def _kind(title):
     return "Prize or award" if any(w in lowered for w in ("award", "prize", "challenge", "competition")) else "Grant"
 
 
+_AGGREGATORS = ("fundsforngos.org", "terravivagrants.org", "facebook.com", "twitter.com", "x.com", "linkedin.com",
+                "instagram.com", "youtube.com", "whatsapp.com", "t.me", "pinterest.", "feedburner", "wp.me", "gravatar")
+
+
+def official_link(item_html):
+    """The funder's own page, when the post links to it: a link labelled as the announcement,
+    application or website first, else the first link that leaves the aggregator site."""
+    links = [(m.group(1), clean(html.unescape(m.group(2))).lower()) for m in _ANCHOR.finditer(item_html or "")]
+    outside = [(href, text) for href, text in links
+               if href.startswith("http") and not any(a in href for a in _AGGREGATORS)]
+    for href, text in outside:
+        if re.search(r"announcement|apply|application|website|guidelines|call|details|more information|official", text):
+            return href
+    return outside[0][0] if outside else ""
+
+
 def normalize(item, source, title_separator=""):
     title, body = item["title"], item["text"]
     fields = glance(body)
@@ -174,6 +191,9 @@ def normalize(item, source, title_separator=""):
     summary = re.sub(r"^\s*Deadline\s*:?\s*\S+\s*", "", body)
     # Keep the summary to the description before the glance block (the block's fields have their own columns).
     cut = re.search(r"Opportunity at a Glance", summary, re.IGNORECASE)
+    row_close = due.isoformat() if due else ""
+    status, evidence = screen.classify({"source": source, "title": title, "link": item["link"],
+                                        "close_date": row_close}, text=body)
     return {
         "source": source,
         "source_id": item["id"],
@@ -195,6 +215,9 @@ def normalize(item, source, title_separator=""):
         "link": item["link"],
         "summary": (summary[:cut.start()] if cut and cut.start() > 80 else summary)[:900],
         "details": "structured" if fields else "",
+        "call_status": status,
+        "status_evidence": evidence,
+        "official_link": official_link(item.get("html", "")),
     }
 
 
@@ -230,6 +253,9 @@ def roundup_calls(item, source):
             "amount_text": "", "eligibility": "", "eligibility_notes": _eligibility_sentences(blurb), "topics": "",
             "location": "", "link": href, "summary": blurb.strip()[:600],
             "details": f"from roundup: {item['title'][:80]}",
+            "call_status": "Open",
+            "status_evidence": f"listed in a roundup with deadline {due.isoformat()}",
+            "official_link": "",
         })
     return calls
 

@@ -137,7 +137,8 @@ def dates(text):
 
 def deadline_in(text):
     """The date written right after "deadline" (or "due", "closes", "apply by"); None if there isn't one."""
-    for m in re.finditer(r"\b(deadline|due|closing date|closes|close on|apply (?:by|before)|submit (?:by|before)|last date)\b",
+    for m in re.finditer(r"\b(deadline|due|closing date|closes|close on|applications? close|apply (?:by|before)|submit (?:by|before)"
+                         r"|last date|accepted until|submitted by|received by|no later than)\b",
                          text or "", re.IGNORECASE):
         found = dates(text[m.end():m.end() + 60])
         if found:

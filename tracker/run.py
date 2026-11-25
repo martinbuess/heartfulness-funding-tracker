@@ -10,7 +10,7 @@ import csv
 import datetime
 import os
 
-from tracker import dedupe, eufunding, feeds, grantsgov, leads, plain, pool, profile, programs, watch
+from tracker import dedupe, verify, eufunding, feeds, grantsgov, leads, plain, pool, profile, programs, watch
 
 POOL_PATH = "data/listings.csv"
 MATCHES_PATH = "data/matches.csv"
@@ -38,10 +38,12 @@ ABOUT = {
 
 # The columns of data/opportunities.csv, the file the Google Sheet shows, in order.
 OPPORTUNITY_COLUMNS = [
-    ("flag", "Flag"), ("fit_score", "Fit (1-5)"), ("funder", "Funder"), ("title", "Grant / program"),
+    ("flag", "Flag"), ("fit_score", "Fit (1-5)"), ("call_status", "Call status"), ("funder", "Funder"),
+    ("title", "Grant / program"),
     ("deadline", "Deadline"), ("amount", "Amount"), ("fbh_topics", "Best-fit FBH projects"), ("fbh_area", "FBH area"),
     ("geography", "Geography"), ("who_can_apply", "Who can apply"),
-    ("eligibility_check", "Eligibility: confirmed vs. to verify"), ("fit_reason", "Why this score"), ("link", "Link"),
+    ("eligibility_check", "Eligibility: confirmed vs. to verify"), ("fit_reason", "Why this score"),
+    ("status_evidence", "Evidence it is open"), ("link", "Link"), ("official_link", "Funder's page"),
     ("in_pipeline", "In pipeline"), ("kind", "Kind"), ("source_label", "Source"), ("last_seen", "Last verified"),
     ("first_seen", "First seen"), ("short_summary", "Summary"), ("also_listed", "Also listed as"), ("uid", "ID"),
     ("alias_ids", "Other IDs"),
@@ -112,9 +114,17 @@ def main():
           f"{sum(r['status'].startswith('CHANGED') for r in watch_rows)} changed, {len(watch_failed)} not read")
 
     plain.add(rows)
-    pool.save(POOL_PATH, rows)
     dropped = []
     matches = profile.apply(prof, rows, dropped)
+    # Check strong calls against the funder's own page, where the listing links to it; a call
+    # the funder says is closed is then set aside.
+    shut = verify.check(matches, today)
+    print(f"funder pages: {sum(1 for r in matches if (r.get('primary_check') or '').startswith(today.isoformat()))} "
+          f"checked, {shut} say the call is closed")
+    if shut:
+        dropped = []
+        matches = profile.apply(prof, rows, dropped)
+    pool.save(POOL_PATH, rows)
     to_archive = profile.on_topic(prof, closed)
     archive_path = ARCHIVE_PATH.format(year=today.year)
     archived = pool.archive(archive_path, to_archive, today)
