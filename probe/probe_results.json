@@ -1,0 +1,15 @@
+{
+ "robots": "ERROR HTTP Error 403: Forbidden",
+ "https://www2.fundsforngos.org/articles-searching-grants-and-donors/5-grantmakers-for-indian-ngos-working-with-women-farmers-and-producer-collectives/": {
+  "robots_allowed": true,
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "https://www2.fundsforngos.org/individuals/global-eba-fund-medium-size-grants-call-for-proposals/": {
+  "robots_allowed": true,
+  "error": "HTTP Error 403: Forbidden"
+ },
+ "https://www2.fundsforngos.org/innovation/open-call-for-wisser-and-family-innovation-challenge-3-0-india/": {
+  "robots_allowed": true,
+  "error": "HTTP Error 403: Forbidden"
+ }
+}
